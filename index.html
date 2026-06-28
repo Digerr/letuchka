@@ -625,6 +625,7 @@
       </div>
       <button class="battle-pause" onclick="pauseBattle()">⏸</button>
       <div class="threat-indicator" id="threatIndicator"></div>
+      <div id="comboDisplay" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:48px;font-weight:900;color:var(--gold);text-shadow:0 0 24px rgba(251,191,36,0.6);opacity:0;transition:opacity 0.3s ease;pointer-events:none;z-index:5;font-family:'SF Mono',monospace;"></div>
       <div class="battle-abilities">
         <button class="ab-btn emp ready" id="abEmp" onclick="useAbility('emp')"><span>⚡</span><div class="ab-cd" id="abEmpCd"></div><div class="ab-cd-text" id="abEmpText" style="display:none;"></div><div class="ab-label">EMP</div></button>
         <button class="ab-btn boost ready" id="abBoost" onclick="useAbility('boost')"><span>🔥</span><div class="ab-cd" id="abBoostCd"></div><div class="ab-cd-text" id="abBoostText" style="display:none;"></div><div class="ab-label">FORSAJ</div></button>
@@ -647,6 +648,7 @@
           <div class="gs-row"><span class="gs-label" data-i18n="gs_kills"></span><span class="gs-value cyan" id="gsKills">0</span></div>
           <div class="gs-row"><span class="gs-label" data-i18n="gs_time"></span><span class="gs-value" id="gsTime">0:00</span></div>
           <div class="gs-row"><span class="gs-label" data-i18n="gs_plasma_collected"></span><span class="gs-value gold" id="gsPlasmaCollected">0</span></div>
+          <div class="gs-row"><span class="gs-label">🔥 MAX COMBO</span><span class="gs-value" style="color:#FBBF24;" id="gsMaxCombo">0</span></div>
         </div>
       </div>
       <div class="go-actions">
@@ -1418,6 +1420,9 @@
       this.kills = 0; this.plasmaCollected = 0;
       this.revivedThisRun = false;
       this.ended = false;
+      this.combo = 0; this.comboTimer = 0; this.maxCombo = 0;
+      this.boss = null; this.nextBossSpawn = 180000; // 3 min
+      this.bossWarning = 0;
       this.startTime = performance.now(); this.elapsedTime = 0;
       this.nextDroneSpawn = 4000; // First drones after 4 sec (was 2)
       this.nextPlasmaSpawn = 300;
@@ -1503,6 +1508,95 @@
       else if (side === 2) { x = Math.random() * this.W; y = this.H + 30; }
       else { x = -30; y = Math.random() * this.H; }
       this.drones.push({ x, y, vx: 0, vy: 0, speed: 80, size: 18, hp: 5, maxHp: 5, phase: Math.random() * Math.PI * 2, golden: true });
+    }
+    spawnBoss() {
+      this.bossWarning = 2000;
+      SOUNDS.danger();
+      vibrate([200, 100, 200, 100, 400]);
+      setTimeout(() => {
+        if (!this.running) return;
+        this.boss = {
+          x: this.W / 2, y: -80,
+          vx: 0, vy: 30,
+          hp: 50, maxHp: 50,
+          phase: 0, shootTimer: 0,
+          size: 40, angle: Math.PI / 2,
+          entering: true
+        };
+        showToast(currentLang === 'ru' ? '🐋 БОСС НАБЛЮДАТЕЛЕЙ ПРИБЫВАЕТ!' : '🐋 WATCHER BOSS INCOMING!', 'danger');
+        SOUNDS.overclock();
+      }, 2000);
+    }
+    updateBoss(dt, eff) {
+      if (!this.boss) return;
+      const b = this.boss;
+      b.phase += dt * 0.002;
+      // Enter from top
+      if (b.entering) {
+        b.y += b.vy * (dt / 1000);
+        if (b.y >= 120) { b.entering = false; b.y = 120; }
+        return;
+      }
+      // Hover left-right
+      b.x = this.W / 2 + Math.sin(b.phase) * (this.W * 0.3);
+      // Shoot at player
+      b.shootTimer -= dt;
+      if (b.shootTimer <= 0) {
+        b.shootTimer = 800;
+        const angle = Math.atan2(this.ship.y - b.y, this.ship.x - b.x);
+        // 3-way spread shot
+        [-0.3, 0, 0.3].forEach(off => {
+          this.bullets.push({ x: b.x, y: b.y, vx: Math.cos(angle + off) * 400, vy: Math.sin(angle + off) * 400, life: 3000, damage: -1, fromBoss: true });
+        });
+        SOUNDS.shoot();
+      }
+      // Bullet-boss collision (player bullets)
+      this.bullets.forEach(bul => {
+        if (bul.fromBoss || bul.life <= 0) return;
+        const dx = bul.x - b.x, dy = bul.y - b.y;
+        if (Math.sqrt(dx*dx + dy*dy) < b.size + 4) {
+          const dmgMult = eff.dmgMult || 1;
+          b.hp -= bul.damage * dmgMult;
+          bul.life = 0;
+          this.spawnExplosion(bul.x, bul.y, '#F43F5E');
+          vibrate(10);
+        }
+      });
+      // Boss death
+      if (b.hp <= 0) {
+        this.kills += 10;
+        this.combo += 10; this.comboTimer = 3000;
+        if (this.combo > this.maxCombo) this.maxCombo = this.combo;
+        // Mega explosion
+        for (let i = 0; i < 40; i++) {
+          const a = (i / 40) * Math.PI * 2;
+          this.particles.push({ x: b.x, y: b.y, vx: Math.cos(a) * (2 + Math.random() * 4), vy: Math.sin(a) * (2 + Math.random() * 4), life: 1.5, color: i % 2 ? '#FBBF24' : '#F43F5E', size: 5 });
+        }
+        // Rewards
+        this.plasmaCollected += 5000;
+        const s2 = getState();
+        s2.lootboxes = [...s2.lootboxes, { id: Date.now(), acquiredAt: Date.now() }, { id: Date.now()+1, acquiredAt: Date.now() }, { id: Date.now()+2, acquiredAt: Date.now() }];
+        saveState(s2);
+        SOUNDS.gameover(); // dramatic sound
+        vibrate([100, 50, 100, 50, 100, 50, 300]);
+        showToast(currentLang === 'ru' ? '🐋 БОСС ПОВЕРЖЕН! +5000 💎 + 3 контейнера!' : '🐋 BOSS DEFEATED! +5000 💎 + 3 containers!', 'gold');
+        this.boss = null;
+      }
+      // Boss collision with ship
+      const dx = this.ship.x - b.x, dy = this.ship.y - b.y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < this.ship.size + b.size) {
+        if (this.ship.shield) { this.ship.shield = false; }
+        else {
+          this.ship.hp--;
+          this.combo = 0;
+          SOUNDS.damage(); vibrate([80, 40, 80]);
+          if (this.ship.hp <= 0) this.endBattle();
+        }
+        // Push ship away
+        this.ship.vx = (dx / dist) * 500;
+        this.ship.vy = (dy / dist) * 500;
+      }
     }
     start() {
       // If setup is deferred, wait for it
@@ -1628,6 +1722,21 @@
       // Update bullets
       this.bullets = this.bullets.filter(b => {
         b.x += b.vx * (dt / 1000); b.y += b.vy * (dt / 1000); b.life -= dt;
+        // Boss bullet hits ship
+        if (b.fromBoss) {
+          const dx = b.x - this.ship.x, dy = b.y - this.ship.y;
+          if (Math.sqrt(dx*dx + dy*dy) < this.ship.size + 4) {
+            b.life = 0;
+            if (this.ship.shield) { this.ship.shield = false; this.spawnExplosion(this.ship.x, this.ship.y, '#22D3EE'); }
+            else {
+              this.ship.hp--;
+              this.combo = 0;
+              SOUNDS.damage(); vibrate([80, 40, 80]);
+              this.spawnExplosion(this.ship.x, this.ship.y, '#F43F5E');
+              if (this.ship.hp <= 0) this.endBattle();
+            }
+          }
+        }
         return b.life > 0 && b.x > -50 && b.x < this.W + 50 && b.y > -50 && b.y < this.H + 50;
       });
 
@@ -1649,10 +1758,11 @@
           if (this.ship.shield) { this.ship.shield = false; this.spawnExplosion(d.x, d.y, '#22D3EE'); }
           else {
             this.ship.hp--;
+            this.combo = 0; // COMBO RESET on damage
             const lostPlasma = Math.floor(this.plasmaCollected * 0.15);
             this.plasmaCollected -= lostPlasma;
             this.spawnExplosion(this.ship.x, this.ship.y, '#F43F5E');
-            SOUNDS.damage(); vibrate(80);
+            SOUNDS.damage(); vibrate([80, 40, 80]); // Haptic pattern: damage
             if (this.ship.hp <= 0) this.endBattle();
           }
           d.hp = 0;
@@ -1661,6 +1771,7 @@
 
       // Bullet-drone collisions
       this.bullets.forEach(b => {
+        if (b.fromBoss) return; // Boss bullets don't hit drones
         this.drones.forEach(d => {
           if (d.hp <= 0) return;
           const dx = b.x - d.x, dy = b.y - d.y;
@@ -1668,10 +1779,19 @@
             d.hp -= b.damage; b.life = 0;
             if (d.hp <= 0) {
               this.kills++;
-              this.spawnExplosion(d.x, d.y, d.golden ? '#FBBF24' : '#F43F5E');
-              SOUNDS.hit(); vibrate(20);
-              // Drop plasma
-              if (Math.random() < 0.4) this.plasma.push({ x: d.x, y: d.y, size: 5, phase: Math.random() * Math.PI * 2, value: 15 });
+              // COMBO: increment on kill, 3 sec window
+              this.combo++;
+              this.comboTimer = 3000;
+              if (this.combo > this.maxCombo) this.maxCombo = this.combo;
+              // Haptic: different patterns by combo tier
+              if (this.combo % 10 === 0) vibrate([30, 30, 30, 30, 60]);
+              else if (this.combo % 5 === 0) vibrate([20, 30, 40]);
+              else vibrate(15);
+              this.spawnExplosion(d.x, d.y, d.golden ? '#FBBF24' : (d.elite ? '#FB923C' : '#F43F5E'));
+              SOUNDS.hit();
+              // Drop plasma with combo bonus
+              const comboMult = 1 + Math.floor(this.combo / 5) * 0.2;
+              if (Math.random() < 0.4) this.plasma.push({ x: d.x, y: d.y, size: 5, phase: Math.random() * Math.PI * 2, value: Math.floor(15 * comboMult) });
               // Vampire effect: heal on kill
               if (eff.vampire && this.ship.hp < this.ship.maxHp && Math.random() < 0.15) {
                 this.ship.hp++;
@@ -1710,6 +1830,20 @@
 
       // Update particles
       this.particles = this.particles.filter(p => { p.x += p.vx; p.y += p.vy; p.life -= 0.03; p.vx *= 0.95; p.vy *= 0.95; return p.life > 0; });
+
+      // COMBO: countdown timer
+      if (this.comboTimer > 0) { this.comboTimer -= dt; if (this.comboTimer <= 0) this.combo = 0; }
+
+      // BOSS: spawn every 3 min
+      this.nextBossSpawn -= dt;
+      if (this.nextBossSpawn <= 0 && !this.boss) {
+        this.spawnBoss();
+        this.nextBossSpawn = 180000;
+      }
+      // Boss warning flash
+      if (this.bossWarning > 0) this.bossWarning -= dt;
+      // Update boss
+      if (this.boss) this.updateBoss(dt, eff);
 
       // Update ability cooldowns
       ['emp', 'boost', 'magnet'].forEach(ab => { if (this.abilities[ab] > 0) this.abilities[ab] = Math.max(0, this.abilities[ab] - dt); });
@@ -1850,6 +1984,7 @@
       document.getElementById('gsKills').textContent = this.kills;
       document.getElementById('gsTime').textContent = formatTime(this.elapsedTime);
       document.getElementById('gsPlasmaCollected').textContent = this.plasmaCollected;
+      document.getElementById('gsMaxCombo').textContent = '×' + this.maxCombo;
       // Switch instantly (no setTimeout)
       switchScreen('gameover');
     }
@@ -1861,6 +1996,21 @@
       let html = '';
       for (let i = 0; i < this.ship.maxHp; i++) html += `<div class="bh-hp-dot ${i >= this.ship.hp ? 'lost' : ''}"></div>`;
       hpEl.innerHTML = html;
+      // Combo display — show when combo >= 3
+      const comboEl = document.getElementById('comboDisplay');
+      if (this.combo >= 3) {
+        comboEl.textContent = `×${this.combo}`;
+        comboEl.style.opacity = Math.min(1, this.comboTimer / 1000);
+        // Scale based on combo size
+        const scale = 1 + Math.min(this.combo, 30) * 0.02;
+        comboEl.style.transform = `translate(-50%, -50%) scale(${scale})`;
+        // Color shift at milestones
+        if (this.combo >= 20) comboEl.style.color = '#F472B6';
+        else if (this.combo >= 10) comboEl.style.color = '#22D3EE';
+        else comboEl.style.color = '#FBBF24';
+      } else {
+        comboEl.style.opacity = 0;
+      }
     }
     draw() {
       const ctx = this.ctx;
@@ -1887,37 +2037,114 @@
         ctx.beginPath(); ctx.arc(p.x, p.y, p.size * pulse, 0, Math.PI * 2); ctx.fill();
         ctx.shadowBlur = 0;
       });
-      // Bullets
-      this.bullets.forEach(b => { ctx.fillStyle = '#A78BFA'; ctx.shadowColor = '#A78BFA'; ctx.shadowBlur = 8; ctx.beginPath(); ctx.arc(b.x, b.y, 3, 0, Math.PI * 2); ctx.fill(); ctx.shadowBlur = 0; });
-      // Drones
+      // Bullets — player (purple) vs boss (red)
+      this.bullets.forEach(b => {
+        if (b.fromBoss) { ctx.fillStyle = '#F43F5E'; ctx.shadowColor = '#F43F5E'; }
+        else { ctx.fillStyle = '#A78BFA'; ctx.shadowColor = '#A78BFA'; }
+        ctx.shadowBlur = 8;
+        ctx.beginPath(); ctx.arc(b.x, b.y, b.fromBoss ? 4 : 3, 0, Math.PI * 2); ctx.fill();
+        ctx.shadowBlur = 0;
+      });
+      // Drones — actual enemy ships, not dots
       this.drones.forEach(d => {
-        const pulse = 1 + Math.sin(d.phase) * 0.15;
-        let color, glowColor;
-        if (d.golden) { color = '#FBBF24'; glowColor = 'rgba(251,191,36,0.6)'; }
-        else if (d.elite) { color = '#FB923C'; glowColor = 'rgba(251,146,60,0.6)'; } // orange elite
-        else { color = '#F43F5E'; glowColor = 'rgba(244,63,94,0.5)'; }
+        const pulse = 1 + Math.sin(d.phase) * 0.1;
+        const color = d.golden ? '#FBBF24' : (d.elite ? '#FB923C' : '#F43F5E');
+        const glowColor = d.golden ? 'rgba(251,191,36,0.5)' : (d.elite ? 'rgba(251,146,60,0.5)' : 'rgba(244,63,94,0.4)');
+        // Glow
         const grad = ctx.createRadialGradient(d.x, d.y, 0, d.x, d.y, d.size * 3);
         grad.addColorStop(0, glowColor);
         grad.addColorStop(1, d.golden ? 'rgba(251,191,36,0)' : (d.elite ? 'rgba(251,146,60,0)' : 'rgba(244,63,94,0)'));
         ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(d.x, d.y, d.size * 3, 0, Math.PI * 2); ctx.fill();
         // Stunned = blue tint
-        if (d.stunned > 0) { ctx.fillStyle = '#22D3EE'; ctx.shadowColor = '#22D3EE'; }
-        else { ctx.fillStyle = color; ctx.shadowColor = color; }
-        ctx.shadowBlur = d.golden ? 20 : (d.elite ? 16 : 12);
+        const bodyColor = d.stunned > 0 ? '#22D3EE' : color;
+        ctx.shadowColor = bodyColor; ctx.shadowBlur = d.golden ? 20 : (d.elite ? 16 : 10);
+        // Draw enemy ship shape (inverted triangle pointing at player)
+        const angle = Math.atan2(this.ship.y - d.y, this.ship.x - d.x);
+        ctx.save();
+        ctx.translate(d.x, d.y);
+        ctx.rotate(angle);
         // Elite: armor ring
-        if (d.elite) { ctx.strokeStyle = '#FB923C'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(d.x, d.y, d.size * pulse * 1.3, 0, Math.PI * 2); ctx.stroke(); }
-        ctx.beginPath(); ctx.arc(d.x, d.y, d.size * pulse, 0, Math.PI * 2); ctx.fill();
-        // Inner core
-        ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(d.x, d.y, d.size * 0.4, 0, Math.PI * 2); ctx.fill();
+        if (d.elite) { ctx.strokeStyle = '#FB923C'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(0, 0, d.size * 1.4, 0, Math.PI * 2); ctx.stroke(); }
+        // Main body — aggressive ship shape
+        ctx.fillStyle = bodyColor;
+        ctx.beginPath();
+        ctx.moveTo(d.size * pulse, 0); // nose pointing at player
+        ctx.lineTo(-d.size * 0.6 * pulse, -d.size * 0.7 * pulse); // left wing
+        ctx.lineTo(-d.size * 0.3 * pulse, 0); // notch
+        ctx.lineTo(-d.size * 0.6 * pulse, d.size * 0.7 * pulse); // right wing
+        ctx.closePath();
+        ctx.fill();
+        // Core
+        ctx.fillStyle = '#fff'; ctx.shadowBlur = 6;
+        ctx.beginPath(); ctx.arc(0, 0, d.size * 0.25, 0, Math.PI * 2); ctx.fill();
         // Golden drone: star marker
         if (d.golden) {
-          ctx.strokeStyle = '#fff'; ctx.lineWidth = 2;
+          ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.shadowBlur = 0;
           ctx.beginPath();
-          for (let i = 0; i < 5; i++) { const a = (i * 2 * Math.PI / 5) - Math.PI / 2; const x = d.x + Math.cos(a) * d.size * 1.2; const y = d.y + Math.sin(a) * d.size * 1.2; if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y); }
+          for (let i = 0; i < 5; i++) { const a = (i * 2 * Math.PI / 5) - Math.PI / 2; const x = Math.cos(a) * d.size * 1.2; const y = Math.sin(a) * d.size * 1.2; if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y); }
           ctx.closePath(); ctx.stroke();
         }
+        ctx.restore();
         ctx.shadowBlur = 0;
       });
+      // Boss — massive enemy dreadnought
+      if (this.boss) {
+        const b = this.boss;
+        const pulse = 1 + Math.sin(this.t * 0.005) * 0.05;
+        // Warning glow when entering
+        if (this.bossWarning > 0) {
+          ctx.fillStyle = `rgba(244, 63, 94, ${0.1 + Math.sin(this.t * 0.02) * 0.05})`;
+          ctx.fillRect(0, 0, this.W, this.H);
+        }
+        // Glow
+        const grad = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, b.size * 4);
+        grad.addColorStop(0, 'rgba(244,63,94,0.6)');
+        grad.addColorStop(1, 'rgba(244,63,94,0)');
+        ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(b.x, b.y, b.size * 4, 0, Math.PI * 2); ctx.fill();
+        ctx.shadowColor = '#F43F5E'; ctx.shadowBlur = 30;
+        ctx.save();
+        ctx.translate(b.x, b.y);
+        ctx.rotate(Math.PI / 2); // boss faces down
+        // Main body — large hexagonal dreadnought
+        ctx.fillStyle = '#F43F5E';
+        ctx.beginPath();
+        for (let i = 0; i < 6; i++) {
+          const a = (i / 6) * Math.PI * 2;
+          const r = b.size * pulse;
+          if (i === 0) ctx.moveTo(Math.cos(a) * r, Math.sin(a) * r);
+          else ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r);
+        }
+        ctx.closePath(); ctx.fill();
+        // Inner armor plates
+        ctx.fillStyle = '#BE123C';
+        ctx.beginPath();
+        for (let i = 0; i < 6; i++) {
+          const a = (i / 6) * Math.PI * 2;
+          const r = b.size * 0.6 * pulse;
+          if (i === 0) ctx.moveTo(Math.cos(a) * r, Math.sin(a) * r);
+          else ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r);
+        }
+        ctx.closePath(); ctx.fill();
+        // Core eye
+        ctx.fillStyle = '#FBBF24'; ctx.shadowColor = '#FBBF24'; ctx.shadowBlur = 20;
+        ctx.beginPath(); ctx.arc(0, 0, b.size * 0.3 * pulse, 0, Math.PI * 2); ctx.fill();
+        // Pupil
+        ctx.fillStyle = '#000'; ctx.shadowBlur = 0;
+        ctx.beginPath(); ctx.arc(0, 0, b.size * 0.12, 0, Math.PI * 2); ctx.fill();
+        // Side cannons
+        ctx.fillStyle = '#BE123C';
+        ctx.fillRect(-b.size * 0.9, -b.size * 0.2, b.size * 0.3, b.size * 0.4);
+        ctx.fillRect(b.size * 0.6, -b.size * 0.2, b.size * 0.3, b.size * 0.4);
+        ctx.restore();
+        ctx.shadowBlur = 0;
+        // HP bar above boss
+        const hpPct = b.hp / b.maxHp;
+        const barW = 80;
+        ctx.fillStyle = 'rgba(0,0,0,0.6)';
+        ctx.fillRect(b.x - barW/2, b.y - b.size - 16, barW, 6);
+        ctx.fillStyle = '#F43F5E';
+        ctx.fillRect(b.x - barW/2, b.y - b.size - 16, barW * hpPct, 6);
+      }
       // Ship
       ctx.save();
       ctx.translate(this.ship.x, this.ship.y);
