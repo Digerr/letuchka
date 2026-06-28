@@ -545,7 +545,7 @@
     <button class="lang-btn active" data-lang="ru" onclick="setLang('ru')">RU</button>
     <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
   </div>
-  <div class="ob-logo mono" id="obLogo">V O I D &nbsp; D R I F T E R</div>
+  <div class="ob-logo mono" id="obLogo">L E T U C H K A</div>
   <div class="ob-ship-wrap" id="obShipWrap"><canvas id="obCanvas" width="400" height="400"></canvas></div>
   <h1 class="ob-title" id="obTitle" data-i18n="ob_title"></h1>
   <div class="ob-sub" id="obSub" data-i18n="ob_sub"></div>
@@ -1262,28 +1262,68 @@
     const overlay = document.getElementById('launch-overlay');
     const canvas = document.getElementById('launchCanvas');
     const ctx = canvas.getContext('2d');
+    // Resize canvas to window
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
     const W = canvas.width, H = canvas.height;
     overlay.classList.add('show');
     document.getElementById('launchText').textContent = currentLang === 'ru' ? 'ПРЫЖОК...' : 'JUMPING...';
     let t = 0;
+    const totalFrames = 90; // ~1.5 sec
+    const fadeStart = 70; // start fading at frame 70
     const stars = [];
-    for (let i = 0; i < 100; i++) stars.push({ x: Math.random() * W, y: Math.random() * H, z: Math.random() * 1000 + 1 });
+    for (let i = 0; i < 120; i++) stars.push({ x: Math.random() * W, y: Math.random() * H, z: Math.random() * 1000 + 1 });
     const anim = () => {
       t++;
-      ctx.fillStyle = 'rgba(3, 2, 10, 0.3)';
+      // Fade trail
+      ctx.fillStyle = 'rgba(3, 2, 10, 0.25)';
       ctx.fillRect(0, 0, W, H);
+      // Stars warp speed increases over time
+      const speed = 15 + t * 0.8;
       stars.forEach(s => {
-        s.z -= 20;
+        s.z -= speed;
         if (s.z <= 0) { s.z = 1000; s.x = Math.random() * W; s.y = Math.random() * H; }
         const k = 200 / s.z;
         const x = s.x * k + W/2 * (1 - k);
         const y = s.y * k + H/2 * (1 - k);
         const size = (1 - s.z / 1000) * 4;
-        ctx.fillStyle = `rgba(167, 139, 250, ${1 - s.z / 1000})`;
+        const alpha = (1 - s.z / 1000) * 0.9;
+        // Color shift: purple → cyan → white as we accelerate
+        let color;
+        if (t < 30) color = `rgba(167, 139, 250, ${alpha})`;
+        else if (t < 60) color = `rgba(34, 211, 238, ${alpha})`;
+        else color = `rgba(255, 255, 255, ${alpha})`;
+        ctx.fillStyle = color;
         ctx.beginPath(); ctx.arc(x, y, size, 0, Math.PI * 2); ctx.fill();
+        // Warp streaks
+        if (t > 20 && size > 1) {
+          ctx.strokeStyle = color;
+          ctx.lineWidth = size * 0.5;
+          ctx.beginPath();
+          ctx.moveTo(x, y);
+          ctx.lineTo(x - (x - W/2) * 0.05, y - (y - H/2) * 0.05);
+          ctx.stroke();
+        }
       });
-      if (t < 60) requestAnimationFrame(anim);
-      else { overlay.classList.remove('show'); callback(); }
+      // Smooth fade out at the end
+      if (t > fadeStart) {
+        const fadeAlpha = (t - fadeStart) / (totalFrames - fadeStart);
+        ctx.fillStyle = `rgba(3, 2, 10, ${fadeAlpha * 0.15})`;
+        ctx.fillRect(0, 0, W, H);
+      }
+      if (t < totalFrames) {
+        requestAnimationFrame(anim);
+      } else {
+        // Smooth fade out the overlay itself
+        overlay.style.transition = 'opacity 0.4s ease';
+        overlay.style.opacity = '0';
+        setTimeout(() => {
+          overlay.classList.remove('show');
+          overlay.style.opacity = '';
+          overlay.style.transition = '';
+          callback();
+        }, 400);
+      }
     };
     anim();
   }
@@ -1377,7 +1417,8 @@
       this.kills = 0; this.plasmaCollected = 0;
       this.revivedThisRun = false;
       this.startTime = performance.now(); this.elapsedTime = 0;
-      this.nextDroneSpawn = 2000; this.nextPlasmaSpawn = 500;
+      this.nextDroneSpawn = 4000; // First drones after 4 sec (was 2)
+      this.nextPlasmaSpawn = 300;
       this.nextGoldenDrone = 30000; // First golden drone after 30s
       this.difficulty = 0;
       this.threatLevel = 0; this.lastThreatLevel = 0;
@@ -1423,8 +1464,11 @@
       this.canvas.addEventListener('pointercancel', onUp);
     }
     spawnPlasma() {
-      const margin = 50;
-      this.plasma.push({ x: margin + Math.random() * (this.W - margin * 2), y: margin + Math.random() * (this.H - margin * 2), size: 5, phase: Math.random() * Math.PI * 2, value: 10 });
+      // FIX: larger margins, especially bottom (nav 70px + abilities 90px + HUD)
+      const marginX = 40;
+      const marginTop = 100; // top HUD
+      const marginBottom = 180; // nav + abilities + safe area
+      this.plasma.push({ x: marginX + Math.random() * (this.W - marginX * 2), y: marginTop + Math.random() * (this.H - marginTop - marginBottom), size: 5, phase: Math.random() * Math.PI * 2, value: 10 });
     }
     spawnDrone() {
       const side = Math.floor(Math.random() * 4);
@@ -1433,7 +1477,9 @@
       else if (side === 1) { x = this.W + 30; y = Math.random() * this.H; }
       else if (side === 2) { x = Math.random() * this.W; y = this.H + 30; }
       else { x = -30; y = Math.random() * this.H; }
-      const speed = 0.5 + this.difficulty * 0.15 + Math.random() * 0.3;
+      // FIX: speed in px/sec — much slower, gradual scaling
+      const baseSpeed = 60 + this.difficulty * 8; // px per second
+      const speed = baseSpeed + Math.random() * 20;
       // Elite drones from threat level 2+
       const elite = this.threatLevel >= 2 && Math.random() < (0.15 + this.threatLevel * 0.05);
       const baseHp = 1 + Math.floor(this.difficulty / 3);
@@ -1454,7 +1500,7 @@
       else if (side === 1) { x = this.W + 30; y = Math.random() * this.H; }
       else if (side === 2) { x = Math.random() * this.W; y = this.H + 30; }
       else { x = -30; y = Math.random() * this.H; }
-      this.drones.push({ x, y, vx: 0, vy: 0, speed: 0.7, size: 18, hp: 5, maxHp: 5, phase: Math.random() * Math.PI * 2, golden: true });
+      this.drones.push({ x, y, vx: 0, vy: 0, speed: 80, size: 18, hp: 5, maxHp: 5, phase: Math.random() * Math.PI * 2, golden: true });
     }
     start() {
       // If setup is deferred, wait for it
@@ -1478,7 +1524,7 @@
       this.lastTime = now;
       this.t += dt;
       this.elapsedTime = (now - this.startTime) / 1000;
-      this.difficulty = Math.floor(this.elapsedTime / 15);
+      this.difficulty = Math.floor(this.elapsedTime / 20);
       this.threatLevel = Math.floor(this.elapsedTime / 120); // every 2 min
       // Detect threat level transition
       if (this.threatLevel > (this.lastThreatLevel || 0)) {
@@ -1513,8 +1559,11 @@
       // Apply movement in px/sec
       this.ship.x += this.ship.vx * (dt / 1000);
       this.ship.y += this.ship.vy * (dt / 1000);
+      // FIX: clamp to playable area (not full canvas — exclude HUD top and nav bottom)
+      const playTop = 50;
+      const playBottom = this.H - 90; // above abilities + nav
       this.ship.x = Math.max(this.ship.size, Math.min(this.W - this.ship.size, this.ship.x));
-      this.ship.y = Math.max(this.ship.size, Math.min(this.H - this.ship.size, this.ship.y));
+      this.ship.y = Math.max(playTop + this.ship.size, Math.min(playBottom - this.ship.size, this.ship.y));
 
       // Auto-shoot
       this.ship.shootCooldown -= dt;
@@ -1534,10 +1583,10 @@
           if (eff.fanShot) {
             // 3-way fan
             [-0.25, 0, 0.25].forEach(off => {
-              this.bullets.push({ x: this.ship.x, y: this.ship.y, vx: Math.cos(angle + off) * 0.8, vy: Math.sin(angle + off) * 0.8, life: 1500, damage });
+              this.bullets.push({ x: this.ship.x, y: this.ship.y, vx: Math.cos(angle + off) * 600, vy: Math.sin(angle + off) * 600, life: 1500, damage });
             });
           } else {
-            this.bullets.push({ x: this.ship.x, y: this.ship.y, vx: Math.cos(angle) * 0.8, vy: Math.sin(angle) * 0.8, life: 1500, damage });
+            this.bullets.push({ x: this.ship.x, y: this.ship.y, vx: Math.cos(angle) * 600, vy: Math.sin(angle) * 600, life: 1500, damage });
           }
           this.ship.shootCooldown = fireRate;
           SOUNDS.shoot();
@@ -1551,9 +1600,10 @@
       // Spawn drones
       this.nextDroneSpawn -= dt;
       if (this.nextDroneSpawn <= 0) {
-        const count = 1 + Math.floor(this.difficulty / 2);
+        // FIX: fewer drones at start, gradual scaling
+        const count = 1 + Math.floor(this.difficulty / 3);
         for (let i = 0; i < count; i++) this.spawnDrone();
-        this.nextDroneSpawn = Math.max(800, 3000 - this.difficulty * 200);
+        this.nextDroneSpawn = Math.max(1500, 5000 - this.difficulty * 250);
       }
 
       // Spawn golden drone (rare)
@@ -1565,7 +1615,7 @@
 
       // Update bullets
       this.bullets = this.bullets.filter(b => {
-        b.x += b.vx * dt; b.y += b.vy * dt; b.life -= dt;
+        b.x += b.vx * (dt / 1000); b.y += b.vy * (dt / 1000); b.life -= dt;
         return b.life > 0 && b.x > -50 && b.x < this.W + 50 && b.y > -50 && b.y < this.H + 50;
       });
 
@@ -1579,7 +1629,8 @@
         const dx = this.ship.x - d.x, dy = this.ship.y - d.y;
         const dist = Math.sqrt(dx*dx + dy*dy);
         if (dist > 0) { d.vx = (dx / dist) * d.speed * droneSpeedMult; d.vy = (dy / dist) * d.speed * droneSpeedMult; }
-        d.x += d.vx * dt; d.y += d.vy * dt;
+        // FIX: speed in px/sec, apply via dt/1000
+        d.x += d.vx * (dt / 1000); d.y += d.vy * (dt / 1000);
         d.phase += 0.05;
         // Collision with ship
         if (dist < this.ship.size + d.size) {
