@@ -1416,6 +1416,7 @@
       this.plasma = []; this.drones = []; this.bullets = []; this.particles = [];
       this.kills = 0; this.plasmaCollected = 0;
       this.revivedThisRun = false;
+      this.ended = false;
       this.startTime = performance.now(); this.elapsedTime = 0;
       this.nextDroneSpawn = 4000; // First drones after 4 sec (was 2)
       this.nextPlasmaSpawn = 300;
@@ -1774,6 +1775,9 @@
     spawnExplosion(x, y, color) { for (let i = 0; i < 15; i++) { const a = (i / 15) * Math.PI * 2; this.particles.push({ x, y, vx: Math.cos(a) * (1 + Math.random() * 3), vy: Math.sin(a) * (1 + Math.random() * 3), life: 1, color, size: 3 }); } }
     spawnCollectEffect(x, y) { for (let i = 0; i < 6; i++) { const a = (i / 6) * Math.PI * 2; this.particles.push({ x, y, vx: Math.cos(a) * 0.5, vy: Math.sin(a) * 0.5, life: 1, color: '#22D3EE', size: 2 }); } }
     endBattle() {
+      // Guard: prevent multiple calls in the same frame
+      if (this.ended) return;
+      this.ended = true;
       this.running = false;
       SOUNDS.gameover();
       // REVIVE: offer once per run if player has stars and hasn't used revive yet
@@ -1784,6 +1788,8 @@
       this.finalizeBattle();
     }
     offerRevive() {
+      // Clear any existing interval from previous calls
+      if (this._reviveInterval) clearInterval(this._reviveInterval);
       const s = getState();
       document.getElementById('rvPlasma').textContent = this.plasmaCollected;
       document.getElementById('rvKills').textContent = this.kills;
@@ -2309,6 +2315,7 @@
     saveState(s);
     if (battle) {
       battle.revivedThisRun = true;
+      battle.ended = false; // Reset so player can die again
       battle.ship.hp = battle.ship.maxHp;
       battle.ship.shield = true;
       battle.running = true;
