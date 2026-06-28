@@ -1129,7 +1129,7 @@
       totalPlasma: parseFloat(localStorage.getItem('vd_total_plasma') || '0'),
       invited: parseInt(localStorage.getItem('vd_invited') || '0'),
       dailyRunScore: parseInt(localStorage.getItem('vd_daily_score') || '0'),
-      dailyRunDate: localStorage.getItem('vd_daily_date') || '',
+      dailyRunDate: localStorage.getItem('vd_daily_run_date') || '',
       lootboxes: JSON.parse(localStorage.getItem('vd_lootboxes') || '[]'),
       upgrades: JSON.parse(localStorage.getItem('vd_upgrades') || '{}'),
       dailyClaimed: JSON.parse(localStorage.getItem('vd_daily_claimed') || '[]'),
@@ -1155,7 +1155,7 @@
     if (s.weeklyProgress !== undefined) localStorage.setItem('vd_weekly_prog', JSON.stringify(s.weeklyProgress));
     if (s.dailyDate !== undefined) localStorage.setItem('vd_daily_date', s.dailyDate);
     if (s.weeklyDate !== undefined) localStorage.setItem('vd_weekly_date', s.weeklyDate);
-    if (s.dailyRunDate !== undefined) localStorage.setItem('vd_daily_date', s.dailyRunDate);
+    if (s.dailyRunDate !== undefined) localStorage.setItem('vd_daily_run_date', s.dailyRunDate);
     if (s.unlockedChapters !== undefined) localStorage.setItem('vd_chapters', JSON.stringify(s.unlockedChapters));
     if (s.readMessages !== undefined) localStorage.setItem('vd_read_msgs', JSON.stringify(s.readMessages));
   }
@@ -1314,14 +1314,15 @@
       if (t < totalFrames) {
         requestAnimationFrame(anim);
       } else {
-        // Smooth fade out the overlay itself
+        // Switch to battle screen FIRST, so the home screen doesn't flash during fade out
+        callback();
+        // Then smooth fade out the overlay itself
         overlay.style.transition = 'opacity 0.4s ease';
         overlay.style.opacity = '0';
         setTimeout(() => {
           overlay.classList.remove('show');
           overlay.style.opacity = '';
           overlay.style.transition = '';
-          callback();
         }, 400);
       }
     };
@@ -1841,15 +1842,16 @@
       updateQuestProgress('kills', this.kills);
       updateQuestProgress('time', Math.floor(this.elapsedTime));
       updateQuestProgress('runs', 1);
-      updateQuestProgress('glory', glory);
       saveState(s);
       checkStoryProgress();
+      // Update Game Over screen stats
       document.getElementById('grPlasma').textContent = this.plasmaCollected;
       document.getElementById('grGlory').textContent = glory;
       document.getElementById('gsKills').textContent = this.kills;
       document.getElementById('gsTime').textContent = formatTime(this.elapsedTime);
       document.getElementById('gsPlasmaCollected').textContent = this.plasmaCollected;
-      setTimeout(() => switchScreen('gameover'), 600);
+      // Switch instantly (no setTimeout)
+      switchScreen('gameover');
     }
     updateHUD() {
       document.getElementById('bhPlasma').textContent = this.plasmaCollected;
@@ -2343,9 +2345,10 @@
     }
   }
   function declineRevive() {
+    const ov = document.getElementById('reviveOverlay');
+    if (ov) ov.classList.remove('show');
     if (battle) {
       clearInterval(battle._reviveInterval);
-      document.getElementById('reviveOverlay').classList.remove('show');
       battle.finalizeBattle();
     }
   }
