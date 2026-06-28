@@ -1,0 +1,2460 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#03020A">
+<title>LETUCHKA — Прорыв блокады</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { width: 100%; min-height: 100vh; background: #03020A; color: #C7D2FE; font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; overflow: hidden; -webkit-font-smoothing: antialiased; user-select: none; -webkit-user-select: none; font-weight: 700; }
+  ::selection { background: #A78BFA; color: #03020A; }
+  .mono { font-family: 'SF Mono', 'JetBrains Mono', 'Courier New', monospace; letter-spacing: 0.05em; }
+  :root { --bg: #03020A; --bg-card: #0A0820; --border: rgba(167, 139, 250, 0.15); --text: #C7D2FE; --text-muted: #6B6B8C; --neon: #A78BFA; --neon-cyan: #22D3EE; --neon-pink: #F472B6; --gold: #FBBF24; --danger: #F43F5E; --success: #34D399; }
+
+  /* ONBOARDING */
+  #onboarding { position: fixed; inset: 0; z-index: 100; background: radial-gradient(ellipse at center, #14102E 0%, #03020A 70%); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px; text-align: center; transition: opacity 0.6s ease; overflow: hidden; }
+  #onboarding::before { content: ''; position: absolute; inset: 0; background-image: radial-gradient(2px 2px at 20% 30%, white, transparent), radial-gradient(1px 1px at 60% 70%, white, transparent), radial-gradient(1px 1px at 80% 10%, white, transparent), radial-gradient(2px 2px at 90% 60%, white, transparent), radial-gradient(1px 1px at 33% 80%, white, transparent), radial-gradient(1px 1px at 50% 50%, white, transparent), radial-gradient(1px 1px at 15% 65%, white, transparent), radial-gradient(1px 1px at 75% 25%, white, transparent); opacity: 0.5; pointer-events: none; animation: twinkle 4s ease-in-out infinite; }
+  @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.7; } }
+  #onboarding::after { content: ''; position: absolute; top: -100px; left: 50%; transform: translateX(-50%); width: 500px; height: 500px; border-radius: 50%; background: radial-gradient(circle, rgba(167, 139, 250, 0.2), transparent 70%); pointer-events: none; }
+  #onboarding.hide { opacity: 0; pointer-events: none; }
+  .lang-switcher { position: absolute; top: 20px; right: 20px; z-index: 110; display: flex; gap: 4px; padding: 4px; background: rgba(167, 139, 250, 0.05); border-radius: 999px; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(167, 139, 250, 0.15); }
+  .lang-btn { background: transparent; border: none; color: #6B6B8C; padding: 6px 14px; font-size: 12px; font-weight: 800; font-family: inherit; cursor: pointer; border-radius: 999px; transition: all 0.25s ease; }
+  .lang-btn.active { background: var(--neon); color: #03020A; }
+  .ob-logo { font-size: 14px; letter-spacing: 0.6em; color: var(--neon); opacity: 0; transform: translateY(20px); transition: all 1s ease; margin-bottom: 24px; font-weight: 800; position: relative; z-index: 2; text-shadow: 0 0 16px rgba(167,139,250,0.6); }
+  .ob-logo.show { opacity: 1; transform: translateY(0); }
+  .ob-ship-wrap { width: 200px; height: 200px; margin-bottom: 24px; opacity: 0; transform: scale(0.7); transition: all 1.4s cubic-bezier(0.34, 1.56, 0.64, 1); position: relative; z-index: 2; }
+  .ob-ship-wrap.show { opacity: 1; transform: scale(1); }
+  .ob-ship-wrap canvas { width: 100%; height: 100%; }
+  .ob-title { font-size: clamp(34px, 9vw, 52px); line-height: 1; letter-spacing: -0.02em; color: #F0EBFF; opacity: 0; transform: translateY(20px); transition: all 1s ease; margin-bottom: 18px; font-weight: 900; position: relative; z-index: 2; }
+  .ob-title.show { opacity: 1; transform: translateY(0); }
+  .ob-title em { color: var(--neon); font-style: normal; text-shadow: 0 0 20px rgba(167,139,250,0.5); }
+  .ob-sub { font-size: clamp(13px, 3.8vw, 15px); color: #8A8AB0; max-width: 380px; line-height: 1.6; opacity: 0; transition: opacity 1s ease; margin-bottom: 32px; font-weight: 600; position: relative; z-index: 2; }
+  .ob-sub.show { opacity: 1; }
+  .ob-sub b { color: var(--neon); font-weight: 800; }
+  .ob-begin { background: linear-gradient(135deg, var(--neon), #7C3AED); color: #03020A; border: none; padding: 18px 56px; font-size: 15px; font-weight: 900; cursor: pointer; opacity: 0; transition: opacity 1s ease, transform 0.2s ease, box-shadow 0.3s ease; font-family: inherit; border-radius: 999px; letter-spacing: 0.2em; position: relative; z-index: 2; text-transform: uppercase; box-shadow: 0 10px 30px rgba(167,139,250,0.4); }
+  .ob-begin.show { opacity: 1; }
+  .ob-begin:hover { transform: translateY(-3px); box-shadow: 0 14px 36px rgba(167,139,250,0.6); }
+
+  /* APP */
+  #app { position: fixed; inset: 0; width: 100%; height: 100dvh; display: flex; flex-direction: column; opacity: 0; transition: opacity 0.6s ease; background: radial-gradient(ellipse at top, #14102E 0%, #03020A 60%); }
+  #app.show { opacity: 1; }
+
+  .topbar { position: fixed; top: 0; left: 0; right: 0; height: 60px; z-index: 40; display: flex; align-items: center; justify-content: space-between; padding: 0 14px; background: rgba(3, 2, 10, 0.92); backdrop-filter: blur(24px) saturate(180%); -webkit-backdrop-filter: blur(24px) saturate(180%); border-bottom: 1px solid rgba(167, 139, 250, 0.12); }
+  .topbar-logo { font-size: 13px; font-weight: 900; color: var(--neon); letter-spacing: 0.15em; text-shadow: 0 0 12px rgba(167,139,250,0.4); }
+  .topbar-title-badge { background: rgba(34, 211, 238, 0.08); padding: 5px 10px; border-radius: 999px; border: 1px solid rgba(34, 211, 238, 0.2); font-size: 9px; font-weight: 800; color: var(--neon-cyan); letter-spacing: 0.08em; max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .topbar-right { display: flex; align-items: center; gap: 6px; }
+  .topbar-pill { display: flex; align-items: center; gap: 4px; background: rgba(251, 191, 36, 0.08); padding: 5px 10px; border-radius: 999px; border: 1px solid rgba(251, 191, 36, 0.2); font-size: 11px; font-weight: 800; color: var(--gold); }
+
+  .screens-wrap { flex: 1; position: relative; overflow: hidden; }
+  .screen { position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; -ms-overflow-style: none; scrollbar-width: none; padding: 70px 0 100px; }
+  .screen::-webkit-scrollbar { display: none; }
+  .screen.active { opacity: 1; pointer-events: auto; }
+
+  /* HOME */
+  #home { display: flex; flex-direction: column; align-items: center; padding-top: 70px; }
+  .home-stats { width: 100%; max-width: 540px; padding: 0 14px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 24px; }
+  .hs-card { background: rgba(10, 8, 32, 0.7); border: 1px solid rgba(167, 139, 250, 0.12); border-radius: 16px; padding: 14px 8px; text-align: center; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+  .hs-icon { font-size: 18px; margin-bottom: 4px; }
+  .hs-value { font-size: 18px; color: var(--neon); font-weight: 900; line-height: 1; }
+  .hs-value.gold { color: var(--gold); }
+  .hs-value.cyan { color: var(--neon-cyan); }
+  .hs-label { font-size: 9px; color: #6B6B8C; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; margin-top: 4px; }
+
+  .home-launch { width: 100%; max-width: 540px; padding: 0 14px; margin-bottom: 20px; }
+  .launch-btn { width: 100%; background: linear-gradient(135deg, var(--neon), #7C3AED); color: #03020A; border: none; padding: 28px 20px; font-size: 22px; font-weight: 900; cursor: pointer; font-family: inherit; border-radius: 24px; letter-spacing: 0.15em; text-transform: uppercase; box-shadow: 0 16px 40px rgba(167,139,250,0.4), inset 0 2px 0 rgba(255,255,255,0.2); transition: all 0.25s ease; position: relative; overflow: hidden; }
+  .launch-btn:hover { transform: translateY(-3px); box-shadow: 0 22px 50px rgba(167,139,250,0.5); }
+  .launch-btn:active { transform: translateY(0); }
+  .launch-btn-icon { font-size: 32px; display: block; margin-bottom: 6px; }
+  .launch-btn::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.2), transparent 50%); animation: launchGlow 3s ease-in-out infinite; pointer-events: none; }
+  @keyframes launchGlow { 0%, 100% { transform: scale(0.8); opacity: 0.5; } 50% { transform: scale(1.1); opacity: 0.8; } }
+
+  .home-quick { width: 100%; max-width: 540px; padding: 0 14px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 20px; }
+  .hq-btn { background: rgba(10, 8, 32, 0.7); border: 1px solid rgba(167, 139, 250, 0.15); padding: 14px 4px; cursor: pointer; font-family: inherit; display: flex; flex-direction: column; align-items: center; gap: 4px; border-radius: 16px; transition: all 0.25s ease; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); position: relative; }
+  .hq-btn:hover { background: rgba(167, 139, 250, 0.1); border-color: var(--neon); transform: translateY(-2px); }
+  .hq-btn-icon { font-size: 22px; }
+  .hq-btn-label { font-size: 10px; font-weight: 800; color: var(--text); letter-spacing: 0.05em; }
+  .hq-badge { position: absolute; top: -4px; right: -4px; background: var(--danger); color: #fff; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px; font-size: 10px; font-weight: 800; display: none; align-items: center; justify-content: center; }
+  .hq-badge.show { display: flex; }
+  .hq-badge.cyan { background: var(--neon-cyan); color: #03020A; }
+
+  .home-mission { width: 100%; max-width: 540px; padding: 0 14px; }
+  .hm-card { background: linear-gradient(135deg, rgba(34,211,238,0.08), rgba(10,8,32,0.8)); border: 1px solid rgba(34, 211, 238, 0.2); border-radius: 16px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; }
+  .hm-icon { font-size: 22px; }
+  .hm-body { flex: 1; }
+  .hm-title { font-size: 12px; font-weight: 800; color: #F0EBFF; }
+  .hm-progress { font-size: 10px; color: #8A8AB0; margin-top: 3px; }
+  .hm-bar { height: 4px; background: rgba(34,211,238,0.1); border-radius: 999px; margin-top: 6px; overflow: hidden; }
+  .hm-bar-fill { height: 100%; background: var(--neon-cyan); border-radius: 999px; box-shadow: 0 0 6px var(--neon-cyan); }
+
+  /* LAUNCH ANIMATION */
+  #launch-overlay { position: fixed; inset: 0; background: #03020A; z-index: 150; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+  #launch-overlay.show { opacity: 1; pointer-events: auto; }
+  #launch-overlay canvas { width: 100%; height: 100%; position: absolute; inset: 0; }
+  .launch-text { font-size: 18px; font-weight: 900; color: var(--neon); letter-spacing: 0.5em; text-transform: uppercase; position: relative; z-index: 2; text-shadow: 0 0 20px rgba(167,139,250,0.6); animation: launchTextPulse 0.8s ease-in-out infinite; }
+  @keyframes launchTextPulse { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
+
+  /* BATTLE */
+  #battle { padding: 0; }
+  #battle.active { overflow: hidden; }
+  .battle-canvas-wrap { position: absolute; inset: 0; }
+  .battle-canvas-wrap canvas { width: 100%; height: 100%; display: block; touch-action: none; }
+  .battle-hud { position: absolute; top: 60px; left: 0; right: 0; padding: 0 14px; display: flex; justify-content: space-between; align-items: flex-start; pointer-events: none; z-index: 5; }
+  .bh-left, .bh-right { display: flex; flex-direction: column; gap: 6px; }
+  .bh-card { background: rgba(3, 2, 10, 0.7); border: 1px solid rgba(167, 139, 250, 0.2); padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 800; color: var(--text); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: flex; align-items: center; gap: 6px; }
+  .bh-card.gold { color: var(--gold); }
+  .bh-card.danger { color: var(--danger); border-color: rgba(244,63,94,0.3); }
+  .bh-hp { display: flex; gap: 3px; }
+  .bh-hp-dot { width: 12px; height: 12px; border-radius: 4px; background: var(--danger); box-shadow: 0 0 8px rgba(244,63,94,0.5); }
+  .bh-hp-dot.lost { background: rgba(244,63,94,0.15); box-shadow: none; }
+  .bh-timer { font-family: 'SF Mono', monospace; }
+
+  .battle-joyhint { position: absolute; bottom: 100px; left: 50%; transform: translateX(-50%); background: rgba(3, 2, 10, 0.85); padding: 8px 16px; border-radius: 999px; font-size: 11px; color: #8A8AB0; font-weight: 700; border: 1px solid rgba(167, 139, 250, 0.15); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); pointer-events: none; z-index: 4; transition: opacity 0.5s ease; }
+  .battle-joyhint.hide { opacity: 0; }
+
+  .battle-pause { position: absolute; top: 60px; left: 50%; transform: translateX(-50%); background: rgba(3, 2, 10, 0.7); border: 1px solid rgba(167, 139, 250, 0.2); width: 36px; height: 36px; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 6; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); font-size: 16px; color: var(--text); }
+  .battle-pause:active { transform: translateX(-50%) scale(0.95); }
+
+  /* GAME OVER */
+  #gameover { display: flex; flex-direction: column; align-items: center; padding-top: 70px; }
+  .go-icon { font-size: 64px; margin-bottom: 12px; animation: goPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  @keyframes goPop { 0% { transform: scale(0); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+  .go-title { font-size: 32px; font-weight: 900; color: var(--danger); margin-bottom: 4px; letter-spacing: -0.01em; text-shadow: 0 0 20px rgba(244,63,94,0.4); }
+  .go-sub { font-size: 13px; color: #8A8AB0; font-weight: 600; margin-bottom: 20px; text-align: center; }
+  .go-rewards { width: 100%; max-width: 540px; padding: 0 14px; margin-bottom: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .gr-card { background: rgba(10, 8, 32, 0.8); border: 1px solid rgba(167, 139, 250, 0.15); border-radius: 16px; padding: 14px; text-align: center; }
+  .gr-icon { font-size: 22px; margin-bottom: 4px; }
+  .gr-value { font-size: 22px; font-weight: 900; color: var(--neon); }
+  .gr-value.gold { color: var(--gold); }
+  .gr-label { font-size: 10px; color: #6B6B8C; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; margin-top: 4px; }
+
+  .go-stats { width: 100%; max-width: 540px; padding: 0 14px; margin-bottom: 16px; }
+  .gs-card { background: rgba(10, 8, 32, 0.8); border: 1px solid rgba(167, 139, 250, 0.12); border-radius: 16px; padding: 14px 16px; }
+  .gs-row { display: flex; justify-content: space-between; font-size: 13px; padding: 6px 0; border-bottom: 1px solid rgba(167,139,250,0.05); }
+  .gs-row:last-child { border-bottom: none; }
+  .gs-label { color: #8A8AB0; font-weight: 700; }
+  .gs-value { color: var(--text); font-weight: 800; }
+  .gs-value.gold { color: var(--gold); }
+  .gs-value.cyan { color: var(--neon-cyan); }
+
+  .go-actions { width: 100%; max-width: 540px; padding: 0 14px; display: flex; flex-direction: column; gap: 10px; }
+  .go-btn { padding: 16px; font-size: 14px; font-weight: 900; cursor: pointer; border: none; font-family: inherit; border-radius: 999px; letter-spacing: 0.05em; text-transform: uppercase; transition: all 0.25s ease; }
+  .go-btn-primary { background: linear-gradient(135deg, var(--neon), #7C3AED); color: #03020A; box-shadow: 0 8px 24px rgba(167,139,250,0.4); }
+  .go-btn-primary:hover { transform: translateY(-2px); }
+  .go-btn-secondary { background: rgba(10, 8, 32, 0.8); color: var(--text); border: 1px solid rgba(167,139,250,0.15); }
+  .go-btn-ghost { background: transparent; color: #6B6B8C; }
+
+  /* SHIPYARD */
+  #shipyard { padding-top: 70px; }
+  .sy-header { text-align: center; margin-bottom: 16px; padding: 0 16px; }
+  .sy-title { font-size: 26px; font-weight: 900; color: #F0EBFF; margin-bottom: 4px; }
+  .sy-title em { color: var(--neon); font-style: normal; }
+  .sy-sub { font-size: 11px; color: #6B6B8C; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; }
+  .sy-balance { max-width: 540px; margin: 0 auto 16px; padding: 0 16px; }
+  .sy-balance-card { background: linear-gradient(135deg, rgba(167,139,250,0.08), rgba(10,8,32,0.8)); border: 1px solid rgba(167, 139, 250, 0.2); border-radius: 16px; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; }
+  .sy-balance-label { font-size: 10px; color: #6B6B8C; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; }
+  .sy-balance-value { font-size: 22px; color: var(--neon); font-weight: 900; }
+  .sy-list { max-width: 540px; margin: 0 auto; padding: 0 16px; display: flex; flex-direction: column; gap: 10px; }
+  .sy-card { background: rgba(10, 8, 32, 0.8); border: 1px solid rgba(167, 139, 250, 0.12); border-radius: 16px; padding: 14px; display: flex; align-items: center; gap: 12px; }
+  .sy-icon { width: 48px; height: 48px; border-radius: 14px; background: linear-gradient(135deg, rgba(167,139,250,0.2), rgba(167,139,250,0.05)); border: 1px solid rgba(167,139,250,0.3); display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
+  .sy-body { flex: 1; min-width: 0; }
+  .sy-name { font-size: 14px; font-weight: 800; color: #F0EBFF; }
+  .sy-desc { font-size: 11px; color: #8A8AB0; margin-top: 2px; }
+  .sy-level { display: flex; gap: 3px; margin-top: 6px; }
+  .sy-dot { width: 14px; height: 5px; border-radius: 999px; background: rgba(167,139,250,0.1); }
+  .sy-dot.filled { background: var(--neon); box-shadow: 0 0 6px rgba(167,139,250,0.5); }
+  .sy-action { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+  .sy-cost { font-size: 12px; font-weight: 800; color: var(--neon); }
+  .sy-buy { background: var(--neon); color: #03020A; border: none; padding: 8px 14px; font-size: 11px; font-weight: 900; cursor: pointer; font-family: inherit; border-radius: 999px; letter-spacing: 0.05em; text-transform: uppercase; }
+  .sy-buy:disabled { background: rgba(167,139,250,0.15); color: #6B6B8C; cursor: not-allowed; }
+  .sy-buy.maxed { background: rgba(52, 211, 153, 0.15); color: var(--success); cursor: default; }
+
+  /* QUESTS */
+  #quests { padding-top: 70px; }
+  .qu-header { text-align: center; margin-bottom: 16px; padding: 0 16px; }
+  .qu-title { font-size: 26px; font-weight: 900; color: #F0EBFF; margin-bottom: 4px; }
+  .qu-title em { color: var(--neon-cyan); font-style: normal; }
+  .qu-sub { font-size: 11px; color: #6B6B8C; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; }
+  .qu-tabs { max-width: 540px; margin: 0 auto 16px; padding: 0 16px; display: flex; gap: 6px; background: rgba(10, 8, 32, 0.6); padding: 4px; border-radius: 999px; border: 1px solid rgba(167, 139, 250, 0.1); }
+  .qu-tab { flex: 1; background: transparent; border: none; color: #6B6B8C; padding: 10px; font-size: 12px; font-weight: 800; cursor: pointer; border-radius: 999px; transition: all 0.25s ease; font-family: inherit; }
+  .qu-tab.active { background: linear-gradient(135deg, var(--neon-cyan), #0891B2); color: #03020A; }
+  .qu-list { max-width: 540px; margin: 0 auto; padding: 0 16px; display: flex; flex-direction: column; gap: 10px; }
+  .qu-card { background: rgba(10, 8, 32, 0.8); border: 1px solid rgba(167, 139, 250, 0.12); border-radius: 16px; padding: 14px; }
+  .qu-card.done { opacity: 0.6; border-color: rgba(52, 211, 153, 0.3); }
+  .qu-top { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .qu-icon { font-size: 22px; }
+  .qu-body { flex: 1; }
+  .qu-name { font-size: 13px; font-weight: 800; color: #F0EBFF; }
+  .qu-reward { font-size: 11px; color: var(--gold); font-weight: 800; }
+  .qu-progress-row { display: flex; align-items: center; gap: 8px; }
+  .qu-bar { flex: 1; height: 5px; background: rgba(167,139,250,0.08); border-radius: 999px; overflow: hidden; }
+  .qu-bar-fill { height: 100%; background: linear-gradient(90deg, var(--neon-cyan), var(--neon)); border-radius: 999px; transition: width 0.5s ease; }
+  .qu-progress-text { font-size: 10px; color: #8A8AB0; font-weight: 700; min-width: 50px; text-align: right; }
+  .qu-check { color: var(--success); font-size: 22px; font-weight: 900; }
+
+  /* COMMS */
+  #comms { padding-top: 70px; }
+  .cm-header { text-align: center; margin-bottom: 16px; padding: 0 16px; }
+  .cm-title { font-size: 26px; font-weight: 900; color: #F0EBFF; margin-bottom: 4px; }
+  .cm-title em { color: var(--neon-cyan); font-style: normal; }
+  .cm-sub { font-size: 11px; color: #6B6B8C; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; }
+  .cm-list { max-width: 540px; margin: 0 auto; padding: 0 16px; }
+  .cm-chapter { padding: 12px 16px; background: linear-gradient(135deg, rgba(34,211,238,0.1), rgba(10,8,32,0.8)); border: 1px solid rgba(34, 211, 238, 0.3); border-radius: 14px; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+  .cm-chapter-num { font-size: 10px; color: var(--neon-cyan); font-weight: 800; letter-spacing: 0.2em; }
+  .cm-chapter-name { font-size: 14px; color: #F0EBFF; font-weight: 800; flex: 1; }
+  .cm-msg { background: rgba(10, 8, 32, 0.8); border: 1px solid rgba(167, 139, 250, 0.15); border-radius: 18px 18px 18px 4px; padding: 14px 16px; margin-bottom: 8px; margin-left: 32px; position: relative; }
+  .cm-msg.kira { border-color: rgba(34, 211, 238, 0.3); background: linear-gradient(135deg, rgba(34,211,238,0.05), rgba(10,8,32,0.8)); }
+  .cm-msg.watchers { border-color: rgba(244, 63, 94, 0.3); background: linear-gradient(135deg, rgba(244,63,94,0.05), rgba(10,8,32,0.8)); }
+  .cm-avatar { position: absolute; left: -32px; top: 0; width: 28px; height: 28px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 14px; background: linear-gradient(135deg, var(--neon-cyan), #0891B2); }
+  .cm-avatar.watchers { background: linear-gradient(135deg, var(--danger), #BE123C); }
+  .cm-avatar.system { background: linear-gradient(135deg, var(--neon), #7C3AED); }
+  .cm-sender { font-size: 10px; color: var(--neon-cyan); font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 6px; }
+  .cm-sender.watchers { color: var(--danger); }
+  .cm-sender.system { color: var(--neon); }
+  .cm-text { font-size: 14px; color: #F0EBFF; font-weight: 600; line-height: 1.5; }
+
+  /* FAQ */
+  #faq { padding-top: 70px; }
+  .fq-header { text-align: center; margin-bottom: 16px; padding: 0 16px; }
+  .fq-title { font-size: 26px; font-weight: 900; color: #F0EBFF; margin-bottom: 4px; }
+  .fq-title em { color: var(--neon); font-style: normal; }
+  .fq-sub { font-size: 11px; color: #6B6B8C; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; }
+  .fq-list { max-width: 540px; margin: 0 auto; padding: 0 16px; }
+  .fq-item { background: rgba(10, 8, 32, 0.8); border: 1px solid rgba(167, 139, 250, 0.12); border-radius: 14px; margin-bottom: 8px; overflow: hidden; }
+  .fq-q { padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-size: 14px; font-weight: 800; color: #F0EBFF; }
+  .fq-q-arrow { color: var(--neon); transition: transform 0.3s ease; }
+  .fq-item.open .fq-q-arrow { transform: rotate(180deg); }
+  .fq-a { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; padding: 0 16px; font-size: 13px; color: #8A8AB0; font-weight: 600; line-height: 1.6; }
+  .fq-item.open .fq-a { max-height: 300px; padding: 0 16px 14px; }
+
+  /* SETTINGS */
+  #settings { padding-top: 70px; }
+  .se-header { text-align: center; margin-bottom: 16px; padding: 0 16px; }
+  .se-title { font-size: 26px; font-weight: 900; color: #F0EBFF; margin-bottom: 4px; }
+  .se-sub { font-size: 11px; color: #6B6B8C; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; }
+  .se-list { max-width: 540px; margin: 0 auto; padding: 0 16px; display: flex; flex-direction: column; gap: 10px; }
+  .se-card { background: rgba(10, 8, 32, 0.8); border: 1px solid rgba(167, 139, 250, 0.12); border-radius: 16px; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; }
+  .se-info { flex: 1; }
+  .se-name { font-size: 14px; font-weight: 800; color: #F0EBFF; }
+  .se-desc { font-size: 11px; color: #8A8AB0; margin-top: 2px; }
+  .se-toggle { width: 48px; height: 28px; background: rgba(167,139,250,0.15); border-radius: 999px; position: relative; cursor: pointer; transition: background 0.25s ease; }
+  .se-toggle.on { background: var(--neon); }
+  .se-toggle::after { content: ''; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; background: #fff; border-radius: 50%; transition: transform 0.25s ease; }
+  .se-toggle.on::after { transform: translateX(20px); }
+  .se-lang { display: flex; gap: 4px; padding: 4px; background: rgba(10, 8, 32, 0.6); border-radius: 999px; border: 1px solid rgba(167, 139, 250, 0.12); }
+
+  /* REVIVE MODAL */
+  .revive-overlay { position: fixed; inset: 0; background: rgba(244, 63, 94, 0.4); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); z-index: 180; display: flex; align-items: center; justify-content: center; padding: 24px; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+  .revive-overlay.show { opacity: 1; pointer-events: auto; }
+  .revive-card { width: 100%; max-width: 360px; background: linear-gradient(180deg, #1A0810 0%, #03020A 100%); border: 2px solid rgba(244,63,94,0.4); border-radius: 28px; padding: 32px 24px; text-align: center; box-shadow: 0 0 60px rgba(244,63,94,0.3), 0 20px 60px rgba(0,0,0,0.6); animation: reviveShake 0.5s ease; }
+  @keyframes reviveShake { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-8px); } 40% { transform: translateX(8px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); } }
+  .revive-icon { font-size: 56px; margin-bottom: 12px; animation: revivePulse 1.2s ease-in-out infinite; }
+  @keyframes revivePulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+  .revive-title { font-size: 22px; font-weight: 900; color: var(--danger); margin-bottom: 8px; letter-spacing: -0.01em; text-shadow: 0 0 20px rgba(244,63,94,0.5); }
+  .revive-sub { font-size: 13px; color: #8A8AB0; font-weight: 600; margin-bottom: 20px; line-height: 1.5; }
+  .revive-stats { display: flex; justify-content: center; gap: 24px; margin-bottom: 20px; }
+  .revive-stat { text-align: center; }
+  .revive-stat-val { font-size: 20px; color: var(--gold); font-weight: 900; }
+  .revive-stat-lbl { font-size: 9px; color: #6B6B8C; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; margin-top: 2px; }
+  .revive-timer { font-size: 11px; color: var(--danger); font-weight: 800; margin-bottom: 16px; letter-spacing: 0.1em; font-family: 'SF Mono', monospace; }
+  .revive-btn { width: 100%; padding: 16px; font-size: 14px; font-weight: 900; cursor: pointer; border: none; font-family: inherit; border-radius: 14px; letter-spacing: 0.05em; text-transform: uppercase; transition: all 0.25s ease; margin-bottom: 8px; }
+  .revive-btn-primary { background: linear-gradient(135deg, var(--gold), #F59E0B); color: #03020A; box-shadow: 0 8px 24px rgba(251,191,36,0.4); animation: reviveBtnGlow 1.5s ease-in-out infinite; }
+  @keyframes reviveBtnGlow { 0%, 100% { box-shadow: 0 8px 24px rgba(251,191,36,0.4); } 50% { box-shadow: 0 8px 32px rgba(251,191,36,0.7); } }
+  .revive-btn-primary:disabled { background: rgba(251,191,36,0.15); color: #6B6B8C; cursor: not-allowed; animation: none; box-shadow: none; }
+  .revive-btn-ghost { background: transparent; color: #6B6B8C; border: 1px solid rgba(167,139,250,0.15); }
+
+  /* LOOTBOX MODAL */
+  .loot-overlay { position: fixed; inset: 0; background: rgba(3, 2, 10, 0.85); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); z-index: 170; display: flex; align-items: flex-end; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+  .loot-overlay.show { opacity: 1; pointer-events: auto; }
+  .loot-card { width: 100%; max-width: 420px; background: linear-gradient(180deg, #1A1228 0%, #03020A 100%); border: 1px solid rgba(251,191,36,0.3); border-radius: 28px 28px 0 0; padding: 28px 24px 32px; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); text-align: center; box-shadow: 0 -20px 60px rgba(0,0,0,0.6); }
+  .loot-overlay.show .loot-card { transform: translateY(0); }
+  .loot-grabber { width: 40px; height: 4px; background: rgba(251,191,36,0.2); border-radius: 999px; margin: 0 auto 20px; }
+  .loot-icon { font-size: 64px; margin-bottom: 12px; filter: drop-shadow(0 0 20px rgba(251,191,36,0.5)); animation: lootFloat 2s ease-in-out infinite; }
+  @keyframes lootFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+  .loot-title { font-size: 22px; font-weight: 900; color: #F0EBFF; margin-bottom: 8px; }
+  .loot-title em { color: var(--gold); font-style: normal; }
+  .loot-desc { font-size: 13px; color: #8A8AB0; font-weight: 600; margin-bottom: 20px; line-height: 1.5; max-width: 320px; margin-left: auto; margin-right: auto; }
+  .loot-timer { background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.3); padding: 10px 16px; border-radius: 12px; margin-bottom: 16px; font-size: 12px; color: var(--gold); font-weight: 800; }
+  .loot-actions { display: flex; flex-direction: column; gap: 8px; }
+  .loot-btn { padding: 16px; font-size: 14px; font-weight: 900; cursor: pointer; border: none; font-family: inherit; border-radius: 14px; letter-spacing: 0.05em; text-transform: uppercase; transition: all 0.25s ease; }
+  .loot-btn-instant { background: linear-gradient(135deg, var(--gold), #F59E0B); color: #03020A; box-shadow: 0 8px 24px rgba(251,191,36,0.4); }
+  .loot-btn-instant:disabled { background: rgba(251,191,36,0.15); color: #6B6B8C; cursor: not-allowed; box-shadow: none; }
+  .loot-btn-free { background: rgba(10, 8, 32, 0.8); color: var(--neon); border: 1px solid rgba(167,139,250,0.2); }
+  .loot-btn-ghost { background: transparent; color: #6B6B8C; }
+  .loot-result { font-size: 18px; color: var(--gold); font-weight: 900; margin: 20px 0; padding: 16px; background: rgba(251,191,36,0.1); border-radius: 14px; border: 1px solid rgba(251,191,36,0.3); animation: lootResultPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  @keyframes lootResultPop { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
+  /* REFERRAL SCREEN */
+  .rf-card { background: rgba(10, 8, 32, 0.8); border: 1px solid rgba(167, 139, 250, 0.12); border-radius: 16px; padding: 14px 16px; margin-bottom: 10px; }
+  .rf-link-row { display: flex; gap: 8px; }
+  .rf-link-input { flex: 1; background: rgba(3, 2, 10, 0.5); border: 1px solid rgba(167, 139, 250, 0.1); color: var(--neon); padding: 10px 14px; border-radius: 12px; font-family: 'SF Mono', monospace; font-size: 11px; font-weight: 700; outline: none; user-select: text; }
+  .rf-link-btn { background: var(--neon); color: #03020A; border: none; padding: 10px 18px; font-size: 12px; font-weight: 900; cursor: pointer; font-family: inherit; border-radius: 12px; }
+  .rf-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 12px 0; }
+  .rf-stat { background: rgba(10, 8, 32, 0.8); border: 1px solid rgba(167, 139, 250, 0.12); border-radius: 14px; padding: 14px; text-align: center; }
+  .rf-stat-val { font-size: 26px; color: var(--neon); font-weight: 900; }
+  .rf-stat-lbl { font-size: 9px; color: #6B6B8C; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; margin-top: 4px; }
+
+  /* REFERRAL LOCK BADGE */
+  .sy-lock-badge { display: inline-flex; align-items: center; gap: 3px; background: rgba(244, 63, 94, 0.15); color: var(--danger); padding: 3px 8px; border-radius: 999px; font-size: 9px; font-weight: 800; border: 1px solid rgba(244,63,94,0.3); margin-top: 4px; }
+
+  /* BATTLE ABILITIES */
+  .battle-abilities { position: absolute; bottom: 90px; left: 50%; transform: translateX(-50%); display: flex; gap: 14px; z-index: 6; pointer-events: auto; }
+  .ab-btn { width: 56px; height: 56px; border-radius: 18px; border: 2px solid rgba(167, 139, 250, 0.3); background: rgba(3, 2, 10, 0.85); backdrop-filter: blur(16px) saturate(180%); -webkit-backdrop-filter: blur(16px) saturate(180%); cursor: pointer; font-family: inherit; display: flex; align-items: center; justify-content: center; font-size: 26px; position: relative; transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); overflow: hidden; }
+  .ab-btn:active { transform: scale(0.88); }
+  .ab-btn.ready { border-color: var(--neon); box-shadow: 0 0 20px rgba(167,139,250,0.5), inset 0 1px 0 rgba(255,255,255,0.1); }
+  .ab-btn.emp.ready { border-color: var(--neon-cyan); box-shadow: 0 0 20px rgba(34,211,238,0.5), inset 0 1px 0 rgba(255,255,255,0.1); }
+  .ab-btn.boost.ready { border-color: var(--gold); box-shadow: 0 0 20px rgba(251,191,36,0.5), inset 0 1px 0 rgba(255,255,255,0.1); }
+  .ab-btn.magnet.ready { border-color: var(--neon-pink); box-shadow: 0 0 20px rgba(244,114,182,0.5), inset 0 1px 0 rgba(255,255,255,0.1); }
+  .ab-btn:disabled, .ab-btn.cooldown { opacity: 0.45; }
+  .ab-cd { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(167, 139, 250, 0.35); height: 0%; transition: height 0.1s linear; pointer-events: none; }
+  .ab-cd-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 16px; font-weight: 900; color: #fff; font-family: 'SF Mono', monospace; text-shadow: 0 1px 3px rgba(0,0,0,0.9); pointer-events: none; z-index: 2; }
+  .ab-label { position: absolute; bottom: -18px; left: 50%; transform: translateX(-50%); font-size: 8px; font-weight: 800; color: #6B6B8C; letter-spacing: 0.12em; text-transform: uppercase; white-space: nowrap; pointer-events: none; }
+
+  /* ============ UNIQUE PREMIUM POLISH ============ */
+  /* Corner brackets for cards — signature element */
+  .corner-frame { position: relative; }
+  .corner-frame::before, .corner-frame::after { content: ''; position: absolute; width: 12px; height: 12px; border: 2px solid var(--neon); pointer-events: none; opacity: 0.6; }
+  .corner-frame::before { top: -1px; left: -1px; border-right: none; border-bottom: none; border-top-left-radius: 8px; }
+  .corner-frame::after { bottom: -1px; right: -1px; border-left: none; border-top: none; border-bottom-right-radius: 8px; }
+
+  /* Animated gradient text */
+  .gradient-text { background: linear-gradient(135deg, var(--neon) 0%, var(--neon-cyan) 50%, var(--neon-pink) 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; background-size: 200% 200%; animation: gradientShift 4s ease-in-out infinite; }
+  @keyframes gradientShift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+
+  /* Premium button shine */
+  .shine-btn { position: relative; overflow: hidden; }
+  .shine-btn::after { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent); animation: shine 3s ease-in-out infinite; pointer-events: none; }
+  @keyframes shine { 0% { left: -100%; } 50%, 100% { left: 200%; } }
+
+  /* Pulsing glow ring for important elements */
+  .pulse-ring { animation: pulseRing 2s ease-in-out infinite; }
+  @keyframes pulseRing { 0%, 100% { box-shadow: 0 0 0 0 rgba(167, 139, 250, 0.4); } 50% { box-shadow: 0 0 0 8px rgba(167, 139, 250, 0); } }
+
+  /* Hexagonal accent */
+  .hex-accent { width: 28px; height: 28px; background: linear-gradient(135deg, var(--neon), var(--neon-cyan)); clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); display: inline-flex; align-items: center; justify-content: center; }
+
+  /* Scanline overlay for sci-fi feel */
+  .scanline { position: relative; }
+  .scanline::before { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(167, 139, 250, 0.03) 2px, rgba(167, 139, 250, 0.03) 4px); pointer-events: none; border-radius: inherit; z-index: 1; }
+
+  /* Premium card with layered depth */
+  .premium-card { background: linear-gradient(135deg, rgba(20, 16, 46, 0.9) 0%, rgba(10, 8, 32, 0.95) 100%); border: 1px solid rgba(167, 139, 250, 0.2); border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06), 0 0 0 1px rgba(167, 139, 250, 0.05); position: relative; }
+  .premium-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(167, 139, 250, 0.4), transparent); border-radius: 20px 20px 0 0; }
+
+  /* Top stat cards with unique design */
+  .hs-card { background: linear-gradient(180deg, rgba(20, 16, 46, 0.9) 0%, rgba(10, 8, 32, 0.95) 100%); border: 1px solid rgba(167, 139, 250, 0.15); border-radius: 16px; padding: 14px 8px; text-align: center; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); position: relative; overflow: hidden; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  .hs-card:hover { transform: translateY(-3px); border-color: rgba(167, 139, 250, 0.4); box-shadow: 0 12px 28px rgba(0,0,0,0.4), 0 0 20px rgba(167,139,250,0.15); }
+  .hs-card::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 60%; height: 2px; background: linear-gradient(90deg, transparent, var(--neon), transparent); border-radius: 0 0 4px 4px; }
+  .hs-card .hs-icon { position: relative; z-index: 2; }
+  .hs-card .hs-value { position: relative; z-index: 2; }
+  .hs-card .hs-label { position: relative; z-index: 2; }
+
+  /* Launch button — hero element with depth */
+  .launch-btn { background: linear-gradient(135deg, #7C3AED 0%, #A78BFA 50%, #22D3EE 100%); background-size: 200% 200%; animation: gradientShift 6s ease-in-out infinite; color: #03020A; border: none; padding: 28px 20px; font-size: 22px; font-weight: 900; cursor: pointer; font-family: inherit; border-radius: 24px; letter-spacing: 0.15em; text-transform: uppercase; box-shadow: 0 16px 40px rgba(124, 58, 237, 0.4), 0 8px 20px rgba(34, 211, 238, 0.2), inset 0 2px 0 rgba(255,255,255,0.3), inset 0 -2px 0 rgba(0,0,0,0.2); transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); position: relative; overflow: hidden; }
+  .launch-btn:hover { transform: translateY(-4px) scale(1.01); box-shadow: 0 24px 50px rgba(124, 58, 237, 0.5), 0 12px 28px rgba(34, 211, 238, 0.3), inset 0 2px 0 rgba(255,255,255,0.3); }
+  .launch-btn:active { transform: translateY(-2px) scale(0.99); }
+  .launch-btn::after { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.15), transparent 60%); animation: launchGlow 3s ease-in-out infinite; pointer-events: none; }
+  .launch-btn-icon { font-size: 32px; display: block; margin-bottom: 6px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
+
+  /* Quick buttons — icon-forward design */
+  .hq-btn { background: linear-gradient(180deg, rgba(20, 16, 46, 0.9) 0%, rgba(10, 8, 32, 0.95) 100%); border: 1px solid rgba(167, 139, 250, 0.15); padding: 14px 4px; cursor: pointer; font-family: inherit; display: flex; flex-direction: column; align-items: center; gap: 4px; border-radius: 16px; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); position: relative; overflow: hidden; }
+  .hq-btn:hover { background: linear-gradient(180deg, rgba(30, 24, 66, 0.9) 0%, rgba(15, 12, 40, 0.95) 100%); border-color: rgba(167, 139, 250, 0.4); transform: translateY(-3px); box-shadow: 0 12px 24px rgba(0,0,0,0.4), 0 0 16px rgba(167,139,250,0.15); }
+  .hq-btn:active { transform: translateY(-1px) scale(0.97); }
+  .hq-btn::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--neon), transparent); opacity: 0; transition: opacity 0.3s ease; }
+  .hq-btn:hover::before { opacity: 1; }
+  .hq-btn-icon { font-size: 22px; transition: transform 0.3s ease; }
+  .hq-btn:hover .hq-btn-icon { transform: scale(1.1); }
+  .hq-btn-label { font-size: 10px; font-weight: 800; color: var(--text); letter-spacing: 0.05em; }
+
+  /* Nav buttons — premium glass with active glow */
+  .nav { background: rgba(3, 2, 10, 0.95); backdrop-filter: blur(32px) saturate(180%); -webkit-backdrop-filter: blur(32px) saturate(180%); border-top: 1px solid rgba(167, 139, 250, 0.15); box-shadow: 0 -8px 32px rgba(0,0,0,0.5), 0 -1px 0 rgba(167, 139, 250, 0.1) inset; }
+  .nav-btn { border-radius: 14px; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); position: relative; }
+  .nav-btn:active { transform: scale(0.92); }
+  .nav-btn.active { color: var(--neon); }
+  .nav-btn.active .nav-btn-icon-wrap { background: linear-gradient(135deg, rgba(167, 139, 250, 0.2), rgba(34, 211, 238, 0.1)); box-shadow: 0 0 16px rgba(167, 139, 250, 0.3), inset 0 1px 0 rgba(255,255,255,0.1); }
+  .nav-btn:hover { color: var(--neon); }
+  .nav-btn:hover .nav-btn-icon-wrap { background: rgba(167, 139, 250, 0.1); }
+  .nav-btn-icon-wrap { transition: all 0.3s ease; }
+  .nav-btn-icon { transition: transform 0.3s ease; }
+  .nav-btn:hover .nav-btn-icon { transform: scale(1.1) translateY(-1px); }
+
+  /* Topbar — refined */
+  .topbar { background: rgba(3, 2, 10, 0.95); backdrop-filter: blur(32px) saturate(180%); -webkit-backdrop-filter: blur(32px) saturate(180%); border-bottom: 1px solid rgba(167, 139, 250, 0.15); box-shadow: 0 4px 24px rgba(0,0,0,0.3); }
+  .topbar-logo { background: linear-gradient(135deg, var(--neon), var(--neon-cyan)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; font-size: 14px; font-weight: 900; letter-spacing: 0.15em; }
+  .topbar-title-badge { background: linear-gradient(135deg, rgba(34, 211, 238, 0.12), rgba(167, 139, 250, 0.08)); border: 1px solid rgba(34, 211, 238, 0.25); box-shadow: 0 2px 8px rgba(34, 211, 238, 0.1), inset 0 1px 0 rgba(255,255,255,0.05); }
+  .topbar-pill { background: linear-gradient(135deg, rgba(251, 191, 36, 0.12), rgba(245, 158, 11, 0.08)); border: 1px solid rgba(251, 191, 36, 0.25); box-shadow: 0 2px 8px rgba(251, 191, 36, 0.1), inset 0 1px 0 rgba(255,255,255,0.05); }
+
+  /* Mission card — premium */
+  .hm-card { background: linear-gradient(135deg, rgba(34, 211, 238, 0.1) 0%, rgba(167, 139, 250, 0.05) 50%, rgba(10, 8, 32, 0.9) 100%); border: 1px solid rgba(34, 211, 238, 0.25); border-radius: 18px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05); position: relative; overflow: hidden; }
+  .hm-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--neon-cyan), var(--neon), transparent); }
+
+  /* Daily run banner — eye-catching */
+  .dr-card { background: linear-gradient(135deg, rgba(244, 63, 94, 0.15) 0%, rgba(167, 139, 250, 0.08) 50%, rgba(10, 8, 32, 0.9) 100%); border: 1px solid rgba(244, 63, 94, 0.3); border-radius: 18px; padding: 14px 16px; cursor: pointer; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); display: flex; align-items: center; gap: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05); position: relative; overflow: hidden; }
+  .dr-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--danger), var(--neon-pink), transparent); }
+  .dr-card:hover { transform: translateY(-3px); border-color: var(--danger); box-shadow: 0 14px 32px rgba(244, 63, 94, 0.25), inset 0 1px 0 rgba(255,255,255,0.05); }
+  .dr-card:active { transform: translateY(-1px) scale(0.99); }
+
+  /* Section titles — refined */
+  .dn-section-title, .qu-sub, .cm-sub, .fq-sub, .se-sub, .sy-sub, .ds-sub, .nw-section-title { position: relative; padding-left: 20px; }
+  .dn-section-title::before, .qu-sub::before, .cm-sub::before, .fq-sub::before, .se-sub::before, .sy-sub::before, .ds-sub::before, .nw-section-title::before { content: ''; position: absolute; left: 4px; top: 50%; transform: translateY(-50%); width: 8px; height: 8px; background: var(--neon); border-radius: 2px; transform: translateY(-50%) rotate(45deg); box-shadow: 0 0 8px rgba(167, 139, 250, 0.5); }
+
+  /* Shipyard cards — premium */
+  .sy-card, .dn-card, .qu-card, .nw-reward, .rf-card { background: linear-gradient(180deg, rgba(20, 16, 46, 0.9) 0%, rgba(10, 8, 32, 0.95) 100%); border: 1px solid rgba(167, 139, 250, 0.15); box-shadow: 0 6px 20px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05); transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  .sy-card:hover, .dn-card:hover, .qu-card:hover, .nw-reward:hover, .rf-card:hover { border-color: rgba(167, 139, 250, 0.35); box-shadow: 0 12px 28px rgba(0,0,0,0.4), 0 0 20px rgba(167,139,250,0.12), inset 0 1px 0 rgba(255,255,255,0.05); transform: translateY(-2px); }
+
+  /* Buy buttons — premium gradient */
+  .sy-buy { background: linear-gradient(135deg, var(--neon), #7C3AED); color: #03020A; border: none; padding: 8px 14px; font-size: 11px; font-weight: 900; cursor: pointer; font-family: inherit; border-radius: 999px; letter-spacing: 0.05em; text-transform: uppercase; box-shadow: 0 4px 12px rgba(167, 139, 250, 0.3), inset 0 1px 0 rgba(255,255,255,0.2); transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  .sy-buy:hover:not(:disabled) { transform: translateY(-1px) scale(1.03); box-shadow: 0 6px 16px rgba(167, 139, 250, 0.4); }
+  .sy-buy:active:not(:disabled) { transform: scale(0.96); }
+  .sy-buy:disabled { background: rgba(167, 139, 250, 0.15); color: #6B6B8C; cursor: not-allowed; box-shadow: none; }
+
+  /* Game over buttons — premium */
+  .go-btn, .loot-btn, .modal-btn, .revive-btn { transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  .go-btn:active, .loot-btn:active, .modal-btn:active, .revive-btn:active { transform: scale(0.97); }
+  .go-btn-primary { background: linear-gradient(135deg, #7C3AED, #A78BFA, #22D3EE); background-size: 200% 200%; animation: gradientShift 4s ease-in-out infinite; box-shadow: 0 8px 24px rgba(124, 58, 237, 0.4), inset 0 2px 0 rgba(255,255,255,0.2); }
+  .go-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(124, 58, 237, 0.5), inset 0 2px 0 rgba(255,255,255,0.2); }
+
+  /* Hangar — premium showcase */
+  .hangar-card { background: linear-gradient(135deg, rgba(20, 16, 46, 0.9) 0%, rgba(10, 8, 32, 0.95) 100%); border: 1px solid rgba(167, 139, 250, 0.25); border-radius: 24px; padding: 16px; position: relative; overflow: hidden; box-shadow: 0 12px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06); }
+  .hangar-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--neon), var(--neon-cyan), var(--neon-pink), transparent); }
+  .hangar-card::after { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(167, 139, 250, 0.02) 2px, rgba(167, 139, 250, 0.02) 4px); pointer-events: none; border-radius: 24px; }
+
+  /* Artifact cards — premium with rarity glow */
+  .art-card { transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); position: relative; overflow: hidden; }
+  .art-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--neon), transparent); opacity: 0.6; }
+  .art-card.rare::before { background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent); }
+  .art-card.epic::before { background: linear-gradient(90deg, transparent, var(--neon-pink), transparent); }
+  .art-card:hover { transform: translateY(-6px) scale(1.03); }
+  .art-card:active { transform: translateY(-2px) scale(0.99); }
+
+  /* Onboarding begin button */
+  .ob-begin { background: transparent; color: var(--neon); border: 1px solid var(--neon); padding: 16px 56px; font-size: 13px; font-weight: 800; cursor: pointer; opacity: 0; transition: opacity 1s ease, all 0.3s ease; font-family: inherit; border-radius: 0; letter-spacing: 0.3em; position: relative; z-index: 2; text-transform: uppercase; overflow: hidden; }
+  .ob-begin.show { opacity: 1; }
+  .ob-begin:hover { background: var(--neon); color: #03020A; box-shadow: 0 0 30px rgba(167,139,250,0.5), 0 0 60px rgba(167,139,250,0.3); letter-spacing: 0.4em; }
+  .ob-begin::after { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(167,139,250,0.3), transparent); animation: shine 3s ease-in-out infinite; }
+
+  /* Tab buttons — premium */
+  .qu-tab, .lb-tab { transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); position: relative; overflow: hidden; }
+  .qu-tab.active, .lb-tab.active { box-shadow: 0 4px 16px rgba(34, 211, 238, 0.3), inset 0 1px 0 rgba(255,255,255,0.2); }
+  .qu-tab:active, .lb-tab:active { transform: scale(0.96); }
+
+  /* FAQ items — premium */
+  .fq-item { transition: all 0.3s ease; }
+  .fq-item:hover { border-color: rgba(167, 139, 250, 0.3); }
+  .fq-item.open { border-color: rgba(167, 139, 250, 0.4); box-shadow: 0 8px 24px rgba(0,0,0,0.3), 0 0 16px rgba(167,139,250,0.1); }
+  .fq-q { transition: all 0.2s ease; }
+  .fq-q:active { background: rgba(167, 139, 250, 0.05); }
+
+  /* Settings toggle — premium */
+  .se-toggle { transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  .se-toggle::after { transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); box-shadow: 0 2px 6px rgba(0,0,0,0.3); }
+  .se-toggle.on { background: linear-gradient(135deg, var(--neon), #7C3AED); box-shadow: 0 0 12px rgba(167, 139, 250, 0.4); }
+
+  /* Toast — premium */
+  .toast { backdrop-filter: blur(24px) saturate(180%); -webkit-backdrop-filter: blur(24px) saturate(180%); }
+
+  /* Modal cards — premium depth */
+  .modal-card, .loot-card, .revive-card { box-shadow: 0 -20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(167, 139, 250, 0.1); }
+  .modal-card::before, .loot-card::before, .revive-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--neon), transparent); border-radius: inherit; }
+
+  .dn-title, .qu-title, .cm-title, .fq-title, .se-title, .sy-title, .ds-title, .nw-title, .msg-title, .dr-screen-title { position: relative; }
+  .dn-title em, .qu-title em, .cm-title em, .fq-title em, .sy-title em, .ds-title em, .nw-title em, .msg-title em, .dr-screen-title em { background: linear-gradient(135deg, var(--neon), var(--neon-cyan)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+
+  /* Onboarding title — gradient */
+  .ob-title em { background: linear-gradient(135deg, var(--neon), var(--neon-cyan), var(--neon-pink)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; background-size: 200% 200%; animation: gradientShift 4s ease-in-out infinite; }
+  .threat-indicator { position: absolute; top: 110px; left: 50%; transform: translateX(-50%); display: flex; gap: 4px; z-index: 5; pointer-events: none; }
+  .ti-dot { width: 24px; height: 4px; border-radius: 999px; background: rgba(167,139,250,0.15); transition: all 0.3s ease; }
+  .ti-dot.active { background: var(--danger); box-shadow: 0 0 8px rgba(244,63,94,0.6); }
+
+  /* DAILY RUN BANNER */
+  .dr-banner { width: 100%; max-width: 540px; padding: 0 14px; margin-bottom: 16px; }
+  .dr-card { background: linear-gradient(135deg, rgba(244,63,94,0.12), rgba(10,8,32,0.8)); border: 1px solid rgba(244, 63, 94, 0.3); border-radius: 18px; padding: 14px 16px; cursor: pointer; transition: all 0.25s ease; display: flex; align-items: center; gap: 12px; }
+  .dr-card:hover { transform: translateY(-2px); border-color: var(--danger); box-shadow: 0 8px 24px rgba(244,63,94,0.2); }
+  .dr-icon { font-size: 28px; }
+  .dr-body { flex: 1; }
+  .dr-title { font-size: 14px; font-weight: 900; color: #F0EBFF; }
+  .dr-sub { font-size: 11px; color: #8A8AB0; margin-top: 2px; }
+  .dr-arrow { color: var(--danger); font-size: 20px; }
+
+  /* ARTIFACT SELECTION MODAL */
+  .art-overlay { position: fixed; inset: 0; background: rgba(3, 2, 10, 0.92); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); z-index: 160; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; }
+  .art-overlay.show { opacity: 1; pointer-events: auto; }
+  .art-header { text-align: center; margin-bottom: 20px; }
+  .art-title { font-size: 22px; font-weight: 900; color: #F0EBFF; margin-bottom: 6px; }
+  .art-title em { color: var(--neon); font-style: normal; }
+  .art-sub { font-size: 12px; color: #8A8AB0; font-weight: 600; max-width: 320px; line-height: 1.5; }
+  .art-cards { display: flex; gap: 12px; max-width: 540px; width: 100%; }
+  .art-card { flex: 1; background: linear-gradient(135deg, rgba(167,139,250,0.08), rgba(10,8,32,0.9)); border: 1px solid rgba(167, 139, 250, 0.2); border-radius: 20px; padding: 18px 12px; cursor: pointer; transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); text-align: center; }
+  .art-card:hover { transform: translateY(-4px) scale(1.02); border-color: var(--neon); box-shadow: 0 12px 32px rgba(167,139,250,0.3); }
+  .art-card.rare { border-color: rgba(34,211,238,0.3); background: linear-gradient(135deg, rgba(34,211,238,0.08), rgba(10,8,32,0.9)); }
+  .art-card.rare:hover { border-color: var(--neon-cyan); box-shadow: 0 12px 32px rgba(34,211,238,0.3); }
+  .art-card.epic { border-color: rgba(244,114,182,0.3); background: linear-gradient(135deg, rgba(244,114,182,0.08), rgba(10,8,32,0.9)); }
+  .art-card.epic:hover { border-color: var(--neon-pink); box-shadow: 0 12px 32px rgba(244,114,182,0.3); }
+  .art-icon { font-size: 40px; margin-bottom: 10px; filter: drop-shadow(0 0 12px rgba(167,139,250,0.4)); }
+  .art-card.rare .art-icon { filter: drop-shadow(0 0 12px rgba(34,211,238,0.4)); }
+  .art-card.epic .art-icon { filter: drop-shadow(0 0 12px rgba(244,114,182,0.4)); }
+  .art-name { font-size: 13px; font-weight: 900; color: #F0EBFF; margin-bottom: 6px; }
+  .art-pro { font-size: 11px; color: var(--success); font-weight: 700; margin-bottom: 3px; line-height: 1.4; }
+  .art-con { font-size: 11px; color: var(--danger); font-weight: 700; line-height: 1.4; }
+  .art-rarity { font-size: 8px; color: #6B6B8C; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; margin-top: 8px; }
+  .art-card.rare .art-rarity { color: var(--neon-cyan); }
+  .art-card.epic .art-rarity { color: var(--neon-pink); }
+  .art-skip { margin-top: 20px; background: transparent; border: 1px solid rgba(167,139,250,0.15); color: #6B6B8C; padding: 12px 28px; font-size: 11px; font-weight: 800; cursor: pointer; font-family: inherit; border-radius: 999px; letter-spacing: 0.1em; text-transform: uppercase; transition: all 0.25s ease; }
+  .art-skip:hover { color: var(--neon); border-color: var(--neon); }
+
+  /* HANGAR (enhanced Shipyard) */
+  .hangar-wrap { max-width: 540px; margin: 0 auto 16px; padding: 0 16px; }
+  .hangar-card { background: linear-gradient(135deg, rgba(167,139,250,0.06), rgba(10,8,32,0.9)); border: 1px solid rgba(167, 139, 250, 0.2); border-radius: 24px; padding: 16px; position: relative; overflow: hidden; }
+  .hangar-canvas-wrap { width: 100%; aspect-ratio: 1.4; position: relative; margin-bottom: 12px; }
+  .hangar-canvas-wrap canvas { width: 100%; height: 100%; display: block; }
+  .hangar-name { text-align: center; font-size: 16px; font-weight: 900; color: #F0EBFF; margin-bottom: 4px; }
+  .hangar-tier { text-align: center; font-size: 11px; color: var(--neon); font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; }
+  .hangar-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 12px; }
+  .hst-card { background: rgba(3, 2, 10, 0.5); border: 1px solid rgba(167, 139, 250, 0.1); border-radius: 10px; padding: 8px 4px; text-align: center; }
+  .hst-icon { font-size: 14px; margin-bottom: 2px; }
+  .hst-val { font-size: 12px; color: var(--neon); font-weight: 900; }
+  .hst-lbl { font-size: 7px; color: #6B6B8C; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+  .se-reset { background: rgba(244, 63, 94, 0.1); border: 1px solid rgba(244, 63, 94, 0.3); color: var(--danger); padding: 14px; border-radius: 14px; font-size: 13px; font-weight: 800; cursor: pointer; font-family: inherit; text-align: center; text-transform: uppercase; letter-spacing: 0.1em; }
+
+  /* NAV */
+  .nav { position: fixed; bottom: 0; left: 0; right: 0; height: 70px; display: flex; align-items: center; justify-content: space-around; background: rgba(3, 2, 10, 0.92); backdrop-filter: blur(24px) saturate(180%); -webkit-backdrop-filter: blur(24px) saturate(180%); border-top: 1px solid rgba(167, 139, 250, 0.12); z-index: 50; padding-bottom: env(safe-area-inset-bottom, 0); }
+  .nav-btn { background: none; border: none; color: #6B6B8C; cursor: pointer; font-family: inherit; font-size: 10px; font-weight: 700; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 10px; transition: all 0.25s ease; position: relative; border-radius: 14px; }
+  .nav-btn.active { color: var(--neon); }
+  .nav-btn.active .nav-btn-icon-wrap { background: rgba(167, 139, 250, 0.1); }
+  .nav-btn:hover { color: var(--neon); }
+  .nav-btn-icon-wrap { width: 34px; height: 34px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+  .nav-btn-icon { font-size: 18px; }
+  .nav-badge { position: absolute; top: 4px; right: 4px; background: var(--danger); color: #fff; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 999px; font-size: 9px; font-weight: 800; display: none; align-items: center; justify-content: center; }
+  .nav-badge.show { display: flex; }
+  .nav-badge.cyan { background: var(--neon-cyan); color: #03020A; }
+
+  /* TOAST */
+  .toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(20px); background: rgba(10, 8, 32, 0.95); color: var(--neon); padding: 12px 22px; font-size: 12px; font-weight: 800; z-index: 200; opacity: 0; transition: opacity 0.3s ease, transform 0.3s ease; pointer-events: none; border-radius: 999px; box-shadow: 0 12px 30px rgba(0,0,0,0.5); max-width: 300px; text-align: center; border: 1px solid rgba(167, 139, 250, 0.3); text-transform: uppercase; }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.gold { color: var(--gold); border-color: rgba(251,191,36,0.4); }
+  .toast.danger { color: var(--danger); border-color: rgba(244,63,94,0.4); }
+  .toast.cyan { color: var(--neon-cyan); border-color: rgba(34,211,238,0.4); }
+  .toast.success { color: var(--success); border-color: rgba(52,211,153,0.4); }
+</style>
+</head>
+<body>
+
+<!-- ONBOARDING -->
+<div id="onboarding">
+  <div class="lang-switcher">
+    <button class="lang-btn active" data-lang="ru" onclick="setLang('ru')">RU</button>
+    <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+  </div>
+  <div class="ob-logo mono" id="obLogo">V O I D &nbsp; D R I F T E R</div>
+  <div class="ob-ship-wrap" id="obShipWrap"><canvas id="obCanvas" width="400" height="400"></canvas></div>
+  <h1 class="ob-title" id="obTitle" data-i18n="ob_title"></h1>
+  <div class="ob-sub" id="obSub" data-i18n="ob_sub"></div>
+  <button class="ob-begin" id="obBegin" onclick="enterApp()" data-i18n="ob_begin"></button>
+</div>
+
+<!-- LAUNCH ANIMATION OVERLAY -->
+<div id="launch-overlay">
+  <canvas id="launchCanvas" width="800" height="800"></canvas>
+  <div class="launch-text mono" id="launchText">ПРЫЖОК...</div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="topbar">
+    <div class="topbar-logo mono">LETUCHKA</div>
+    <div class="topbar-title-badge mono" id="topTitle">ИСКАТЕЛЬ</div>
+    <div class="topbar-right">
+      <div class="topbar-pill"><span>★</span><span id="starsCount">50</span></div>
+    </div>
+  </div>
+
+  <div class="screens-wrap">
+    <!-- HOME -->
+    <div id="home" class="screen active">
+      <div class="home-stats">
+        <div class="hs-card"><div class="hs-icon">💎</div><div class="hs-value cyan" id="hsPlasma">0</div><div class="hs-label" data-i18n="hs_plasma"></div></div>
+        <div class="hs-card"><div class="hs-icon">⭐</div><div class="hs-value gold" id="hsGlory">0</div><div class="hs-label" data-i18n="hs_glory"></div></div>
+        <div class="hs-card"><div class="hs-icon">🏆</div><div class="hs-value" id="hsBest">0</div><div class="hs-label" data-i18n="hs_best"></div></div>
+      </div>
+      <div class="home-launch">
+        <button class="launch-btn" onclick="startBattle()">
+          <span class="launch-btn-icon">🚀</span>
+          <span data-i18n="launch"></span>
+        </button>
+      </div>
+      <div class="dr-banner">
+        <div class="dr-card" onclick="switchScreen('dailyrun')">
+          <div class="dr-icon">⚔️</div>
+          <div class="dr-body">
+            <div class="dr-title" data-i18n="dr_title"></div>
+            <div class="dr-sub" data-i18n="dr_sub"></div>
+          </div>
+          <div class="dr-arrow">›</div>
+        </div>
+      </div>
+      <div class="home-quick">
+        <button class="hq-btn" onclick="switchScreen('shipyard')"><div class="hq-btn-icon">🛠</div><div class="hq-btn-label" data-i18n="nav_shipyard"></div></button>
+        <button class="hq-btn" onclick="switchScreen('quests')"><div class="hq-btn-icon">📋</div><div class="hq-btn-label" data-i18n="nav_quests"></div><div class="hq-badge cyan" id="qBadge">3</div></button>
+        <button class="hq-btn" onclick="switchScreen('comms')"><div class="hq-btn-icon">📨</div><div class="hq-btn-label" data-i18n="nav_comms"></div><div class="hq-badge cyan" id="cmBadge">!</div></button>
+        <button class="hq-btn" onclick="switchScreen('faq')"><div class="hq-btn-icon">❓</div><div class="hq-btn-label" data-i18n="nav_faq"></div></button>
+      </div>
+      <div class="home-mission">
+        <div class="hm-card">
+          <div class="hm-icon">🎯</div>
+          <div class="hm-body">
+            <div class="hm-title" id="hmTitle">—</div>
+            <div class="hm-progress" id="hmProgress">—</div>
+            <div class="hm-bar"><div class="hm-bar-fill" id="hmBar" style="width: 0%;"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BATTLE -->
+    <div id="battle" class="screen">
+      <div class="battle-canvas-wrap"><canvas id="battleCanvas"></canvas></div>
+      <div class="battle-hud">
+        <div class="bh-left">
+          <div class="bh-card gold"><span>💎</span><span id="bhPlasma">0</span></div>
+          <div class="bh-card"><span class="bh-hp" id="bhHp"></span></div>
+        </div>
+        <div class="bh-right">
+          <div class="bh-card danger"><span>💀</span><span id="bhKills">0</span></div>
+          <div class="bh-card"><span class="bh-timer" id="bhTimer">0:00</span></div>
+        </div>
+      </div>
+      <button class="battle-pause" onclick="pauseBattle()">⏸</button>
+      <div class="threat-indicator" id="threatIndicator"></div>
+      <div class="battle-abilities">
+        <button class="ab-btn emp ready" id="abEmp" onclick="useAbility('emp')"><span>⚡</span><div class="ab-cd" id="abEmpCd"></div><div class="ab-cd-text" id="abEmpText" style="display:none;"></div><div class="ab-label">EMP</div></button>
+        <button class="ab-btn boost ready" id="abBoost" onclick="useAbility('boost')"><span>🔥</span><div class="ab-cd" id="abBoostCd"></div><div class="ab-cd-text" id="abBoostText" style="display:none;"></div><div class="ab-label">FORSAJ</div></button>
+        <button class="ab-btn magnet ready" id="abMagnet" onclick="useAbility('magnet')"><span>🧲</span><div class="ab-cd" id="abMagnetCd"></div><div class="ab-cd-text" id="abMagnetText" style="display:none;"></div><div class="ab-label">MAGNET</div></button>
+      </div>
+      <div class="battle-joyhint" id="joyHint" data-i18n="joy_hint"></div>
+    </div>
+
+    <!-- GAME OVER -->
+    <div id="gameover" class="screen">
+      <div class="go-icon">💥</div>
+      <div class="go-title" data-i18n="go_title"></div>
+      <div class="go-sub" data-i18n="go_sub"></div>
+      <div class="go-rewards">
+        <div class="gr-card"><div class="gr-icon">💎</div><div class="gr-value" id="grPlasma">0</div><div class="gr-label" data-i18n="gr_plasma"></div></div>
+        <div class="gr-card"><div class="gr-icon">⭐</div><div class="gr-value gold" id="grGlory">0</div><div class="gr-label" data-i18n="gr_glory"></div></div>
+      </div>
+      <div class="go-stats">
+        <div class="gs-card">
+          <div class="gs-row"><span class="gs-label" data-i18n="gs_kills"></span><span class="gs-value cyan" id="gsKills">0</span></div>
+          <div class="gs-row"><span class="gs-label" data-i18n="gs_time"></span><span class="gs-value" id="gsTime">0:00</span></div>
+          <div class="gs-row"><span class="gs-label" data-i18n="gs_plasma_collected"></span><span class="gs-value gold" id="gsPlasmaCollected">0</span></div>
+        </div>
+      </div>
+      <div class="go-actions">
+        <button class="go-btn go-btn-primary" onclick="startBattle()" data-i18n="go_again"></button>
+        <button class="go-btn go-btn-secondary" onclick="switchScreen('shipyard')" data-i18n="go_shipyard"></button>
+        <button class="go-btn go-btn-ghost" onclick="switchScreen('home')" data-i18n="go_home"></button>
+      </div>
+    </div>
+
+    <!-- SHIPYARD -->
+    <div id="shipyard" class="screen">
+      <div class="sy-header">
+        <div class="sy-title" data-i18n="sy_title"></div>
+        <div class="sy-sub mono" data-i18n="sy_sub"></div>
+      </div>
+      <!-- HANGAR PREVIEW -->
+      <div class="hangar-wrap">
+        <div class="hangar-card">
+          <div class="hangar-canvas-wrap"><canvas id="hangarCanvas" width="540" height="386"></canvas></div>
+          <div class="hangar-name" id="hangarName">🚀 ЛЕТУЧКА</div>
+          <div class="hangar-tier" id="hangarTier">Tier I · Искатель</div>
+          <div class="hangar-stats">
+            <div class="hst-card"><div class="hst-icon">⚡</div><div class="hst-val" id="hstFire">1</div><div class="hst-lbl" data-i18n="hst_fire"></div></div>
+            <div class="hst-card"><div class="hst-icon">💥</div><div class="hst-val" id="hstDmg">1</div><div class="hst-lbl" data-i18n="hst_dmg"></div></div>
+            <div class="hst-card"><div class="hst-icon">🎯</div><div class="hst-val" id="hstRad">30</div><div class="hst-lbl" data-i18n="hst_rad"></div></div>
+            <div class="hst-card"><div class="hst-icon">❤️</div><div class="hst-val" id="hstHp">3</div><div class="hst-lbl" data-i18n="hst_hp"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="sy-balance">
+        <div class="sy-balance-card">
+          <div class="sy-balance-label mono" data-i18n="sy_balance"></div>
+          <div class="sy-balance-value mono" id="syBalance">0 💎</div>
+        </div>
+      </div>
+      <div class="sy-list" id="syList"></div>
+    </div>
+
+    <!-- QUESTS -->
+    <div id="quests" class="screen">
+      <div class="qu-header">
+        <div class="qu-title" data-i18n="qu_title"></div>
+        <div class="qu-sub mono" data-i18n="qu_sub"></div>
+      </div>
+      <div class="qu-tabs">
+        <button class="qu-tab active" data-tab="daily" onclick="switchQuestTab('daily')" data-i18n="qu_daily"></button>
+        <button class="qu-tab" data-tab="weekly" onclick="switchQuestTab('weekly')" data-i18n="qu_weekly"></button>
+        <button class="qu-tab" data-tab="story" onclick="switchQuestTab('story')" data-i18n="qu_story"></button>
+      </div>
+      <div class="qu-list" id="quList"></div>
+    </div>
+
+    <!-- COMMS -->
+    <div id="comms" class="screen">
+      <div class="cm-header">
+        <div class="cm-title" data-i18n="cm_title"></div>
+        <div class="cm-sub mono" data-i18n="cm_sub"></div>
+      </div>
+      <div class="cm-list" id="cmList"></div>
+    </div>
+
+    <!-- FAQ -->
+    <div id="faq" class="screen">
+      <div class="fq-header">
+        <div class="fq-title" data-i18n="fq_title"></div>
+        <div class="fq-sub mono" data-i18n="fq_sub"></div>
+      </div>
+      <div class="fq-list" id="fqList"></div>
+    </div>
+
+    <!-- DAILY RUN -->
+    <div id="dailyrun" class="screen">
+      <div class="qu-header">
+        <div class="qu-title" data-i18n="dr_screen_title"></div>
+        <div class="qu-sub mono" data-i18n="dr_screen_sub"></div>
+      </div>
+      <div style="max-width:540px;margin:0 auto;padding:0 16px;">
+        <div class="dr-card" style="margin-bottom:16px;cursor:default;">
+          <div class="dr-icon">🗺️</div>
+          <div class="dr-body">
+            <div class="dr-title" data-i18n="dr_today"></div>
+            <div class="dr-sub" id="drDate">—</div>
+          </div>
+        </div>
+        <button class="launch-btn" style="margin-bottom:20px;font-size:18px;padding:20px;" onclick="startDailyRun()">
+          <span class="launch-btn-icon">⚔️</span>
+          <span data-i18n="dr_start"></span>
+        </button>
+        <div style="font-size:11px;font-weight:800;color:#6B6B8C;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:10px;" data-i18n="dr_lb"></div>
+        <div id="drLeaderboard"></div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div id="settings" class="screen">
+      <div class="se-header">
+        <div class="se-title" data-i18n="se_title"></div>
+        <div class="se-sub mono" data-i18n="se_sub"></div>
+      </div>
+      <div class="se-list">
+        <div class="se-card">
+          <div class="se-info">
+            <div class="se-name" data-i18n="se_lang"></div>
+            <div class="se-desc" data-i18n="se_lang_desc"></div>
+          </div>
+          <div class="se-lang">
+            <button class="lang-btn active" data-lang="ru" onclick="setLang('ru')">RU</button>
+            <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+          </div>
+        </div>
+        <div class="se-card">
+          <div class="se-info"><div class="se-name" data-i18n="se_sound"></div><div class="se-desc" data-i18n="se_sound_desc"></div></div>
+          <div class="se-toggle on" id="seSound" onclick="toggleSetting('sound', this)"></div>
+        </div>
+        <div class="se-card">
+          <div class="se-info"><div class="se-name" data-i18n="se_vibration"></div><div class="se-desc" data-i18n="se_vibration_desc"></div></div>
+          <div class="se-toggle on" id="seVibration" onclick="toggleSetting('vibration', this)"></div>
+        </div>
+        <button class="se-reset" onclick="resetProgress()" data-i18n="se_reset"></button>
+      </div>
+    </div>
+
+    <!-- REFERRALS -->
+    <div id="referrals" class="screen">
+      <div class="qu-header" style="margin-bottom:16px;">
+        <div class="qu-title" data-i18n="rf_title"></div>
+        <div class="qu-sub mono" data-i18n="rf_sub"></div>
+      </div>
+      <div style="max-width:540px;margin:0 auto;padding:0 16px;">
+        <div class="rf-card">
+          <div style="font-size:10px;color:#6B6B8C;font-weight:800;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:8px;" data-i18n="rf_link_label"></div>
+          <div class="rf-link-row">
+            <input class="rf-link-input mono" id="rfLink" value="t.me/letuchka_bot?start=ref_HK7X9Q" readonly>
+            <button class="rf-link-btn" onclick="copyRefLink()" data-i18n="rf_copy"></button>
+          </div>
+        </div>
+        <div class="rf-stats">
+          <div class="rf-stat"><div class="rf-stat-val mono" id="rfInvited">0</div><div class="rf-stat-lbl" data-i18n="rf_invited"></div></div>
+          <div class="rf-stat"><div class="rf-stat-val mono" id="rfNeeded">3</div><div class="rf-stat-lbl" data-i18n="rf_needed"></div></div>
+        </div>
+        <div style="background:linear-gradient(135deg,rgba(244,63,94,0.08),rgba(10,8,32,0.8));border:1px solid rgba(244,63,94,0.2);border-radius:14px;padding:14px 16px;margin-bottom:12px;">
+          <div style="font-size:13px;color:#F0EBFF;font-weight:800;margin-bottom:6px;" data-i18n="rf_lock_title"></div>
+          <div style="font-size:11px;color:#8A8AB0;font-weight:600;line-height:1.5;" data-i18n="rf_lock_desc"></div>
+        </div>
+        <div style="background:linear-gradient(135deg,rgba(251,191,36,0.08),rgba(10,8,32,0.8));border:1px solid rgba(251,191,36,0.2);border-radius:14px;padding:14px 16px;">
+          <div style="font-size:13px;color:#F0EBFF;font-weight:800;margin-bottom:6px;" data-i18n="rf_rewards_title"></div>
+          <div style="font-size:11px;color:#8A8AB0;font-weight:600;line-height:1.5;" data-i18n="rf_rewards_desc"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav">
+    <button class="nav-btn active" data-screen="home" onclick="switchScreen('home')"><div class="nav-btn-icon-wrap"><div class="nav-btn-icon">🏠</div></div><span data-i18n="nav_home"></span></button>
+    <button class="nav-btn" data-screen="shipyard" onclick="switchScreen('shipyard')"><div class="nav-btn-icon-wrap"><div class="nav-btn-icon">🛠</div></div><span data-i18n="nav_shipyard"></span></button>
+    <button class="nav-btn" data-screen="quests" onclick="switchScreen('quests')"><div class="nav-btn-icon-wrap"><div class="nav-btn-icon">📋</div></div><span data-i18n="nav_quests"></span><div class="nav-badge cyan" id="navQuestBadge">3</div></button>
+    <button class="nav-btn" data-screen="referrals" onclick="switchScreen('referrals')"><div class="nav-btn-icon-wrap"><div class="nav-btn-icon">🔗</div></div><span data-i18n="nav_refs"></span></button>
+    <button class="nav-btn" data-screen="settings" onclick="switchScreen('settings')"><div class="nav-btn-icon-wrap"><div class="nav-btn-icon">⚙️</div></div><span data-i18n="nav_settings"></span></button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- REVIVE MODAL -->
+<div class="revive-overlay" id="reviveOverlay">
+  <div class="revive-card">
+    <div class="revive-icon">💥</div>
+    <div class="revive-title" data-i18n="revive_title"></div>
+    <div class="revive-sub" data-i18n="revive_sub"></div>
+    <div class="revive-stats">
+      <div class="revive-stat"><div class="revive-stat-val" id="rvPlasma">0</div><div class="revive-stat-lbl" data-i18n="gr_plasma"></div></div>
+      <div class="revive-stat"><div class="revive-stat-val" id="rvKills">0</div><div class="revive-stat-lbl" data-i18n="gs_kills"></div></div>
+      <div class="revive-stat"><div class="revive-stat-val" id="rvTime">0:00</div><div class="revive-stat-lbl" data-i18n="gs_time"></div></div>
+    </div>
+    <div class="revive-timer mono" id="rvTimer">10</div>
+    <button class="revive-btn revive-btn-primary" id="rvBtn" onclick="revive()"><span data-i18n="revive_btn"></span> · 50 ★</button>
+    <button class="revive-btn revive-btn-ghost" onclick="declineRevive()" data-i18n="revive_decline"></button>
+  </div>
+</div>
+
+<!-- LOOTBOX MODAL -->
+<div class="loot-overlay" id="lootOverlay">
+  <div class="loot-card" id="lootCard">
+    <div class="loot-grabber"></div>
+    <div class="loot-icon" id="lootIcon">📦</div>
+    <div class="loot-title" data-i18n="loot_title"></div>
+    <div class="loot-desc" data-i18n="loot_desc"></div>
+    <div class="loot-timer" id="lootTimer" style="display:none;"></div>
+    <div class="loot-result" id="lootResult" style="display:none;"></div>
+    <div class="loot-actions" id="lootActions">
+      <button class="loot-btn loot-btn-instant" id="lootInstantBtn" onclick="openLootInstant()"><span data-i18n="loot_instant"></span> · 100 ★</button>
+      <button class="loot-btn loot-btn-free" id="lootFreeBtn" onclick="openLootFree()" data-i18n="loot_free"></button>
+      <button class="loot-btn loot-btn-ghost" onclick="closeLoot()" data-i18n="loot_later"></button>
+    </div>
+  </div>
+</div>
+
+<!-- ARTIFACT SELECTION MODAL -->
+<div class="art-overlay" id="artOverlay">
+  <div class="art-header">
+    <div class="art-title" data-i18n="art_title"></div>
+    <div class="art-sub" data-i18n="art_sub"></div>
+  </div>
+  <div class="art-cards" id="artCards"></div>
+  <button class="art-skip" onclick="skipArtifact()" data-i18n="art_skip"></button>
+</div>
+
+<script>
+  // ============ I18N ============
+  const I18N = {
+    ru: {
+      ob_title: 'Прорыв<br><em>блокады.</em>',
+      ob_sub: 'Ты — капитан ЛЕТУЧКИ. Собирай плазму. Отстреливай дронов Наблюдателей. Прорывайся через блокаду. Чем дольше живёшь — тем больше награда.',
+      ob_begin: 'Взлёт',
+      hs_plasma: 'ПЛАЗМА', hs_glory: 'СЛАВА', hs_best: 'РЕКОРД',
+      launch: 'ЛЕТЕТЬ',
+      nav_home: 'Главная', nav_shipyard: 'Верфь', nav_quests: 'Задания', nav_comms: 'Связь', nav_faq: 'FAQ', nav_settings: 'Настройки',
+      joy_hint: 'Веди палец в любом месте — корабль летит за ним',
+      go_title: 'РЕЙС ОКОНЧЕН', go_sub: 'Корабль уничтожен. Плазма спасена.',
+      gr_plasma: 'ПЛАЗМА', gr_glory: 'СЛАВА',
+      gs_kills: 'Дронов сбито', gs_time: 'Время в рейсе', gs_plasma_collected: 'Плазмы собрано',
+      go_again: 'ЛЕТЕТЬ СНОВА', go_shipyard: 'В ВЕРФЬ', go_home: 'НА ГЛАВНУЮ',
+      sy_title: 'Космическая <em>верфь</em>', sy_sub: 'Апгрейды корабля · прокачка',
+      sy_balance: 'БАЛАНС ПЛАЗМЫ',
+      qu_title: 'Задания <em>капитана</em>', qu_sub: 'Выполняй · получай награды',
+      qu_daily: 'Дневные', qu_weekly: 'Недельные', qu_story: 'Сюжет',
+      cm_title: 'Гиперпространственные <em>сигналы</em>', cm_sub: 'Те, кто вышел на связь',
+      fq_title: 'Как <em>играть</em>', fq_sub: 'Механики · советы · секреты',
+      se_title: 'Настройки', se_sub: 'Язык · звук · вибрация',
+      se_lang: 'Язык', se_lang_desc: 'RU / EN',
+      se_sound: 'Звук', se_sound_desc: 'Звуковые эффекты',
+      se_vibration: 'Вибрация', se_vibration_desc: 'Тактильная отдача',
+      se_reset: 'СБРОСИТЬ ПРОГРЕСС',
+      not_enough: 'Недостаточно плазмы',
+      purchased: 'Апгрейд куплен',
+      maxed: 'Максимальный уровень',
+      quest_done: 'Задание выполнено',
+      chapter_unlocked: 'Глава разблокирована',
+      need_referrals: 'Нужно 3 приглашённых капитана',
+      not_enough_stars: 'Недостаточно звёзд',
+      ref_copied: 'Ссылка скопирована',
+      ref_invited: 'Новый капитан присоединился!',
+      revive_title: 'КОРАБЛЬ ПОВРЕЖДЁН',
+      revive_sub: 'Восстановить щиты и продолжить рейс? Не упусти награду!',
+      revive_btn: 'ВОССТАНОВИТЬ',
+      revive_decline: 'Сдаться',
+      loot_title: 'Секретный <em>груз</em>',
+      loot_desc: 'Контейнер с Золотого Дрона. Внутри — плазма, звёзды или уникальный скин корабля.',
+      loot_instant: 'ОТКРЫТЬ СЕЙЧАС',
+      loot_free: 'Открыть бесплатно (3ч)',
+      loot_later: 'Позже',
+      loot_opening: 'Открываем...',
+      loot_ready: 'Готов к открытию!',
+      loot_waiting: 'Откроется через',
+      rf_title: 'Твой <em>флот</em>',
+      rf_sub: 'Зови капитанов · открывай ТОП-апгрейды',
+      rf_link_label: 'ТВОЯ ПРИГЛАСИТЕЛЬНАЯ ССЫЛКА',
+      rf_copy: 'КОПИРОВАТЬ',
+      rf_invited: 'ПРИГЛАШЕНО',
+      rf_needed: 'НУЖНО ДЛЯ ТОП',
+      rf_lock_title: '🔒 Блокировка ТОП-апгрейдов',
+      rf_lock_desc: '4-й и 5-й уровни апгрейдов в Верфи требуют минимум 3 приглашённых капитана. Делись ссылкой — открывай мощь.',
+      rf_rewards_title: '🎁 Награды за рефералов',
+      rf_rewards_desc: '1 капитан → +5% к добыче. 3 капитана → разблокировка ТОП-апгрейдов. 10 капитанов → +5000 плазмы.',
+      nav_refs: 'Флот',
+      dr_title: 'Дневной вызов',
+      dr_sub: 'Одинаковая карта для всех · кто соберёт больше плазмы?',
+      dr_screen_title: 'Дневной <em>рейд</em>',
+      dr_screen_sub: 'Сегодня все играют одну карту',
+      dr_today: 'Карта дня',
+      dr_start: 'НАЧАТЬ РЕЙД',
+      dr_lb: 'Лидеры сегодня',
+      dr_seed: 'Сид дня',
+      art_title: 'Модуль <em>дрейфа</em>',
+      art_sub: 'Выбери модификатор на этот рейс. Каждый рейс — новый билд.',
+      art_skip: 'Играть без модуля',
+      hst_fire: 'СКОР.СТР', hst_dmg: 'УРОН', hst_rad: 'РАДИУС', hst_hp: 'ПРОЧН',
+      titles: ['Искатель','Новичок','Штурман','Капитан','Командор','Адмирал','Звездоходец','Галактический Лорд','Бог Вселенной'],
+      faq: {
+        q1: 'Как управлять кораблём?',
+        a1: 'Поставь палец в любое место экрана и веди его. Корабль плавно летит в ту же сторону. Это виртуальный джойстик — самое надёжное управление на мобильных.',
+        q2: 'Как собирать плазму?',
+        a2: 'Плазма (синие кристаллы) автоматически собирается, когда твой корабль оказывается рядом. Чем выше уровень «Радиуса добычи» в Верфи — тем дальше собираешь.',
+        q3: 'Как стрелять?',
+        a3: 'Корабль стреляет автоматически по ближайшим дронам. Тебе нужно только маневрировать. Прокачивай «Скорострельность» и «Урон» в Верфи.',
+        q4: 'Что делать с красными дронами?',
+        a4: 'Красные дроны Наблюдателей летят прямо на тебя. Если врежется — потеряешь 1 HP и часть плазмы. Уворачивайся и отстреливай их.',
+        q5: 'Что такое слава?',
+        a5: 'Слава растёт от убийств дронов и времени в рейсе. От неё зависит твой титул: от Искателя до Бога Вселенной.',
+        q6: 'Зачем нужны звёзды?',
+        a6: 'Звёзды (★) — премиум-валюта. В будущей версии за них можно купить разгон и автопилот. Сейчас выдаются за кейсы и достижения.',
+        q7: 'Советы новичку',
+        a7: '1. Сначала прокачай Радиус добычи до 3 уровня — будешь собирать плазму быстрее.\n2. Потом Скорострельность — выживешь дольше.\n3. Не пытайся собрать всю плазму — иногда лучше уворачиваться.\n4. Заходи каждый день за стриком — награды растут.'
+      }
+    },
+    en: {
+      ob_title: 'Break the<br><em>blockade.</em>',
+      ob_sub: 'You are a LETUCHKA captain. Collect plasma. Shoot Watcher drones. Break through the blockade. The longer you survive — the bigger the reward.',
+      ob_begin: 'Launch',
+      hs_plasma: 'PLASMA', hs_glory: 'GLORY', hs_best: 'BEST',
+      launch: 'LAUNCH',
+      nav_home: 'Home', nav_shipyard: 'Shipyard', nav_quests: 'Quests', nav_comms: 'Comms', nav_faq: 'FAQ', nav_settings: 'Settings',
+      joy_hint: 'Drag finger anywhere — ship follows',
+      go_title: 'MISSION ENDED', go_sub: 'Ship destroyed. Plasma saved.',
+      gr_plasma: 'PLASMA', gr_glory: 'GLORY',
+      gs_kills: 'Drones killed', gs_time: 'Time in battle', gs_plasma_collected: 'Plasma collected',
+      go_again: 'LAUNCH AGAIN', go_shipyard: 'TO SHIPYARD', go_home: 'GO HOME',
+      sy_title: 'Cosmic <em>shipyard</em>', sy_sub: 'Ship upgrades · progression',
+      sy_balance: 'PLASMA BALANCE',
+      qu_title: 'Captain\'s <em>quests</em>', qu_sub: 'Complete · earn rewards',
+      qu_daily: 'Daily', qu_weekly: 'Weekly', qu_story: 'Story',
+      cm_title: 'Hyperspace <em>signals</em>', cm_sub: 'Those who reached out',
+      fq_title: 'How to <em>play</em>', fq_sub: 'Mechanics · tips · secrets',
+      se_title: 'Settings', se_sub: 'Language · sound · vibration',
+      se_lang: 'Language', se_lang_desc: 'RU / EN',
+      se_sound: 'Sound', se_sound_desc: 'Sound effects',
+      se_vibration: 'Vibration', se_vibration_desc: 'Haptic feedback',
+      se_reset: 'RESET PROGRESS',
+      not_enough: 'Not enough plasma',
+      purchased: 'Upgrade purchased',
+      maxed: 'Max level',
+      quest_done: 'Quest completed',
+      chapter_unlocked: 'Chapter unlocked',
+      need_referrals: 'Need 3 invited captains',
+      not_enough_stars: 'Not enough stars',
+      ref_copied: 'Link copied',
+      ref_invited: 'New captain joined!',
+      revive_title: 'SHIP DAMAGED',
+      revive_sub: 'Restore shields and continue? Don\'t lose your reward!',
+      revive_btn: 'RESTORE',
+      revive_decline: 'Give up',
+      loot_title: 'Secret <em>cargo</em>',
+      loot_desc: 'Container from Golden Drone. Inside — plasma, stars, or unique ship skin.',
+      loot_instant: 'OPEN NOW',
+      loot_free: 'Open free (3h)',
+      loot_later: 'Later',
+      loot_opening: 'Opening...',
+      loot_ready: 'Ready to open!',
+      loot_waiting: 'Opens in',
+      rf_title: 'Your <em>fleet</em>',
+      rf_sub: 'Recruit captains · unlock TOP upgrades',
+      rf_link_label: 'YOUR INVITE LINK',
+      rf_copy: 'COPY',
+      rf_invited: 'INVITED',
+      rf_needed: 'NEEDED FOR TOP',
+      rf_lock_title: '🔒 TOP upgrade lock',
+      rf_lock_desc: 'Level 4 and 5 upgrades in Shipyard require at least 3 invited captains. Share your link — unlock the power.',
+      rf_rewards_title: '🎁 Referral rewards',
+      rf_rewards_desc: '1 captain → +5% yield. 3 captains → unlock TOP upgrades. 10 captains → +5000 plasma.',
+      nav_refs: 'Fleet',
+      dr_title: 'Daily Challenge',
+      dr_sub: 'Same map for everyone · who collects more plasma?',
+      dr_screen_title: 'Daily <em>raid</em>',
+      dr_screen_sub: 'Today everyone plays the same map',
+      dr_today: 'Map of the day',
+      dr_start: 'START RAID',
+      dr_lb: 'Today\'s leaders',
+      dr_seed: 'Daily seed',
+      art_title: 'Drift <em>module</em>',
+      art_sub: 'Choose a modifier for this run. Every run — a new build.',
+      art_skip: 'Play without module',
+      hst_fire: 'FIRE', hst_dmg: 'DMG', hst_rad: 'RADIUS', hst_hp: 'HULL',
+      titles: ['Seeker','Novice','Navigator','Captain','Commander','Admiral','Starwalker','Galactic Lord','God of Universe'],
+      faq: {
+        q1: 'How to control the ship?',
+        a1: 'Put your finger anywhere on screen and drag. The ship smoothly follows. This is a virtual joystick — the most reliable mobile control.',
+        q2: 'How to collect plasma?',
+        a2: 'Plasma (blue crystals) is collected automatically when your ship is nearby. Higher "Collection radius" level in Shipyard = larger pickup range.',
+        q3: 'How to shoot?',
+        a3: 'Ship shoots automatically at nearest drones. You only maneuver. Upgrade "Fire rate" and "Damage" in Shipyard.',
+        q4: 'What about red drones?',
+        a4: 'Red Watcher drones fly straight at you. If they hit — you lose 1 HP and some plasma. Dodge and shoot them.',
+        q5: 'What is glory?',
+        a5: 'Glory grows from drone kills and time in battle. It determines your title: from Seeker to God of Universe.',
+        q6: 'What are stars for?',
+        a6: 'Stars (★) are premium currency. In future versions you can buy overclock and autopilot. Currently given for cases and achievements.',
+        q7: 'Tips for beginners',
+        a7: '1. First upgrade Collection Radius to level 3 — collect plasma faster.\n2. Then Fire Rate — survive longer.\n3. Don\'t try to collect all plasma — sometimes better to dodge.\n4. Come back daily for streak — rewards grow.'
+      }
+    }
+  };
+
+  let currentLang = 'ru';
+  function t(key) { const parts = key.split('.'); let val = I18N[currentLang]; for (const p of parts) { if (val && typeof val === 'object' && p in val) val = val[p]; else return key; } return val || key; }
+  function setLang(lang) { currentLang = lang; localStorage.setItem('vd_lang', lang); document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === lang)); applyI18n(); if (document.getElementById('app').classList.contains('show')) { renderAll(); } }
+  function applyI18n() { document.querySelectorAll('[data-i18n]').forEach(el => { const val = t(el.dataset.i18n); if (val.includes('<')) el.innerHTML = val; else el.textContent = val; }); }
+
+  // ============ AUDIO ============
+  let audioCtx = null; let soundOn = true; let vibrationOn = true;
+  function initAudio() { if (!audioCtx) { try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} } if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume(); }
+  function playTone(freq, dur = 0.08, type = 'sine', vol = 0.1) { if (!audioCtx || !soundOn) return; const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain(); osc.type = type; osc.frequency.value = freq; gain.gain.setValueAtTime(0, audioCtx.currentTime); gain.gain.linearRampToValueAtTime(vol, audioCtx.currentTime + 0.005); gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur); osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + dur); }
+  const SOUNDS = {
+    shoot: () => playTone(800, 0.04, 'square', 0.05),
+    hit: () => playTone(150, 0.15, 'sawtooth', 0.1),
+    collect: () => playTone(1200, 0.06, 'sine', 0.06),
+    damage: () => playTone(80, 0.3, 'sawtooth', 0.15),
+    gameover: () => { [400, 300, 200, 100].forEach((f, i) => setTimeout(() => playTone(f, 0.2, 'sawtooth', 0.12), i * 150)); },
+    buy: () => { playTone(500, 0.08, 'triangle', 0.1); setTimeout(() => playTone(700, 0.08, 'triangle', 0.1), 80); setTimeout(() => playTone(1000, 0.12, 'triangle', 0.1), 160); },
+    quest: () => { [600, 800, 1000].forEach((f, i) => setTimeout(() => playTone(f, 0.1, 'sine', 0.1), i * 80)); }
+  };
+  function vibrate(ms) { if (vibrationOn && navigator.vibrate) navigator.vibrate(ms); }
+
+  // ============ DATA ============
+  const UPGRADES = [
+    { id: 'radius', icon: '🎯', name: { ru: 'Радиус добычи', en: 'Collect Radius' }, desc: { ru: 'Дальность сбора плазмы', en: 'Plasma pickup range' }, maxLevel: 5, baseCost: 200, costMult: 1.8 },
+    { id: 'fireRate', icon: '⚡', name: { ru: 'Скорострельность', en: 'Fire Rate' }, desc: { ru: 'Частота выстрелов', en: 'Shoot frequency' }, maxLevel: 5, baseCost: 300, costMult: 1.9 },
+    { id: 'damage', icon: '💥', name: { ru: 'Урон лазера', en: 'Laser Damage' }, desc: { ru: 'Урон по дронам', en: 'Damage per shot' }, maxLevel: 5, baseCost: 400, costMult: 2.0 },
+    { id: 'speed', icon: '🚀', name: { ru: 'Скорость корабля', en: 'Ship Speed' }, desc: { ru: 'Скорость движения', en: 'Movement speed' }, maxLevel: 5, baseCost: 250, costMult: 1.8 },
+    { id: 'maxHp', icon: '❤️', name: { ru: 'Прочность корпуса', en: 'Hull Strength' }, desc: { ru: 'Максимальное HP', en: 'Max HP' }, maxLevel: 3, baseCost: 1000, costMult: 2.5 },
+    { id: 'shield', icon: '🛡', name: { ru: 'Энергощит', en: 'Energy Shield' }, desc: { ru: 'Защита от 1 удара за рейс', en: 'Block 1 hit per run' }, maxLevel: 1, baseCost: 5000, costMult: 1 }
+  ];
+
+  const DAILY_QUESTS = [
+    { id: 'd1', icon: '💎', text: { ru: 'Собери 500 плазмы', en: 'Collect 500 plasma' }, target: 500, type: 'plasma', reward: { type: 'plasma', amount: 200 } },
+    { id: 'd2', icon: '💀', text: { ru: 'Убей 20 дронов', en: 'Kill 20 drones' }, target: 20, type: 'kills', reward: { type: 'plasma', amount: 300 } },
+    { id: 'd3', icon: '⏱', text: { ru: 'Проживи 60 секунд в рейсе', en: 'Survive 60 seconds' }, target: 60, type: 'time', reward: { type: 'stars', amount: 5 } }
+  ];
+  const WEEKLY_QUESTS = [
+    { id: 'w1', icon: '🚀', text: { ru: '10 рейсов за неделю', en: '10 runs this week' }, target: 10, type: 'runs', reward: { type: 'plasma', amount: 3000 } },
+    { id: 'w2', icon: '💀', text: { ru: '500 убийств дронов', en: '500 drone kills' }, target: 500, type: 'kills', reward: { type: 'stars', amount: 30 } },
+    { id: 'w3', icon: '💎', text: { ru: '5000 плазмы', en: '5000 plasma' }, target: 5000, type: 'plasma', reward: { type: 'stars', amount: 50 } }
+  ];
+  const STORY_QUESTS = [
+    { id: 's1', icon: '🚀', text: { ru: 'Соверши первый вылет', en: 'First launch' }, target: 1, type: 'runs', reward: { type: 'plasma', amount: 100 } },
+    { id: 's2', icon: '💀', text: { ru: 'Убей первого дрона', en: 'Kill first drone' }, target: 1, type: 'kills', reward: { type: 'plasma', amount: 100 } },
+    { id: 's3', icon: '🛠', text: { ru: 'Купи первый апгрейд', en: 'Buy first upgrade' }, target: 1, type: 'upgrades', reward: { type: 'plasma', amount: 200 } },
+    { id: 's4', icon: '⏱', text: { ru: 'Проживи 90 секунд', en: 'Survive 90 seconds' }, target: 90, type: 'time', reward: { type: 'plasma', amount: 500 } },
+    { id: 's5', icon: '⭐', text: { ru: 'Достигни 5000 славы', en: 'Reach 5000 glory' }, target: 5000, type: 'glory', reward: { type: 'stars', amount: 100 } }
+  ];
+
+  const CHAPTERS = [
+    { num: 1, name: { ru: 'ПЕРВЫЙ ВЫЛЕТ', en: 'FIRST LAUNCH' }, tagline: { ru: 'Тишина. Бесконечная темнота. И ты.', en: 'Silence. Endless dark. And you.' }, trigger: () => true, messages: [
+      { from: 'system', text: { ru: 'Корабль активирован. Перед тобой — открытый космос. Вокруг разбросана плазма. Собирай. Наблюдатели уже заметили тебя.', en: 'Ship activated. Before you — open space. Plasma scattered around. Collect. Watchers already noticed you.' } }
+    ]},
+    { num: 2, name: { ru: 'ГОЛОС В ТИШИНЕ', en: 'VOICE IN THE VOID' }, tagline: { ru: 'Кто-то слушает твой канал.', en: 'Someone is listening.' }, trigger: (s) => s.totalRuns >= 5, messages: [
+      { from: 'kira', text: { ru: 'Капитан. Не отвечай. Просто слушай. Я — Кира. Бывший штурман флота Наблюдателей. Дезертировала. Я знаю, что ты там. И знаю, что они идут за тобой.', en: 'Captain. Don\'t reply. Just listen. I am Kira. Former Watcher navigator. Deserted. I know you\'re there. And I know they\'re coming for you.' } }
+    ]},
+    { num: 3, name: { ru: 'НАБЛЮДАТЕЛИ', en: 'THE WATCHERS' }, tagline: { ru: 'Им 4 миллиарда лет.', en: 'They are 4 billion years old.' }, trigger: (s) => s.totalRuns >= 10 && s.totalKills >= 100, messages: [
+      { from: 'kira', text: { ru: 'Наблюдатели построили Звёздные Врата. Они считают галактику своей. Красные дроны, что атакуют тебя — их патрули. Будь осторожен.', en: 'Watchers built the Star Gates. They consider the galaxy theirs. Red drones attacking you are their patrols. Be careful.' } },
+      { from: 'watchers', text: { ru: '[СИСТЕМНОЕ СООБЩЕНИЕ] Аномальная активность в секторе 7-K. Цель идентифицирована. Отправляем патрули.', en: '[SYSTEM MESSAGE] Anomalous activity in sector 7-K. Target identified. Dispatching patrols.' } }
+    ]},
+    { num: 4, name: { ru: 'ПРЕДАТЕЛЬСТВО', en: 'BETRAYAL' }, tagline: { ru: 'Кира не та, кем кажется.', en: 'Kira is not who she seems.' }, trigger: (s) => s.totalKills >= 500, messages: [
+      { from: 'kira', text: { ru: 'Я должна была сказать раньше. Я — их агент. Использовала тебя, чтобы найти других дезертиров. Прости. Но я отправила тебе всё о слабостях Наблюдателей. Это последнее, что я могу сделать.', en: 'I should have said earlier. I am their agent. Used you to find other deserters. Forgive me. But I sent you everything about Watcher weaknesses. This is the last I can do.' } }
+    ]},
+    { num: 5, name: { ru: 'БЕССМЕРТНЫЙ', en: 'IMMORTAL' }, tagline: { ru: 'Ты стал больше, чем капитаном.', en: 'You became more than a captain.' }, trigger: (s) => s.glory >= 5000, messages: [
+      { from: 'system', text: { ru: 'Ты исчез из всех систем Наблюдателей. Ты — призрак. Легенда. Теперь у тебя есть выбор: уничтожить их или стать одним из них.', en: 'You vanished from all Watcher systems. You are a ghost. A legend. Now you have a choice: destroy them or become one of them.' } },
+      { from: 'watchers', text: { ru: '[ОШИБКА] Не могу тебя найти. Кто ты?', en: '[ERROR] Cannot locate you. Who are you?' } }
+    ]}
+  ];
+
+  // Drift artifacts (roguelike modifiers)
+  const ARTIFACTS = [
+    { id: 'speed', icon: '🚀', name: { ru: 'Гипердвигатель', en: 'Hyperdrive' }, pro: { ru: '+30% скорость', en: '+30% speed' }, con: { ru: '-1 HP', en: '-1 HP' }, rarity: 'common', effect: { speedMult: 1.3, hpAdd: -1 } },
+    { id: 'fan', icon: '🌐', name: { ru: 'Веерная стрельба', en: 'Fan Shot' }, pro: { ru: 'Стреляет веером ×3', en: 'Shoots 3-way fan' }, con: { ru: '-40% урон', en: '-40% damage' }, rarity: 'rare', effect: { fanShot: true, dmgMult: 0.6 } },
+    { id: 'vampire', icon: '🩸', name: { ru: 'Вампир', en: 'Vampire' }, pro: { ru: 'Восстанавливает HP за киллы', en: 'Heal on kill' }, con: { ru: '-50% плазмы', en: '-50% plasma' }, rarity: 'rare', effect: { vampire: true, plasmaMult: 0.5 } },
+    { id: 'berserk', icon: '⚔️', name: { ru: 'Берсерк', en: 'Berserker' }, pro: { ru: '+100% урон', en: '+100% damage' }, con: { ru: '-2 HP', en: '-2 HP' }, rarity: 'rare', effect: { dmgMult: 2.0, hpAdd: -2 } },
+    { id: 'magnet', icon: '🧲', name: { ru: 'Постоянный магнит', en: 'Permanent Magnet' }, pro: { ru: '+200% радиус сбора', en: '+200% collect radius' }, con: { ru: '+30% скорость дронов', en: '+30% drone speed' }, rarity: 'rare', effect: { radiusMult: 3.0, droneSpeedMult: 1.3 } },
+    { id: 'glass', icon: '🔮', name: { ru: 'Стеклянная пушка', en: 'Glass Cannon' }, pro: { ru: '+150% урон, +50% скорострел', en: '+150% dmg, +50% fire rate' }, con: { ru: '1 HP всего', en: 'Only 1 HP' }, rarity: 'epic', effect: { dmgMult: 2.5, fireRateMult: 1.5, hpSet: 1 } },
+    { id: 'tank', icon: '🛡️', name: { ru: 'Танк', en: 'Tank' }, pro: { ru: '+3 HP', en: '+3 HP' }, con: { ru: '-30% скорость', en: '-30% speed' }, rarity: 'rare', effect: { hpAdd: 3, speedMult: 0.7 } },
+    { id: 'rapid', icon: '⚡', name: { ru: 'Скорострел', en: 'Rapid Fire' }, pro: { ru: '+100% скорострельность', en: '+100% fire rate' }, con: { ru: '-30% урон', en: '-30% damage' }, rarity: 'common', effect: { fireRateMult: 2.0, dmgMult: 0.7 } },
+    { id: 'plasma', icon: '💎', name: { ru: 'Плазменный жрец', en: 'Plasma Priest' }, pro: { ru: '+200% плазмы', en: '+200% plasma' }, con: { ru: '-1 HP', en: '-1 HP' }, rarity: 'rare', effect: { plasmaMult: 3.0, hpAdd: -1 } },
+    { id: 'lucky', icon: '🍀', name: { ru: 'Удачливый', en: 'Lucky' }, pro: { ru: '+100% шанс золотого дрона', en: '+100% golden drone chance' }, con: { ru: '-20% урон', en: '-20% damage' }, rarity: 'rare', effect: { goldenMult: 2.0, dmgMult: 0.8 } },
+    { id: 'godmode', icon: '👑', name: { ru: 'Бог войны', en: 'God of War' }, pro: { ru: '+50% всё', en: '+50% everything' }, con: { ru: 'Нет щита', en: 'No shield' }, rarity: 'epic', effect: { dmgMult: 1.5, fireRateMult: 1.5, speedMult: 1.5, plasmaMult: 1.5, noShield: true } },
+    { id: 'pacifist', icon: '🕊️', name: { ru: 'Пацифист', en: 'Pacifist' }, pro: { ru: '+300% плазмы, +2 HP', en: '+300% plasma, +2 HP' }, con: { ru: 'Нет стрельбы', en: 'No shooting' }, rarity: 'epic', effect: { plasmaMult: 4.0, hpAdd: 2, noShoot: true } }
+  ];
+
+  let pendingBattleCallback = null;
+  let selectedArtifact = null;
+
+  // ============ STATE ============
+  function getState() {
+    return {
+      plasma: parseFloat(localStorage.getItem('vd_plasma') || '0'),
+      stars: parseInt(localStorage.getItem('vd_stars') || '50'),
+      glory: parseInt(localStorage.getItem('vd_glory') || '0'),
+      bestRun: parseInt(localStorage.getItem('vd_best') || '0'),
+      totalRuns: parseInt(localStorage.getItem('vd_runs') || '0'),
+      totalKills: parseInt(localStorage.getItem('vd_kills') || '0'),
+      totalPlasma: parseFloat(localStorage.getItem('vd_total_plasma') || '0'),
+      invited: parseInt(localStorage.getItem('vd_invited') || '0'),
+      dailyRunScore: parseInt(localStorage.getItem('vd_daily_score') || '0'),
+      dailyRunDate: localStorage.getItem('vd_daily_date') || '',
+      lootboxes: JSON.parse(localStorage.getItem('vd_lootboxes') || '[]'),
+      upgrades: JSON.parse(localStorage.getItem('vd_upgrades') || '{}'),
+      dailyClaimed: JSON.parse(localStorage.getItem('vd_daily_claimed') || '[]'),
+      weeklyClaimed: JSON.parse(localStorage.getItem('vd_weekly_claimed') || '[]'),
+      storyClaimed: JSON.parse(localStorage.getItem('vd_story_claimed') || '[]'),
+      dailyProgress: JSON.parse(localStorage.getItem('vd_daily_prog') || '{}'),
+      weeklyProgress: JSON.parse(localStorage.getItem('vd_weekly_prog') || '{}'),
+      dailyDate: localStorage.getItem('vd_daily_date') || '',
+      weeklyDate: localStorage.getItem('vd_weekly_date') || '',
+      unlockedChapters: JSON.parse(localStorage.getItem('vd_chapters') || '[1]'),
+      readMessages: JSON.parse(localStorage.getItem('vd_read_msgs') || '[]')
+    };
+  }
+  function saveState(s) {
+    const keys = { plasma: 'vd_plasma', stars: 'vd_stars', glory: 'vd_glory', bestRun: 'vd_best', totalRuns: 'vd_runs', totalKills: 'vd_kills', totalPlasma: 'vd_total_plasma', invited: 'vd_invited', dailyRunScore: 'vd_daily_score' };
+    Object.keys(keys).forEach(k => { if (s[k] !== undefined) localStorage.setItem(keys[k], s[k].toString()); });
+    if (s.upgrades !== undefined) localStorage.setItem('vd_upgrades', JSON.stringify(s.upgrades));
+    if (s.lootboxes !== undefined) localStorage.setItem('vd_lootboxes', JSON.stringify(s.lootboxes));
+    if (s.dailyClaimed !== undefined) localStorage.setItem('vd_daily_claimed', JSON.stringify(s.dailyClaimed));
+    if (s.weeklyClaimed !== undefined) localStorage.setItem('vd_weekly_claimed', JSON.stringify(s.weeklyClaimed));
+    if (s.storyClaimed !== undefined) localStorage.setItem('vd_story_claimed', JSON.stringify(s.storyClaimed));
+    if (s.dailyProgress !== undefined) localStorage.setItem('vd_daily_prog', JSON.stringify(s.dailyProgress));
+    if (s.weeklyProgress !== undefined) localStorage.setItem('vd_weekly_prog', JSON.stringify(s.weeklyProgress));
+    if (s.dailyDate !== undefined) localStorage.setItem('vd_daily_date', s.dailyDate);
+    if (s.weeklyDate !== undefined) localStorage.setItem('vd_weekly_date', s.weeklyDate);
+    if (s.dailyRunDate !== undefined) localStorage.setItem('vd_daily_date', s.dailyRunDate);
+    if (s.unlockedChapters !== undefined) localStorage.setItem('vd_chapters', JSON.stringify(s.unlockedChapters));
+    if (s.readMessages !== undefined) localStorage.setItem('vd_read_msgs', JSON.stringify(s.readMessages));
+  }
+
+  function getTitle() {
+    const s = getState();
+    const thresholds = [0, 100, 500, 1500, 3000, 5000, 8000, 15000, 30000];
+    let idx = 0;
+    for (let i = 0; i < thresholds.length; i++) if (s.glory >= thresholds[i]) idx = i;
+    return I18N[currentLang].titles[idx];
+  }
+
+  function checkDailyReset() {
+    const s = getState();
+    const today = new Date().toDateString();
+    if (s.dailyDate !== today) { s.dailyProgress = {}; s.dailyClaimed = []; s.dailyDate = today; saveState(s); }
+    const week = getWeekKey();
+    if (s.weeklyDate !== week) { s.weeklyProgress = {}; s.weeklyClaimed = []; s.weeklyDate = week; saveState(s); }
+  }
+  function getWeekKey() { const d = new Date(); const onejan = new Date(d.getFullYear(), 0, 1); const week = Math.ceil(((d - onejan) / 86400000 + onejan.getDay() + 1) / 7); return `${d.getFullYear()}-W${week}`; }
+
+  // ============ ONBOARDING ============
+  let obAnimId = null;
+  setTimeout(() => document.getElementById('obLogo').classList.add('show'), 200);
+  setTimeout(() => {
+    document.getElementById('obShipWrap').classList.add('show');
+    const c = document.getElementById('obCanvas'); const ctx = c.getContext('2d'); const W = c.width, H = c.height; let t = 0;
+    const animate = () => {
+      t += 16; ctx.clearRect(0, 0, W, H);
+      // Stars
+      for (let i = 0; i < 50; i++) { const x = (i * 73 % W); const y = (i * 137 % H); const tw = 0.3 + Math.sin(t * 0.003 + i) * 0.3; ctx.fillStyle = `rgba(255,255,255,${tw})`; ctx.beginPath(); ctx.arc(x, y, 1, 0, Math.PI * 2); ctx.fill(); }
+      // Nebula
+      const ng = ctx.createRadialGradient(W/2, H/2, 0, W/2, H/2, W/2); ng.addColorStop(0, 'rgba(167,139,250,0.1)'); ng.addColorStop(1, 'rgba(167,139,250,0)'); ctx.fillStyle = ng; ctx.beginPath(); ctx.arc(W/2, H/2, W/2, 0, Math.PI * 2); ctx.fill();
+      // Ship in center, hovering
+      const cx = W/2, cy = H/2 + Math.sin(t * 0.003) * 8;
+      // Engine trail
+      const trailGrad = ctx.createLinearGradient(cx, cy + 20, cx, cy + 80);
+      trailGrad.addColorStop(0, 'rgba(167,139,250,0.8)'); trailGrad.addColorStop(1, 'rgba(167,139,250,0)');
+      ctx.fillStyle = trailGrad;
+      ctx.beginPath(); ctx.moveTo(cx - 12, cy + 20); ctx.lineTo(cx + 12, cy + 20); ctx.lineTo(cx + 6, cy + 80 + Math.sin(t * 0.01) * 5); ctx.lineTo(cx - 6, cy + 80 + Math.sin(t * 0.01) * 5); ctx.closePath(); ctx.fill();
+      // Ship body
+      ctx.fillStyle = '#A78BFA'; ctx.shadowColor = '#A78BFA'; ctx.shadowBlur = 20;
+      ctx.beginPath(); ctx.moveTo(cx, cy - 25); ctx.lineTo(cx + 18, cy + 15); ctx.lineTo(cx + 8, cy + 20); ctx.lineTo(cx - 8, cy + 20); ctx.lineTo(cx - 18, cy + 15); ctx.closePath(); ctx.fill();
+      // Cockpit
+      ctx.fillStyle = '#22D3EE'; ctx.shadowColor = '#22D3EE'; ctx.shadowBlur = 12;
+      ctx.beginPath(); ctx.arc(cx, cy - 5, 6, 0, Math.PI * 2); ctx.fill();
+      ctx.shadowBlur = 0;
+      obAnimId = requestAnimationFrame(animate);
+    };
+    animate();
+  }, 600);
+  setTimeout(() => document.getElementById('obTitle').classList.add('show'), 1400);
+  setTimeout(() => document.getElementById('obSub').classList.add('show'), 2200);
+  setTimeout(() => document.getElementById('obBegin').classList.add('show'), 3000);
+
+  function enterApp() {
+    initAudio();
+    document.getElementById('onboarding').classList.add('hide');
+    if (obAnimId) cancelAnimationFrame(obAnimId);
+    setTimeout(() => { document.getElementById('onboarding').style.display = 'none'; document.getElementById('app').classList.add('show'); checkDailyReset(); renderAll(); checkStoryProgress(); }, 600);
+  }
+
+  // ============ SCREENS ============
+  function switchScreen(name) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(name).classList.add('active');
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.screen === name));
+    if (name === 'home') renderHome();
+    if (name === 'shipyard') renderShipyard();
+    if (name === 'quests') renderQuests();
+    if (name === 'comms') { renderComms(); markMessagesRead(); }
+    if (name === 'faq') renderFAQ();
+    if (name === 'referrals') renderReferrals();
+    if (name === 'dailyrun') renderDailyRun();
+    if (name === 'battle') {} else { if (battle) battle.stop(); }
+  }
+
+  function renderAll() { renderHome(); renderShipyard(); renderQuests(); renderComms(); renderFAQ(); renderReferrals(); renderDailyRun(); updateBadges(); }
+
+  function renderHome() {
+    const s = getState();
+    document.getElementById('hsPlasma').textContent = Math.floor(s.plasma);
+    document.getElementById('hsGlory').textContent = s.glory;
+    document.getElementById('hsBest').textContent = s.bestRun;
+    document.getElementById('topTitle').textContent = getTitle().toUpperCase();
+    document.getElementById('starsCount').textContent = s.stars;
+    // Show first unclaimed daily quest as mission
+    const unclaimed = DAILY_QUESTS.find(q => !s.dailyClaimed.includes(q.id));
+    if (unclaimed) {
+      const prog = s.dailyProgress[unclaimed.id] || 0;
+      const pct = Math.min(100, (prog / unclaimed.target) * 100);
+      document.getElementById('hmTitle').textContent = unclaimed.text[currentLang];
+      document.getElementById('hmProgress').textContent = `${prog} / ${unclaimed.target}`;
+      document.getElementById('hmBar').style.width = pct + '%';
+    } else {
+      document.getElementById('hmTitle').textContent = currentLang === 'ru' ? 'Все задания выполнены!' : 'All quests done!';
+      document.getElementById('hmProgress').textContent = currentLang === 'ru' ? 'Возвращайся завтра' : 'Come back tomorrow';
+      document.getElementById('hmBar').style.width = '100%';
+    }
+  }
+
+  // ============ LAUNCH ANIMATION ============
+  function showLaunchAnimation(callback) {
+    const overlay = document.getElementById('launch-overlay');
+    const canvas = document.getElementById('launchCanvas');
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+    overlay.classList.add('show');
+    document.getElementById('launchText').textContent = currentLang === 'ru' ? 'ПРЫЖОК...' : 'JUMPING...';
+    let t = 0;
+    const stars = [];
+    for (let i = 0; i < 100; i++) stars.push({ x: Math.random() * W, y: Math.random() * H, z: Math.random() * 1000 + 1 });
+    const anim = () => {
+      t++;
+      ctx.fillStyle = 'rgba(3, 2, 10, 0.3)';
+      ctx.fillRect(0, 0, W, H);
+      stars.forEach(s => {
+        s.z -= 20;
+        if (s.z <= 0) { s.z = 1000; s.x = Math.random() * W; s.y = Math.random() * H; }
+        const k = 200 / s.z;
+        const x = s.x * k + W/2 * (1 - k);
+        const y = s.y * k + H/2 * (1 - k);
+        const size = (1 - s.z / 1000) * 4;
+        ctx.fillStyle = `rgba(167, 139, 250, ${1 - s.z / 1000})`;
+        ctx.beginPath(); ctx.arc(x, y, size, 0, Math.PI * 2); ctx.fill();
+      });
+      if (t < 60) requestAnimationFrame(anim);
+      else { overlay.classList.remove('show'); callback(); }
+    };
+    anim();
+  }
+
+  // ============ BATTLE ============
+  let battle = null;
+  function startBattle() {
+    initAudio();
+    showArtifactSelection(() => {
+      showLaunchAnimation(() => {
+        switchScreen('battle');
+        if (battle) battle.stop();
+        battle = new BattleEngine('battleCanvas');
+        battle.start();
+      });
+    });
+  }
+  function showArtifactSelection(callback) {
+    pendingBattleCallback = callback;
+    const shuffled = [...ARTIFACTS].sort(() => Math.random() - 0.5);
+    const choices = shuffled.slice(0, 3);
+    const cardsEl = document.getElementById('artCards');
+    cardsEl.innerHTML = choices.map(a => `
+      <div class="art-card ${a.rarity}" onclick="selectArtifact('${a.id}')">
+        <div class="art-icon">${a.icon}</div>
+        <div class="art-name">${a.name[currentLang]}</div>
+        <div class="art-pro">+ ${a.pro[currentLang]}</div>
+        <div class="art-con">- ${a.con[currentLang]}</div>
+        <div class="art-rarity">${a.rarity}</div>
+      </div>
+    `).join('');
+    document.getElementById('artOverlay').classList.add('show');
+  }
+  function selectArtifact(id) {
+    selectedArtifact = ARTIFACTS.find(a => a.id === id);
+    document.getElementById('artOverlay').classList.remove('show');
+    SOUNDS.buy();
+    if (pendingBattleCallback) { pendingBattleCallback(); pendingBattleCallback = null; }
+  }
+  function skipArtifact() {
+    selectedArtifact = null;
+    document.getElementById('artOverlay').classList.remove('show');
+    if (pendingBattleCallback) { pendingBattleCallback(); pendingBattleCallback = null; }
+  }
+
+  function pauseBattle() { if (battle) battle.pause(); }
+  function useAbility(name) { if (battle) battle.useAbility(name); }
+
+  class BattleEngine {
+    constructor(canvasId) {
+      this.canvas = document.getElementById(canvasId);
+      this.ctx = this.canvas.getContext('2d');
+      this.t = 0; this.lastTime = performance.now();
+      this.running = false; this.paused = false;
+      // Defer resize to next frame so canvas has dimensions
+      requestAnimationFrame(() => {
+        this.resize();
+        this.setupState();
+        this.setupInput();
+        this.loop = this.loop.bind(this);
+        // Re-resize on window orientation change
+        window.addEventListener('resize', () => this.resize());
+        window.addEventListener('orientationchange', () => setTimeout(() => this.resize(), 100));
+      });
+    }
+    resize() {
+      const rect = this.canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      // Use fallback if rect is 0 (canvas not visible yet)
+      const cssW = rect.width > 0 ? rect.width : window.innerWidth;
+      const cssH = rect.height > 0 ? rect.height : window.innerHeight;
+      this.canvas.width = cssW * dpr;
+      this.canvas.height = cssH * dpr;
+      // Reset transform before scaling to avoid accumulation
+      this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+      this.ctx.scale(dpr, dpr);
+      this.W = cssW; this.H = cssH;
+      this.dpr = dpr;
+    }
+    setupState() {
+      const s = getState();
+      // Apply artifact effects
+      this.artifact = selectedArtifact;
+      const eff = this.artifact ? this.artifact.effect : {};
+      const hpAdd = eff.hpAdd || 0;
+      const hpSet = eff.hpSet || null;
+      let baseHp = 3 + (s.upgrades.maxHp || 0) + hpAdd;
+      if (hpSet !== null) baseHp = hpSet;
+      this.ship = { x: this.W / 2, y: this.H / 2, vx: 0, vy: 0, angle: -Math.PI / 2, hp: baseHp, maxHp: baseHp, shield: (eff.noShield ? false : (s.upgrades.shield ? true : false)), size: 16, shootCooldown: 0 };
+      this.plasma = []; this.drones = []; this.bullets = []; this.particles = [];
+      this.kills = 0; this.plasmaCollected = 0;
+      this.revivedThisRun = false;
+      this.startTime = performance.now(); this.elapsedTime = 0;
+      this.nextDroneSpawn = 2000; this.nextPlasmaSpawn = 500;
+      this.nextGoldenDrone = 30000; // First golden drone after 30s
+      this.difficulty = 0;
+      this.threatLevel = 0; this.lastThreatLevel = 0;
+      // Abilities: cooldowns in ms, ready when 0
+      this.abilities = { emp: 0, boost: 0, magnet: 0 };
+      this.abilityCooldowns = { emp: 25000, boost: 20000, magnet: 30000 };
+      this.magnetActive = 0; // ms remaining
+      this.boostTrail = []; // boost effect particles
+      this.joystick = { active: false, startX: 0, startY: 0, dx: 0, dy: 0 };
+      this.bgStars = [];
+      for (let i = 0; i < 80; i++) this.bgStars.push({ x: Math.random() * this.W, y: Math.random() * this.H, size: Math.random() * 1.5 + 0.3, phase: Math.random() * Math.PI * 2 });
+      // Initial plasma
+      for (let i = 0; i < 8; i++) this.spawnPlasma();
+      document.getElementById('joyHint').classList.remove('hide');
+    }
+    setupInput() {
+      this.canvas.style.touchAction = 'none';
+      const getPos = (e) => { const rect = this.canvas.getBoundingClientRect(); return { x: e.clientX - rect.left, y: e.clientY - rect.top }; };
+      const onDown = (e) => {
+        e.preventDefault();
+        if (!this.running || this.paused) return;
+        const pos = getPos(e);
+        this.joystick.active = true;
+        this.joystick.startX = pos.x; this.joystick.startY = pos.y;
+        this.joystick.dx = 0; this.joystick.dy = 0;
+        document.getElementById('joyHint').classList.add('hide');
+        try { this.canvas.setPointerCapture(e.pointerId); } catch (err) {}
+      };
+      const onMove = (e) => {
+        if (!this.joystick.active) return;
+        e.preventDefault();
+        const pos = getPos(e);
+        this.joystick.dx = pos.x - this.joystick.startX;
+        this.joystick.dy = pos.y - this.joystick.startY;
+      };
+      const onUp = (e) => {
+        this.joystick.active = false;
+        this.joystick.dx = 0; this.joystick.dy = 0;
+      };
+      this.canvas.addEventListener('pointerdown', onDown);
+      this.canvas.addEventListener('pointermove', onMove);
+      this.canvas.addEventListener('pointerup', onUp);
+      this.canvas.addEventListener('pointercancel', onUp);
+    }
+    spawnPlasma() {
+      const margin = 50;
+      this.plasma.push({ x: margin + Math.random() * (this.W - margin * 2), y: margin + Math.random() * (this.H - margin * 2), size: 5, phase: Math.random() * Math.PI * 2, value: 10 });
+    }
+    spawnDrone() {
+      const side = Math.floor(Math.random() * 4);
+      let x, y;
+      if (side === 0) { x = Math.random() * this.W; y = -30; }
+      else if (side === 1) { x = this.W + 30; y = Math.random() * this.H; }
+      else if (side === 2) { x = Math.random() * this.W; y = this.H + 30; }
+      else { x = -30; y = Math.random() * this.H; }
+      const speed = 0.5 + this.difficulty * 0.15 + Math.random() * 0.3;
+      // Elite drones from threat level 2+
+      const elite = this.threatLevel >= 2 && Math.random() < (0.15 + this.threatLevel * 0.05);
+      const baseHp = 1 + Math.floor(this.difficulty / 3);
+      this.drones.push({ x, y, vx: 0, vy: 0, speed, size: elite ? 16 : 12, hp: elite ? baseHp * 3 : baseHp, maxHp: elite ? baseHp * 3 : baseHp, phase: Math.random() * Math.PI * 2, golden: false, elite, stunned: 0 });
+    }
+    onThreatLevelUp() {
+      // Visual + sound cue
+      SOUNDS.danger();
+      vibrate([100, 50, 100]);
+      showToast(currentLang === 'ru' ? `⚠️ УРОВЕНЬ УГРОЗЫ ${this.threatLevel + 1}!` : `⚠️ THREAT LEVEL ${this.threatLevel + 1}!`, 'danger');
+      // Spawn burst of drones
+      for (let i = 0; i < 3 + this.threatLevel; i++) this.spawnDrone();
+    }
+    spawnGoldenDrone() {
+      const side = Math.floor(Math.random() * 4);
+      let x, y;
+      if (side === 0) { x = Math.random() * this.W; y = -30; }
+      else if (side === 1) { x = this.W + 30; y = Math.random() * this.H; }
+      else if (side === 2) { x = Math.random() * this.W; y = this.H + 30; }
+      else { x = -30; y = Math.random() * this.H; }
+      this.drones.push({ x, y, vx: 0, vy: 0, speed: 0.7, size: 18, hp: 5, maxHp: 5, phase: Math.random() * Math.PI * 2, golden: true });
+    }
+    start() {
+      // If setup is deferred, wait for it
+      if (!this.ship) {
+        setTimeout(() => this.start(), 50);
+        return;
+      }
+      this.running = true;
+      this.lastTime = performance.now();
+      requestAnimationFrame(this.loop);
+    }
+    stop() { this.running = false; }
+    pause() {
+      this.paused = !this.paused;
+      if (!this.paused) { this.lastTime = performance.now(); requestAnimationFrame(this.loop); }
+    }
+    loop(now) {
+      if (!this.running) return;
+      if (this.paused) return;
+      const dt = Math.min(50, now - this.lastTime);
+      this.lastTime = now;
+      this.t += dt;
+      this.elapsedTime = (now - this.startTime) / 1000;
+      this.difficulty = Math.floor(this.elapsedTime / 15);
+      this.threatLevel = Math.floor(this.elapsedTime / 120); // every 2 min
+      // Detect threat level transition
+      if (this.threatLevel > (this.lastThreatLevel || 0)) {
+        this.lastThreatLevel = this.threatLevel;
+        this.onThreatLevelUp();
+      }
+      this.update(dt);
+      this.draw();
+      this.updateHUD();
+      requestAnimationFrame(this.loop);
+    }
+    update(dt) {
+      const s = getState();
+      const speedUpgrade = s.upgrades.speed || 0;
+      const eff = this.artifact ? this.artifact.effect : {};
+      const speedMult = eff.speedMult || 1;
+      // FIX: normal physics — speed in px/sec, applied via dt/1000
+      const shipSpeed = (220 + speedUpgrade * 30) * speedMult; // px per second
+      // Ship movement from joystick
+      if (this.joystick.active) {
+        const len = Math.sqrt(this.joystick.dx ** 2 + this.joystick.dy ** 2);
+        if (len > 8) {
+          const maxLen = 60;
+          const cl = Math.min(len, maxLen);
+          const intensity = cl / maxLen; // 0..1
+          const nx = this.joystick.dx / len, ny = this.joystick.dy / len;
+          this.ship.vx = nx * shipSpeed * intensity;
+          this.ship.vy = ny * shipSpeed * intensity;
+          this.ship.angle = Math.atan2(ny, nx);
+        } else { this.ship.vx *= 0.85; this.ship.vy *= 0.85; }
+      } else { this.ship.vx *= 0.85; this.ship.vy *= 0.85; }
+      // Apply movement in px/sec
+      this.ship.x += this.ship.vx * (dt / 1000);
+      this.ship.y += this.ship.vy * (dt / 1000);
+      this.ship.x = Math.max(this.ship.size, Math.min(this.W - this.ship.size, this.ship.x));
+      this.ship.y = Math.max(this.ship.size, Math.min(this.H - this.ship.size, this.ship.y));
+
+      // Auto-shoot
+      this.ship.shootCooldown -= dt;
+      const fireRateUpgrade = s.upgrades.fireRate || 0;
+      const fireMult = eff.fireRateMult || 1;
+      const fireRate = Math.max(100, (600 - fireRateUpgrade * 100) / fireMult);
+      const noShoot = eff.noShoot || false;
+      if (!noShoot && this.ship.shootCooldown <= 0 && this.drones.length > 0) {
+        // Find nearest drone
+        let nearest = null, minDist = Infinity;
+        this.drones.forEach(d => { const dx = d.x - this.ship.x, dy = d.y - this.ship.y; const dist = Math.sqrt(dx*dx + dy*dy); if (dist < minDist) { minDist = dist; nearest = d; } });
+        if (nearest && minDist < 400) {
+          const angle = Math.atan2(nearest.y - this.ship.y, nearest.x - this.ship.x);
+          const damageUpgrade = s.upgrades.damage || 0;
+          const dmgMult = eff.dmgMult || 1;
+          const damage = (1 + damageUpgrade) * dmgMult;
+          if (eff.fanShot) {
+            // 3-way fan
+            [-0.25, 0, 0.25].forEach(off => {
+              this.bullets.push({ x: this.ship.x, y: this.ship.y, vx: Math.cos(angle + off) * 0.8, vy: Math.sin(angle + off) * 0.8, life: 1500, damage });
+            });
+          } else {
+            this.bullets.push({ x: this.ship.x, y: this.ship.y, vx: Math.cos(angle) * 0.8, vy: Math.sin(angle) * 0.8, life: 1500, damage });
+          }
+          this.ship.shootCooldown = fireRate;
+          SOUNDS.shoot();
+        }
+      }
+
+      // Spawn plasma
+      this.nextPlasmaSpawn -= dt;
+      if (this.nextPlasmaSpawn <= 0 && this.plasma.length < 12) { this.spawnPlasma(); this.nextPlasmaSpawn = 1500 + Math.random() * 1500; }
+
+      // Spawn drones
+      this.nextDroneSpawn -= dt;
+      if (this.nextDroneSpawn <= 0) {
+        const count = 1 + Math.floor(this.difficulty / 2);
+        for (let i = 0; i < count; i++) this.spawnDrone();
+        this.nextDroneSpawn = Math.max(800, 3000 - this.difficulty * 200);
+      }
+
+      // Spawn golden drone (rare)
+      this.nextGoldenDrone -= dt;
+      if (this.nextGoldenDrone <= 0) {
+        this.spawnGoldenDrone();
+        this.nextGoldenDrone = 45000 + Math.random() * 30000; // Every 45-75s
+      }
+
+      // Update bullets
+      this.bullets = this.bullets.filter(b => {
+        b.x += b.vx * dt; b.y += b.vy * dt; b.life -= dt;
+        return b.life > 0 && b.x > -50 && b.x < this.W + 50 && b.y > -50 && b.y < this.H + 50;
+      });
+
+      // Update drones
+      const radiusUpgrade = s.upgrades.radius || 0;
+      const radiusMult = eff.radiusMult || 1;
+      const collectRadius = (30 + radiusUpgrade * 12) * radiusMult;
+      const droneSpeedMult = eff.droneSpeedMult || 1;
+      this.drones.forEach(d => {
+        if (d.stunned > 0) { d.stunned -= dt; d.phase += 0.02; return; }
+        const dx = this.ship.x - d.x, dy = this.ship.y - d.y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if (dist > 0) { d.vx = (dx / dist) * d.speed * droneSpeedMult; d.vy = (dy / dist) * d.speed * droneSpeedMult; }
+        d.x += d.vx * dt; d.y += d.vy * dt;
+        d.phase += 0.05;
+        // Collision with ship
+        if (dist < this.ship.size + d.size) {
+          if (this.ship.shield) { this.ship.shield = false; this.spawnExplosion(d.x, d.y, '#22D3EE'); }
+          else {
+            this.ship.hp--;
+            const lostPlasma = Math.floor(this.plasmaCollected * 0.15);
+            this.plasmaCollected -= lostPlasma;
+            this.spawnExplosion(this.ship.x, this.ship.y, '#F43F5E');
+            SOUNDS.damage(); vibrate(80);
+            if (this.ship.hp <= 0) this.endBattle();
+          }
+          d.hp = 0;
+        }
+      });
+
+      // Bullet-drone collisions
+      this.bullets.forEach(b => {
+        this.drones.forEach(d => {
+          if (d.hp <= 0) return;
+          const dx = b.x - d.x, dy = b.y - d.y;
+          if (Math.sqrt(dx*dx + dy*dy) < d.size + 4) {
+            d.hp -= b.damage; b.life = 0;
+            if (d.hp <= 0) {
+              this.kills++;
+              this.spawnExplosion(d.x, d.y, d.golden ? '#FBBF24' : '#F43F5E');
+              SOUNDS.hit(); vibrate(20);
+              // Drop plasma
+              if (Math.random() < 0.4) this.plasma.push({ x: d.x, y: d.y, size: 5, phase: Math.random() * Math.PI * 2, value: 15 });
+              // Vampire effect: heal on kill
+              if (eff.vampire && this.ship.hp < this.ship.maxHp && Math.random() < 0.15) {
+                this.ship.hp++;
+                this.spawnCollectEffect(this.ship.x, this.ship.y);
+                SOUNDS.collect();
+              }
+              // Golden drone drops lootbox
+              if (d.golden) {
+                const s2 = getState();
+                s2.lootboxes = [...s2.lootboxes, { id: Date.now(), acquiredAt: Date.now() }];
+                saveState(s2);
+                showToast(currentLang === 'ru' ? '🎁 Золотой дрон сбит! Контейнер в Верфи!' : '🎁 Golden drone down! Container in Shipyard!', 'gold');
+                SOUNDS.buy();
+                vibrate([50, 50, 50]);
+              }
+            }
+          }
+        });
+      });
+      this.drones = this.drones.filter(d => d.hp > 0);
+
+      // Plasma collection
+      const plasmaMult = eff.plasmaMult || 1;
+      this.plasma = this.plasma.filter(p => {
+        const dx = p.x - this.ship.x, dy = p.y - this.ship.y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if (dist < collectRadius) {
+          this.plasmaCollected += Math.floor(p.value * plasmaMult);
+          this.spawnCollectEffect(p.x, p.y);
+          SOUNDS.collect();
+          return false;
+        }
+        p.phase += 0.04;
+        return true;
+      });
+
+      // Update particles
+      this.particles = this.particles.filter(p => { p.x += p.vx; p.y += p.vy; p.life -= 0.03; p.vx *= 0.95; p.vy *= 0.95; return p.life > 0; });
+
+      // Update ability cooldowns
+      ['emp', 'boost', 'magnet'].forEach(ab => { if (this.abilities[ab] > 0) this.abilities[ab] = Math.max(0, this.abilities[ab] - dt); });
+      // Magnet effect
+      if (this.magnetActive > 0) {
+        this.magnetActive -= dt;
+        const magnetRange = 400;
+        this.plasma.forEach(p => {
+          const dx = this.ship.x - p.x, dy = this.ship.y - p.y;
+          const dist = Math.sqrt(dx*dx + dy*dy);
+          if (dist < magnetRange && dist > 0) { p.x += (dx / dist) * 8; p.y += (dy / dist) * 8; }
+        });
+      }
+      // Boost trail fade
+      this.boostTrail = this.boostTrail.filter(t => { t.life -= 0.05; return t.life > 0; });
+      this.updateAbilityUI();
+    }
+    useAbility(name) {
+      if (this.abilities[name] > 0) return;
+      this.abilities[name] = this.abilityCooldowns[name];
+      if (name === 'emp') {
+        // Stun all drones within 150px for 2s
+        this.drones.forEach(d => { const dx = d.x - this.ship.x, dy = d.y - this.ship.y; if (Math.sqrt(dx*dx + dy*dy) < 150) d.stunned = 2000; });
+        this.spawnExplosion(this.ship.x, this.ship.y, '#22D3EE');
+        for (let i = 0; i < 30; i++) { const a = (i / 30) * Math.PI * 2; this.particles.push({ x: this.ship.x, y: this.ship.y, vx: Math.cos(a) * 4, vy: Math.sin(a) * 4, life: 1, color: '#22D3EE', size: 4 }); }
+        SOUNDS.danger(); vibrate([50, 50, 50]);
+        showToast(currentLang === 'ru' ? '⚡ EMP-ВЗРЫВ!' : '⚡ EMP BLAST!', 'cyan');
+      } else if (name === 'boost') {
+        // Dash forward, leave fire trail that kills drones
+        const ang = this.ship.angle;
+        const dashDist = 200;
+        const steps = 20;
+        for (let i = 0; i < steps; i++) {
+          const sx = this.ship.x + Math.cos(ang) * (dashDist * i / steps);
+          const sy = this.ship.y + Math.sin(ang) * (dashDist * i / steps);
+          this.boostTrail.push({ x: sx, y: sy, life: 1 });
+          // Kill drones in trail
+          this.drones.forEach(d => { const dx = d.x - sx, dy = d.y - sy; if (Math.sqrt(dx*dx + dy*dy) < 30) { d.hp = 0; this.kills++; this.spawnExplosion(d.x, d.y, '#FBBF24'); } });
+        }
+        this.ship.x = Math.max(this.ship.size, Math.min(this.W - this.ship.size, this.ship.x + Math.cos(ang) * dashDist));
+        this.ship.y = Math.max(this.ship.size, Math.min(this.H - this.ship.size, this.ship.y + Math.sin(ang) * dashDist));
+        SOUNDS.overclock(); vibrate(100);
+        showToast(currentLang === 'ru' ? '🔥 ФОРСАЖ!' : '🔥 BOOST!', 'gold');
+      } else if (name === 'magnet') {
+        this.magnetActive = 5000;
+        SOUNDS.buy(); vibrate(60);
+        showToast(currentLang === 'ru' ? '🧲 ПРИТЯЖЕНИЕ 5с!' : '🧲 MAGNET 5s!', 'cyan');
+      }
+    }
+    updateAbilityUI() {
+      ['emp', 'boost', 'magnet'].forEach(ab => {
+        const btn = document.getElementById('ab' + ab.charAt(0).toUpperCase() + ab.slice(1));
+        const cd = document.getElementById('ab' + ab.charAt(0).toUpperCase() + ab.slice(1) + 'Cd');
+        const txt = document.getElementById('ab' + ab.charAt(0).toUpperCase() + ab.slice(1) + 'Text');
+        if (!btn) return;
+        if (this.abilities[ab] > 0) {
+          btn.classList.remove('ready'); btn.classList.add('cooldown');
+          const pct = (this.abilities[ab] / this.abilityCooldowns[ab]) * 100;
+          cd.style.height = pct + '%';
+          txt.style.display = 'block';
+          txt.textContent = Math.ceil(this.abilities[ab] / 1000);
+        } else {
+          btn.classList.add('ready'); btn.classList.remove('cooldown');
+          cd.style.height = '0%';
+          txt.style.display = 'none';
+        }
+      });
+      // Threat indicator
+      const ti = document.getElementById('threatIndicator');
+      let html = '';
+      for (let i = 0; i < 5; i++) html += `<div class="ti-dot ${i <= this.threatLevel ? 'active' : ''}"></div>`;
+      ti.innerHTML = html;
+    }
+    spawnExplosion(x, y, color) { for (let i = 0; i < 15; i++) { const a = (i / 15) * Math.PI * 2; this.particles.push({ x, y, vx: Math.cos(a) * (1 + Math.random() * 3), vy: Math.sin(a) * (1 + Math.random() * 3), life: 1, color, size: 3 }); } }
+    spawnCollectEffect(x, y) { for (let i = 0; i < 6; i++) { const a = (i / 6) * Math.PI * 2; this.particles.push({ x, y, vx: Math.cos(a) * 0.5, vy: Math.sin(a) * 0.5, life: 1, color: '#22D3EE', size: 2 }); } }
+    endBattle() {
+      this.running = false;
+      SOUNDS.gameover();
+      // REVIVE: offer once per run if player has stars and hasn't used revive yet
+      if (!this.revivedThisRun && this.elapsedTime > 15) {
+        this.offerRevive();
+        return;
+      }
+      this.finalizeBattle();
+    }
+    offerRevive() {
+      const s = getState();
+      document.getElementById('rvPlasma').textContent = this.plasmaCollected;
+      document.getElementById('rvKills').textContent = this.kills;
+      document.getElementById('rvTime').textContent = formatTime(this.elapsedTime);
+      const btn = document.getElementById('rvBtn');
+      btn.disabled = s.stars < 50;
+      btn.innerHTML = (s.stars < 50 ? '<span data-i18n="not_enough_stars"></span>' : '<span data-i18n="revive_btn"></span>') + ' · 50 ★';
+      applyI18n();
+      document.getElementById('reviveOverlay').classList.add('show');
+      // Countdown 10 seconds
+      let countdown = 10;
+      document.getElementById('rvTimer').textContent = countdown;
+      this._reviveInterval = setInterval(() => {
+        countdown--;
+        document.getElementById('rvTimer').textContent = countdown;
+        if (countdown <= 0) {
+          clearInterval(this._reviveInterval);
+          declineRevive();
+        }
+      }, 1000);
+    }
+    finalizeBattle() {
+      const s = getState();
+      const glory = this.kills * 5 + Math.floor(this.elapsedTime);
+      s.plasma += this.plasmaCollected;
+      s.glory += glory;
+      s.totalRuns++;
+      s.totalKills += this.kills;
+      s.totalPlasma += this.plasmaCollected;
+      // Save daily run score if this was a daily run
+      if (this.isDailyRun) {
+        const today = new Date().toDateString();
+        if (s.dailyRunDate !== today) { s.dailyRunDate = today; s.dailyRunScore = 0; }
+        if (this.plasmaCollected > s.dailyRunScore) s.dailyRunScore = this.plasmaCollected;
+      }
+      const score = this.plasmaCollected + this.kills * 20 + Math.floor(this.elapsedTime) * 2;
+      if (score > s.bestRun) s.bestRun = score;
+      updateQuestProgress('plasma', this.plasmaCollected);
+      updateQuestProgress('kills', this.kills);
+      updateQuestProgress('time', Math.floor(this.elapsedTime));
+      updateQuestProgress('runs', 1);
+      updateQuestProgress('glory', glory);
+      saveState(s);
+      checkStoryProgress();
+      document.getElementById('grPlasma').textContent = this.plasmaCollected;
+      document.getElementById('grGlory').textContent = glory;
+      document.getElementById('gsKills').textContent = this.kills;
+      document.getElementById('gsTime').textContent = formatTime(this.elapsedTime);
+      document.getElementById('gsPlasmaCollected').textContent = this.plasmaCollected;
+      setTimeout(() => switchScreen('gameover'), 600);
+    }
+    updateHUD() {
+      document.getElementById('bhPlasma').textContent = this.plasmaCollected;
+      document.getElementById('bhKills').textContent = this.kills;
+      document.getElementById('bhTimer').textContent = formatTime(this.elapsedTime);
+      const hpEl = document.getElementById('bhHp');
+      let html = '';
+      for (let i = 0; i < this.ship.maxHp; i++) html += `<div class="bh-hp-dot ${i >= this.ship.hp ? 'lost' : ''}"></div>`;
+      hpEl.innerHTML = html;
+    }
+    draw() {
+      const ctx = this.ctx;
+      // Background — color shifts with threat level
+      const threatColors = ['#03020A', '#0A0820', '#1A0810', '#2A0810', '#3A0810', '#4A0810'];
+      const bgColor = threatColors[Math.min(this.threatLevel, threatColors.length - 1)];
+      ctx.fillStyle = bgColor; ctx.fillRect(0, 0, this.W, this.H);
+      // Red vignette at high threat
+      if (this.threatLevel >= 2) {
+        const vig = ctx.createRadialGradient(this.W/2, this.H/2, this.W/3, this.W/2, this.H/2, this.W/1.5);
+        vig.addColorStop(0, 'rgba(244,63,94,0)');
+        vig.addColorStop(1, `rgba(244,63,94,${0.05 + this.threatLevel * 0.03})`);
+        ctx.fillStyle = vig; ctx.fillRect(0, 0, this.W, this.H);
+      }
+      // BG stars
+      this.bgStars.forEach(s => { const tw = 0.3 + Math.sin(this.t * 0.002 + s.phase) * 0.4; ctx.fillStyle = `rgba(255,255,255,${Math.max(0, tw)})`; ctx.beginPath(); ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2); ctx.fill(); });
+      // Nebula
+      const ng = ctx.createRadialGradient(this.W * 0.3, this.H * 0.4, 0, this.W * 0.3, this.H * 0.4, this.W * 0.6); ng.addColorStop(0, 'rgba(167,139,250,0.06)'); ng.addColorStop(1, 'rgba(167,139,250,0)'); ctx.fillStyle = ng; ctx.fillRect(0, 0, this.W, this.H);
+      // Plasma
+      this.plasma.forEach(p => {
+        const pulse = 1 + Math.sin(this.t * 0.005 + p.phase) * 0.2;
+        const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size * 3); grad.addColorStop(0, 'rgba(34,211,238,0.6)'); grad.addColorStop(1, 'rgba(34,211,238,0)'); ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(p.x, p.y, p.size * 3, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#22D3EE'; ctx.shadowColor = '#22D3EE'; ctx.shadowBlur = 10;
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.size * pulse, 0, Math.PI * 2); ctx.fill();
+        ctx.shadowBlur = 0;
+      });
+      // Bullets
+      this.bullets.forEach(b => { ctx.fillStyle = '#A78BFA'; ctx.shadowColor = '#A78BFA'; ctx.shadowBlur = 8; ctx.beginPath(); ctx.arc(b.x, b.y, 3, 0, Math.PI * 2); ctx.fill(); ctx.shadowBlur = 0; });
+      // Drones
+      this.drones.forEach(d => {
+        const pulse = 1 + Math.sin(d.phase) * 0.15;
+        let color, glowColor;
+        if (d.golden) { color = '#FBBF24'; glowColor = 'rgba(251,191,36,0.6)'; }
+        else if (d.elite) { color = '#FB923C'; glowColor = 'rgba(251,146,60,0.6)'; } // orange elite
+        else { color = '#F43F5E'; glowColor = 'rgba(244,63,94,0.5)'; }
+        const grad = ctx.createRadialGradient(d.x, d.y, 0, d.x, d.y, d.size * 3);
+        grad.addColorStop(0, glowColor);
+        grad.addColorStop(1, d.golden ? 'rgba(251,191,36,0)' : (d.elite ? 'rgba(251,146,60,0)' : 'rgba(244,63,94,0)'));
+        ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(d.x, d.y, d.size * 3, 0, Math.PI * 2); ctx.fill();
+        // Stunned = blue tint
+        if (d.stunned > 0) { ctx.fillStyle = '#22D3EE'; ctx.shadowColor = '#22D3EE'; }
+        else { ctx.fillStyle = color; ctx.shadowColor = color; }
+        ctx.shadowBlur = d.golden ? 20 : (d.elite ? 16 : 12);
+        // Elite: armor ring
+        if (d.elite) { ctx.strokeStyle = '#FB923C'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(d.x, d.y, d.size * pulse * 1.3, 0, Math.PI * 2); ctx.stroke(); }
+        ctx.beginPath(); ctx.arc(d.x, d.y, d.size * pulse, 0, Math.PI * 2); ctx.fill();
+        // Inner core
+        ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(d.x, d.y, d.size * 0.4, 0, Math.PI * 2); ctx.fill();
+        // Golden drone: star marker
+        if (d.golden) {
+          ctx.strokeStyle = '#fff'; ctx.lineWidth = 2;
+          ctx.beginPath();
+          for (let i = 0; i < 5; i++) { const a = (i * 2 * Math.PI / 5) - Math.PI / 2; const x = d.x + Math.cos(a) * d.size * 1.2; const y = d.y + Math.sin(a) * d.size * 1.2; if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y); }
+          ctx.closePath(); ctx.stroke();
+        }
+        ctx.shadowBlur = 0;
+      });
+      // Ship
+      ctx.save();
+      ctx.translate(this.ship.x, this.ship.y);
+      ctx.rotate(this.ship.angle + Math.PI / 2);
+      // Engine trail
+      const trailGrad = ctx.createLinearGradient(0, 15, 0, 50); trailGrad.addColorStop(0, 'rgba(167,139,250,0.8)'); trailGrad.addColorStop(1, 'rgba(167,139,250,0)'); ctx.fillStyle = trailGrad;
+      ctx.beginPath(); ctx.moveTo(-8, 15); ctx.lineTo(8, 15); ctx.lineTo(4, 45); ctx.lineTo(-4, 45); ctx.closePath(); ctx.fill();
+      // Body
+      ctx.fillStyle = '#A78BFA'; ctx.shadowColor = '#A78BFA'; ctx.shadowBlur = 16;
+      ctx.beginPath(); ctx.moveTo(0, -18); ctx.lineTo(14, 12); ctx.lineTo(6, 16); ctx.lineTo(-6, 16); ctx.lineTo(-14, 12); ctx.closePath(); ctx.fill();
+      // Cockpit
+      ctx.fillStyle = '#22D3EE'; ctx.shadowColor = '#22D3EE'; ctx.shadowBlur = 8;
+      ctx.beginPath(); ctx.arc(0, -4, 5, 0, Math.PI * 2); ctx.fill();
+      // Shield
+      if (this.ship.shield) { ctx.strokeStyle = 'rgba(34,211,238,0.5)'; ctx.lineWidth = 2; ctx.shadowBlur = 0; ctx.beginPath(); ctx.arc(0, 0, 24, 0, Math.PI * 2); ctx.stroke(); }
+      ctx.shadowBlur = 0;
+      ctx.restore();
+      // Joystick visual — hidden (player just drags anywhere)
+      // (no rendering, ship follows finger silently)
+      // Boost trail
+      this.boostTrail.forEach(t => {
+        ctx.fillStyle = `rgba(251, 191, 36, ${t.life * 0.6})`;
+        ctx.shadowColor = '#FBBF24'; ctx.shadowBlur = 16;
+        ctx.beginPath(); ctx.arc(t.x, t.y, 12 * t.life, 0, Math.PI * 2); ctx.fill();
+        ctx.shadowBlur = 0;
+      });
+      // Magnet aura
+      if (this.magnetActive > 0) {
+        ctx.strokeStyle = `rgba(244, 114, 182, ${0.3 + Math.sin(this.t * 0.01) * 0.2})`; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.arc(this.ship.x, this.ship.y, 80, 0, Math.PI * 2); ctx.stroke();
+        ctx.strokeStyle = `rgba(244, 114, 182, ${0.15})`;
+        ctx.beginPath(); ctx.arc(this.ship.x, this.ship.y, 160, 0, Math.PI * 2); ctx.stroke();
+      }
+      // Particles
+      this.particles.forEach(p => { ctx.fillStyle = p.color; ctx.globalAlpha = p.life; ctx.beginPath(); ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2); ctx.fill(); });
+      ctx.globalAlpha = 1;
+    }
+  }
+
+  function formatTime(sec) { const m = Math.floor(sec / 60); const s = Math.floor(sec % 60); return `${m}:${s.toString().padStart(2, '0')}`; }
+
+  // ============ HANGAR PREVIEW ============
+  let hangarAnimId = null;
+  function renderHangar() {
+    if (hangarAnimId) cancelAnimationFrame(hangarAnimId);
+    const canvas = document.getElementById('hangarCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+    const s = getState();
+    const upgrades = s.upgrades || {};
+    const t0 = performance.now();
+    const animate = () => {
+      const t = performance.now() - t0;
+      ctx.clearRect(0, 0, W, H);
+      // Background stars
+      ctx.fillStyle = '#03020A'; ctx.fillRect(0, 0, W, H);
+      for (let i = 0; i < 40; i++) {
+        const x = (i * 73 % W); const y = (i * 137 % H);
+        const tw = 0.3 + Math.sin(t * 0.002 + i) * 0.3;
+        ctx.fillStyle = `rgba(255,255,255,${tw})`;
+        ctx.beginPath(); ctx.arc(x, y, 1, 0, Math.PI * 2); ctx.fill();
+      }
+      // Nebula
+      const ng = ctx.createRadialGradient(W/2, H/2, 0, W/2, H/2, W/2);
+      ng.addColorStop(0, 'rgba(167,139,250,0.08)'); ng.addColorStop(1, 'rgba(167,139,250,0)');
+      ctx.fillStyle = ng; ctx.beginPath(); ctx.arc(W/2, H/2, W/2, 0, Math.PI * 2); ctx.fill();
+      // Ship in center, hovering
+      const cx = W/2, cy = H/2 + Math.sin(t * 0.002) * 8;
+      const totalUp = Object.values(upgrades).reduce((a, b) => a + b, 0);
+      // Color shifts with tier
+      let bodyColor = '#A78BFA', cockpitColor = '#22D3EE';
+      if (totalUp >= 20) { bodyColor = '#FBBF24'; cockpitColor = '#F43F5E'; }
+      else if (totalUp >= 12) { bodyColor = '#F472B6'; cockpitColor = '#FBBF24'; }
+      else if (totalUp >= 7) { bodyColor = '#22D3EE'; cockpitColor = '#A78BFA'; }
+      else if (totalUp >= 3) { bodyColor = '#A78BFA'; cockpitColor = '#22D3EE'; }
+      // Engine trail
+      const trailGrad = ctx.createLinearGradient(cx, cy + 30, cx, cy + 100);
+      trailGrad.addColorStop(0, bodyColor + 'CC'); trailGrad.addColorStop(1, bodyColor + '00');
+      ctx.fillStyle = trailGrad;
+      ctx.beginPath();
+      const trailW = 14 + (upgrades.speed || 0) * 2;
+      ctx.moveTo(cx - trailW, cy + 30); ctx.lineTo(cx + trailW, cy + 30);
+      ctx.lineTo(cx + trailW * 0.5, cy + 100 + Math.sin(t * 0.01) * 8);
+      ctx.lineTo(cx - trailW * 0.5, cy + 100 + Math.sin(t * 0.01) * 8);
+      ctx.closePath(); ctx.fill();
+      // Ship body
+      ctx.fillStyle = bodyColor; ctx.shadowColor = bodyColor; ctx.shadowBlur = 24;
+      const sizeScale = 1 + totalUp * 0.03;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy - 35 * sizeScale);
+      ctx.lineTo(cx + 25 * sizeScale, cy + 20 * sizeScale);
+      ctx.lineTo(cx + 12 * sizeScale, cy + 28 * sizeScale);
+      ctx.lineTo(cx - 12 * sizeScale, cy + 28 * sizeScale);
+      ctx.lineTo(cx - 25 * sizeScale, cy + 20 * sizeScale);
+      ctx.closePath(); ctx.fill();
+      // Wing extensions (if speed upgrade)
+      if (upgrades.speed > 0) {
+        ctx.fillStyle = bodyColor + 'AA';
+        ctx.beginPath();
+        ctx.moveTo(cx - 25 * sizeScale, cy + 5); ctx.lineTo(cx - 40 * sizeScale, cy + 15);
+        ctx.lineTo(cx - 35 * sizeScale, cy + 25 * sizeScale); ctx.lineTo(cx - 25 * sizeScale, cy + 20 * sizeScale);
+        ctx.closePath(); ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(cx + 25 * sizeScale, cy + 5); ctx.lineTo(cx + 40 * sizeScale, cy + 15);
+        ctx.lineTo(cx + 35 * sizeScale, cy + 25 * sizeScale); ctx.lineTo(cx + 25 * sizeScale, cy + 20 * sizeScale);
+        ctx.closePath(); ctx.fill();
+      }
+      // Cannons (if damage upgrade)
+      if (upgrades.damage > 0) {
+        ctx.fillStyle = '#F43F5E'; ctx.shadowColor = '#F43F5E'; ctx.shadowBlur = 8;
+        for (let i = 0; i < Math.min(upgrades.damage, 4); i++) {
+          const off = (i - (Math.min(upgrades.damage, 4) - 1) / 2) * 8;
+          ctx.fillRect(cx + off - 2, cy - 20 * sizeScale, 4, 12);
+        }
+      }
+      // Shield bubble (if shield)
+      if (upgrades.shield) {
+        ctx.strokeStyle = 'rgba(34,211,238,0.4)'; ctx.lineWidth = 2; ctx.shadowBlur = 0;
+        ctx.beginPath(); ctx.arc(cx, cy, 50 * sizeScale, 0, Math.PI * 2); ctx.stroke();
+        ctx.strokeStyle = 'rgba(34,211,238,0.2)';
+        ctx.beginPath(); ctx.arc(cx, cy, 55 * sizeScale, 0, Math.PI * 2); ctx.stroke();
+      }
+      // Cockpit
+      ctx.fillStyle = cockpitColor; ctx.shadowColor = cockpitColor; ctx.shadowBlur = 12;
+      ctx.beginPath(); ctx.arc(cx, cy - 8 * sizeScale, 7 * sizeScale, 0, Math.PI * 2); ctx.fill();
+      // HP bars (if maxHp upgrade)
+      if (upgrades.maxHp > 0) {
+        ctx.shadowBlur = 0;
+        for (let i = 0; i < upgrades.maxHp; i++) {
+          ctx.fillStyle = '#F43F5E';
+          ctx.fillRect(cx - 20 + i * 8, cy + 35 * sizeScale, 6, 4);
+        }
+      }
+      ctx.shadowBlur = 0;
+      hangarAnimId = requestAnimationFrame(animate);
+    };
+    animate();
+  }
+
+  // ============ SHIPYARD ============
+  function getUpgradeCost(up, currentLevel) { return Math.floor(up.baseCost * Math.pow(up.costMult, currentLevel)); }
+  function renderShipyard() {
+    const s = getState();
+    document.getElementById('syBalance').textContent = Math.floor(s.plasma) + ' 💎';
+    // Update hangar stats
+    const dmgUp = s.upgrades.damage || 0;
+    const fireUp = s.upgrades.fireRate || 0;
+    const radUp = s.upgrades.radius || 0;
+    const hpUp = s.upgrades.maxHp || 0;
+    document.getElementById('hstFire').textContent = (1 + fireUp);
+    document.getElementById('hstDmg').textContent = (1 + dmgUp);
+    document.getElementById('hstRad').textContent = (30 + radUp * 12);
+    document.getElementById('hstHp').textContent = (3 + hpUp);
+    // Tier based on total upgrades
+    const totalUp = Object.values(s.upgrades).reduce((a, b) => a + b, 0);
+    let tierName = 'Tier I · Искатель';
+    if (totalUp >= 20) tierName = 'Tier V · Бог Вселенной';
+    else if (totalUp >= 12) tierName = 'Tier IV · Галактический Лорд';
+    else if (totalUp >= 7) tierName = 'Tier III · Адмирал';
+    else if (totalUp >= 3) tierName = 'Tier II · Капитан';
+    document.getElementById('hangarTier').textContent = tierName;
+    // Render hangar canvas
+    renderHangar();
+    const list = document.getElementById('syList');
+    // Lootbox section (if any)
+    let lootHtml = '';
+    if (s.lootboxes && s.lootboxes.length > 0) {
+      lootHtml = s.lootboxes.map((lb, i) => {
+        const elapsed = Date.now() - lb.acquiredAt;
+        const ready = elapsed >= 3 * 3600 * 1000;
+        const timeLeft = ready ? 0 : (3 * 3600 * 1000 - elapsed);
+        const timeStr = ready ? (currentLang === 'ru' ? 'ГОТОВ' : 'READY') : formatLootTime(timeLeft);
+        return `<div class="sy-card" style="border-color:rgba(251,191,36,0.3);background:linear-gradient(135deg,rgba(251,191,36,0.06),rgba(10,8,32,0.8));">
+          <div class="sy-icon" style="background:linear-gradient(135deg,rgba(251,191,36,0.2),rgba(251,191,36,0.05));border-color:rgba(251,191,36,0.3);">📦</div>
+          <div class="sy-body">
+            <div class="sy-name">${currentLang === 'ru' ? 'Секретный груз #' + (i+1) : 'Secret cargo #' + (i+1)}</div>
+            <div class="sy-desc">${currentLang === 'ru' ? 'Контейнер с Золотого Дрона' : 'Container from Golden Drone'}</div>
+            <div class="sy-level"><div style="font-size:10px;color:${ready ? '#34D399' : '#FBBF24'};font-weight:800;letter-spacing:0.1em;">${timeStr}</div></div>
+          </div>
+          <div class="sy-action">
+            <div class="sy-cost" style="color:#FBBF24;">100 ★</div>
+            <button class="sy-buy" style="background:linear-gradient(135deg,#FBBF24,#F59E0B);color:#03020A;" ${s.stars < 100 ? 'disabled' : ''} onclick="openLootbox(${i})">${currentLang === 'ru' ? 'ОТКРЫТЬ' : 'OPEN'}</button>
+          </div>
+        </div>`;
+      }).join('');
+    }
+    // Upgrades
+    const upHtml = UPGRADES.map(up => {
+      const level = s.upgrades[up.id] || 0;
+      const maxed = level >= up.maxLevel;
+      const cost = maxed ? 0 : getUpgradeCost(up, level);
+      // Referral lock for levels 4-5 (except shield which is level 1 max)
+      const needsRefs = !maxed && level >= 3 && up.maxLevel >= 4 && s.invited < 3;
+      const canBuy = !maxed && !needsRefs && s.plasma >= cost;
+      let dots = '';
+      for (let i = 0; i < up.maxLevel; i++) dots += `<div class="sy-dot ${i < level ? 'filled' : ''}"></div>`;
+      let actionHtml = '';
+      if (maxed) actionHtml = '<div class="sy-cost" style="color:#34D399">MAX</div><button class="sy-buy maxed">✓</button>';
+      else if (needsRefs) actionHtml = `<div class="sy-cost">${cost} 💎</div><div class="sy-lock-badge">🔒 ${s.invited}/3</div><button class="sy-buy" disabled onclick="showToast(t('need_referrals'),'danger')">${currentLang === 'ru' ? 'ЗАБЛОКИРОВАНО' : 'LOCKED'}</button>`;
+      else actionHtml = `<div class="sy-cost">${cost} 💎</div><button class="sy-buy" ${canBuy ? '' : 'disabled'} onclick="buyUpgrade('${up.id}')">${currentLang === 'ru' ? 'КУПИТЬ' : 'BUY'}</button>`;
+      return `<div class="sy-card">
+        <div class="sy-icon">${up.icon}</div>
+        <div class="sy-body">
+          <div class="sy-name">${up.name[currentLang]}</div>
+          <div class="sy-desc">${up.desc[currentLang]}</div>
+          <div class="sy-level">${dots}</div>
+        </div>
+        <div class="sy-action">${actionHtml}</div>
+      </div>`;
+    }).join('');
+    list.innerHTML = lootHtml + upHtml;
+  }
+  function formatLootTime(ms) {
+    const h = Math.floor(ms / 3600000); const m = Math.floor((ms % 3600000) / 60000); const s = Math.floor((ms % 60000) / 1000);
+    return `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+  }
+  function buyUpgrade(id) {
+    const up = UPGRADES.find(u => u.id === id);
+    if (!up) return;
+    const s = getState();
+    const level = s.upgrades[id] || 0;
+    if (level >= up.maxLevel) return;
+    const cost = getUpgradeCost(up, level);
+    if (s.plasma < cost) { showToast(t('not_enough'), 'danger'); return; }
+    s.plasma -= cost;
+    s.upgrades[id] = level + 1;
+    saveState(s);
+    SOUNDS.buy();
+    updateQuestProgress('upgrades', 1);
+    showToast(t('purchased'), 'success');
+    renderShipyard(); renderHome();
+    checkStoryProgress();
+  }
+
+  // ============ QUESTS ============
+  let questTab = 'daily';
+  function switchQuestTab(tab) {
+    questTab = tab;
+    document.querySelectorAll('.qu-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+    renderQuests();
+  }
+  function renderQuests() {
+    const s = getState();
+    const list = document.getElementById('quList');
+    let quests, claimed, progress;
+    if (questTab === 'daily') { quests = DAILY_QUESTS; claimed = s.dailyClaimed; progress = s.dailyProgress; }
+    else if (questTab === 'weekly') { quests = WEEKLY_QUESTS; claimed = s.weeklyClaimed; progress = s.weeklyProgress; }
+    else { quests = STORY_QUESTS; claimed = s.storyClaimed; progress = null; }
+    list.innerHTML = quests.map(q => {
+      const isClaimed = claimed.includes(q.id);
+      let prog = 0;
+      if (questTab === 'story') {
+        const st = getState();
+        if (q.type === 'runs') prog = st.totalRuns;
+        else if (q.type === 'kills') prog = st.totalKills;
+        else if (q.type === 'time') prog = st.bestRun > 0 ? 90 : 0; // simplified
+        else if (q.type === 'upgrades') prog = Object.values(st.upgrades).reduce((a, b) => a + b, 0);
+        else if (q.type === 'glory') prog = st.glory;
+      } else {
+        prog = (progress && progress[q.id]) || 0;
+      }
+      const done = prog >= q.target;
+      const canClaim = done && !isClaimed;
+      const pct = Math.min(100, (prog / q.target) * 100);
+      const rewardText = q.reward.type === 'plasma' ? `+${q.reward.amount} 💎` : `+${q.reward.amount} ★`;
+      return `<div class="qu-card ${isClaimed ? 'done' : ''}">
+        <div class="qu-top">
+          <div class="qu-icon">${q.icon}</div>
+          <div class="qu-body"><div class="qu-name">${q.text[currentLang]}</div><div class="qu-reward">${rewardText}</div></div>
+          ${isClaimed ? '<div class="qu-check">✓</div>' : ''}
+        </div>
+        <div class="qu-progress-row">
+          <div class="qu-bar"><div class="qu-bar-fill" style="width:${pct}%;"></div></div>
+          <div class="qu-progress-text">${Math.min(prog, q.target)}/${q.target}</div>
+        </div>
+        ${canClaim ? `<button class="go-btn go-btn-primary" style="margin-top:10px;font-size:12px;padding:10px;" onclick="claimQuest('${q.id}')">${currentLang === 'ru' ? 'ЗАБРАТЬ' : 'CLAIM'}</button>` : ''}
+      </div>`;
+    }).join('');
+  }
+  function claimQuest(qid) {
+    const s = getState();
+    let quests, claimedArr, key;
+    if (questTab === 'daily') { quests = DAILY_QUESTS; claimedArr = s.dailyClaimed; key = 'dailyClaimed'; }
+    else if (questTab === 'weekly') { quests = WEEKLY_QUESTS; claimedArr = s.weeklyClaimed; key = 'weeklyClaimed'; }
+    else { quests = STORY_QUESTS; claimedArr = s.storyClaimed; key = 'storyClaimed'; }
+    const q = quests.find(x => x.id === qid);
+    if (!q || claimedArr.includes(qid)) return;
+    if (q.reward.type === 'plasma') s.plasma += q.reward.amount;
+    else if (q.reward.type === 'stars') s.stars += q.reward.amount;
+    s[key] = [...claimedArr, qid];
+    saveState(s);
+    SOUNDS.quest();
+    showToast(t('quest_done') + ' +' + q.reward.amount + (q.reward.type === 'plasma' ? ' 💎' : ' ★'), 'success');
+    renderQuests(); renderHome(); updateBadges();
+  }
+  function updateQuestProgress(type, amount) {
+    const s = getState();
+    const addProg = (quests, progObj, claimedKey) => {
+      quests.forEach(q => {
+        if (q.type === type && !s[claimedKey].includes(q.id)) {
+          if (type === 'runs' || type === 'upgrades') progObj[q.id] = (progObj[q.id] || 0) + amount;
+          else progObj[q.id] = Math.max(progObj[q.id] || 0, amount);
+        }
+      });
+    };
+    addProg(DAILY_QUESTS, s.dailyProgress, 'dailyClaimed');
+    addProg(WEEKLY_QUESTS, s.weeklyProgress, 'weeklyClaimed');
+    saveState(s);
+    updateBadges();
+  }
+  function updateBadges() {
+    const s = getState();
+    // Quest badge — count claimable
+    let claimable = 0;
+    const checkClaimable = (quests, claimed, progress) => {
+      quests.forEach(q => {
+        if (claimed.includes(q.id)) return;
+        let prog = 0;
+        if (progress) prog = (progress[q.id] || 0);
+        else {
+          if (q.type === 'runs') prog = s.totalRuns;
+          else if (q.type === 'kills') prog = s.totalKills;
+          else if (q.type === 'upgrades') prog = Object.values(s.upgrades).reduce((a, b) => a + b, 0);
+          else if (q.type === 'glory') prog = s.glory;
+          else if (q.type === 'time') prog = s.bestRun > 0 ? 90 : 0;
+        }
+        if (prog >= q.target) claimable++;
+      });
+    };
+    checkClaimable(DAILY_QUESTS, s.dailyClaimed, s.dailyProgress);
+    checkClaimable(WEEKLY_QUESTS, s.weeklyClaimed, s.weeklyProgress);
+    checkClaimable(STORY_QUESTS, s.storyClaimed, null);
+    const qb1 = document.getElementById('qBadge'); const qb2 = document.getElementById('navQuestBadge');
+    if (claimable > 0) { qb1.classList.add('show'); qb1.textContent = claimable; qb2.classList.add('show'); qb2.textContent = claimable; }
+    else { qb1.classList.remove('show'); qb2.classList.remove('show'); }
+    // Comms badge
+    let unread = 0;
+    CHAPTERS.forEach(ch => { if (s.unlockedChapters.includes(ch.num)) ch.messages.forEach((m, i) => { if (!s.readMessages.includes(`${ch.num}-${i}`)) unread++; }); });
+    const cb1 = document.getElementById('cmBadge'); const cb2 = document.getElementById('navCommsBadge');
+    if (unread > 0) { cb1.classList.add('show'); cb2.classList.add('show'); } else { cb1.classList.remove('show'); cb2.classList.remove('show'); }
+  }
+
+  // ============ STORY ============
+  function checkStoryProgress() {
+    const s = getState();
+    CHAPTERS.forEach(ch => {
+      if (!s.unlockedChapters.includes(ch.num) && ch.trigger(s)) {
+        s.unlockedChapters = [...s.unlockedChapters, ch.num];
+        saveState(s);
+        showToast(t('chapter_unlocked') + ' ' + ch.num, 'cyan');
+      }
+    });
+    updateBadges();
+  }
+  function renderComms() {
+    const s = getState();
+    const list = document.getElementById('cmList');
+    let html = '';
+    CHAPTERS.forEach(ch => {
+      if (!s.unlockedChapters.includes(ch.num)) return;
+      html += `<div class="cm-chapter"><div class="cm-chapter-num">${(currentLang === 'ru' ? 'ГЛАВА' : 'CHAPTER')} ${ch.num}</div><div class="cm-chapter-name">${ch.name[currentLang]}</div></div>`;
+      ch.messages.forEach((msg, i) => {
+        let sender = '', cls = '', avatar = '';
+        if (msg.from === 'kira') { sender = 'КИРА'; cls = 'kira'; avatar = '👩‍🚀'; }
+        else if (msg.from === 'watchers') { sender = 'НАБЛЮДАТЕЛИ'; cls = 'watchers'; avatar = '👁'; }
+        else { sender = currentLang === 'ru' ? 'КОРАБЛЬ' : 'SHIP'; cls = 'system'; avatar = '🚀'; }
+        html += `<div class="cm-msg ${cls}"><div class="cm-avatar ${cls}">${avatar}</div><div class="cm-sender ${cls}">${sender}</div><div class="cm-text">${msg.text[currentLang]}</div></div>`;
+      });
+    });
+    list.innerHTML = html || `<div style="text-align:center;padding:60px 16px;color:#6B6B8C;font-style:italic;">${currentLang === 'ru' ? 'Тишина в эфире.' : 'Silence on the air.'}</div>`;
+  }
+  function markMessagesRead() {
+    const s = getState();
+    let newRead = [...s.readMessages];
+    CHAPTERS.forEach(ch => { if (s.unlockedChapters.includes(ch.num)) ch.messages.forEach((m, i) => { const id = `${ch.num}-${i}`; if (!newRead.includes(id)) newRead.push(id); }); });
+    s.readMessages = newRead; saveState(s); updateBadges();
+  }
+
+  // ============ FAQ ============
+  function renderFAQ() {
+    const list = document.getElementById('fqList');
+    const items = ['q1','q2','q3','q4','q5','q6','q7'];
+    list.innerHTML = items.map((q, i) => `<div class="fq-item" id="fq${i}" onclick="toggleFAQ(${i})"><div class="fq-q"><span>${I18N[currentLang].faq[q]}</span><span class="fq-q-arrow">▼</span></div><div class="fq-a">${I18N[currentLang].faq['a' + q.slice(1)].replace(/\n/g, '<br>')}</div></div>`).join('');
+  }
+  function toggleFAQ(i) { document.getElementById('fq' + i).classList.toggle('open'); }
+
+  // ============ SETTINGS ============
+  function toggleSetting(key, el) {
+    if (key === 'sound') { soundOn = !soundOn; el.classList.toggle('on', soundOn); localStorage.setItem('vd_sound', soundOn ? '1' : '0'); }
+    else if (key === 'vibration') { vibrationOn = !vibrationOn; el.classList.toggle('on', vibrationOn); localStorage.setItem('vd_vibration', vibrationOn ? '1' : '0'); }
+  }
+  function resetProgress() {
+    if (!confirm(currentLang === 'ru' ? 'Сбросить весь прогресс?' : 'Reset all progress?')) return;
+    Object.keys(localStorage).filter(k => k.startsWith('vd_')).forEach(k => localStorage.removeItem(k));
+    location.reload();
+  }
+
+  // ============ TOAST ============
+  function showToast(msg, type = '') { const el = document.getElementById('toast'); el.textContent = msg; el.className = 'toast ' + type; el.classList.add('show'); clearTimeout(el._tm); el._tm = setTimeout(() => el.classList.remove('show'), 2400); }
+
+  // ============ REVIVE / LOOTBOX / REFERRALS ============
+  function revive() {
+    const s = getState();
+    if (s.stars < 50) { showToast(t('not_enough_stars'), 'danger'); return; }
+    s.stars -= 50;
+    saveState(s);
+    if (battle) {
+      battle.revivedThisRun = true;
+      battle.ship.hp = battle.ship.maxHp;
+      battle.ship.shield = true;
+      battle.running = true;
+      battle.lastTime = performance.now();
+      clearInterval(battle._reviveInterval);
+      document.getElementById('reviveOverlay').classList.remove('show');
+      // Clear nearby drones
+      battle.drones = battle.drones.filter(d => {
+        const dx = d.x - battle.ship.x, dy = d.y - battle.ship.y;
+        return Math.sqrt(dx*dx + dy*dy) > 150;
+      });
+      battle.spawnExplosion(battle.ship.x, battle.ship.y, '#FBBF24');
+      SOUNDS.buy();
+      requestAnimationFrame(battle.loop);
+    }
+  }
+  function declineRevive() {
+    if (battle) {
+      clearInterval(battle._reviveInterval);
+      document.getElementById('reviveOverlay').classList.remove('show');
+      battle.finalizeBattle();
+    }
+  }
+  function openLootbox(index) {
+    const s = getState();
+    if (!s.lootboxes || !s.lootboxes[index]) return;
+    const lb = s.lootboxes[index];
+    const elapsed = Date.now() - lb.acquiredAt;
+    const ready = elapsed >= 3 * 3600 * 1000;
+    // Show lootbox modal
+    document.getElementById('lootResult').style.display = 'none';
+    document.getElementById('lootActions').style.display = 'flex';
+    const timerEl = document.getElementById('lootTimer');
+    const instantBtn = document.getElementById('lootInstantBtn');
+    const freeBtn = document.getElementById('lootFreeBtn');
+    if (ready) {
+      timerEl.style.display = 'none';
+      freeBtn.disabled = false;
+      freeBtn.textContent = currentLang === 'ru' ? 'ОТКРЫТЬ БЕСПЛАТНО' : 'OPEN FREE';
+    } else {
+      timerEl.style.display = 'block';
+      timerEl.textContent = t('loot_waiting') + ' ' + formatLootTime(3 * 3600 * 1000 - elapsed);
+      freeBtn.disabled = true;
+      freeBtn.textContent = currentLang === 'ru' ? 'Откроется через ' + formatLootTime(3 * 3600 * 1000 - elapsed) : 'Opens in ' + formatLootTime(3 * 3600 * 1000 - elapsed);
+    }
+    instantBtn.disabled = s.stars < 100;
+    instantBtn.innerHTML = (s.stars < 100 ? '<span>' + t('not_enough_stars') + '</span>' : '<span data-i18n="loot_instant"></span>') + ' · 100 ★';
+    applyI18n();
+    document.getElementById('lootOverlay').classList.add('show');
+    document.getElementById('lootOverlay').dataset.index = index;
+    // Update timer every second
+    if (!ready) {
+      document.getElementById('lootOverlay')._timer = setInterval(() => {
+        const elapsed2 = Date.now() - lb.acquiredAt;
+        if (elapsed2 >= 3 * 3600 * 1000) {
+          clearInterval(document.getElementById('lootOverlay')._timer);
+          timerEl.style.display = 'none';
+          freeBtn.disabled = false;
+          freeBtn.textContent = currentLang === 'ru' ? 'ОТКРЫТЬ БЕСПЛАТНО' : 'OPEN FREE';
+        } else {
+          timerEl.textContent = t('loot_waiting') + ' ' + formatLootTime(3 * 3600 * 1000 - elapsed2);
+          freeBtn.textContent = currentLang === 'ru' ? 'Откроется через ' + formatLootTime(3 * 3600 * 1000 - elapsed2) : 'Opens in ' + formatLootTime(3 * 3600 * 1000 - elapsed2);
+        }
+      }, 1000);
+    }
+  }
+  function openLootInstant() {
+    const s = getState();
+    if (s.stars < 100) { showToast(t('not_enough_stars'), 'danger'); return; }
+    s.stars -= 100;
+    claimLootbox();
+  }
+  function openLootFree() {
+    claimLootbox();
+  }
+  function claimLootbox() {
+    const overlay = document.getElementById('lootOverlay');
+    const index = parseInt(overlay.dataset.index);
+    const s = getState();
+    if (!s.lootboxes || !s.lootboxes[index]) return;
+    // Remove lootbox
+    s.lootboxes.splice(index, 1);
+    // Generate reward
+    const rewards = [
+      { type: 'plasma', amount: 500, label: '+500 💎', icon: '💎' },
+      { type: 'plasma', amount: 2000, label: '+2000 💎', icon: '💎' },
+      { type: 'plasma', amount: 5000, label: '+5000 💎', icon: '💎' },
+      { type: 'stars', amount: 20, label: '+20 ★', icon: '⭐' },
+      { type: 'stars', amount: 50, label: '+50 ★', icon: '⭐' },
+      { type: 'stars', amount: 100, label: '+100 ★', icon: '⭐' },
+      { type: 'skin', amount: 0, label: currentLang === 'ru' ? 'СКИН КОРАБЛЯ!' : 'SHIP SKIN!', icon: '🎨' }
+    ];
+    const reward = rewards[Math.floor(Math.random() * rewards.length)];
+    if (reward.type === 'plasma') s.plasma += reward.amount;
+    else if (reward.type === 'stars') s.stars += reward.amount;
+    saveState(s);
+    SOUNDS.buy();
+    vibrate([50, 50, 100]);
+    // Show result
+    clearInterval(overlay._timer);
+    document.getElementById('lootResult').style.display = 'block';
+    document.getElementById('lootResult').innerHTML = `${reward.icon}<br><span style="font-size:22px;">${reward.label}</span>`;
+    document.getElementById('lootActions').style.display = 'none';
+    setTimeout(() => {
+      closeLoot();
+      renderShipyard();
+      renderHome();
+    }, 2500);
+  }
+  function closeLoot() {
+    const overlay = document.getElementById('lootOverlay');
+    clearInterval(overlay._timer);
+    overlay.classList.remove('show');
+  }
+  function copyRefLink() {
+    const input = document.getElementById('rfLink');
+    input.select(); input.setSelectionRange(0, 99999);
+    try { navigator.clipboard.writeText(input.value); } catch (e) { document.execCommand('copy'); }
+    showToast(t('ref_copied'), 'cyan');
+    // Simulate referral for demo (1 per copy, max 30)
+    const s = getState();
+    if (s.invited < 30) {
+      s.invited++;
+      saveState(s);
+      renderReferrals();
+      renderShipyard();
+      showToast(t('ref_invited'), 'success');
+    }
+  }
+  function renderReferrals() {
+    const s = getState();
+    document.getElementById('rfInvited').textContent = s.invited;
+    document.getElementById('rfNeeded').textContent = Math.max(0, 3 - s.invited);
+  }
+
+  // ============ DAILY RUN ============
+  function getDailySeed() {
+    const d = new Date();
+    return parseInt(`${d.getFullYear()}${(d.getMonth()+1).toString().padStart(2,'0')}${d.getDate().toString().padStart(2,'0')}`);
+  }
+  function getDailyLeaderboard() {
+    // Fake competitors + player's score
+    const seed = getDailySeed();
+    const names = ['DragonSlayer', 'QueenOfVoid', 'NebulaHunter', 'StarReaper', 'VoidWalker', 'PlasmaKing', 'DarkComet', 'GhostShip'];
+    const fakeScores = [45200, 38900, 32100, 27500, 21800, 16400, 11200, 7600];
+    const s = getState();
+    const myScore = s.dailyRunScore || 0;
+    const all = [...names.map((n, i) => ({ name: n, score: fakeScores[i], isMe: false })), { name: s.invited > 0 ? 'Ты' : 'You', score: myScore, isMe: true }];
+    all.sort((a, b) => b.score - a.score);
+    return all;
+  }
+  function renderDailyRun() {
+    const d = new Date();
+    const dateStr = d.toLocaleDateString(currentLang === 'ru' ? 'ru-RU' : 'en-US', { day: 'numeric', month: 'long', year: 'numeric' });
+    document.getElementById('drDate').textContent = dateStr + ' · ' + t('dr_seed') + ': ' + getDailySeed();
+    const lb = document.getElementById('drLeaderboard');
+    const list = getDailyLeaderboard();
+    lb.innerHTML = list.map((p, i) => {
+      let cls = 'nw-reward';
+      if (p.isMe) cls += ' unlocked';
+      let rankCls = '';
+      if (i === 0) rankCls = 'style="background:linear-gradient(135deg,rgba(255,215,0,0.15),rgba(10,8,32,0.8));border-color:rgba(255,215,0,0.4);"';
+      else if (i === 1) rankCls = 'style="background:linear-gradient(135deg,rgba(192,192,192,0.1),rgba(10,8,32,0.8));border-color:rgba(192,192,192,0.3);"';
+      else if (i === 2) rankCls = 'style="background:linear-gradient(135deg,rgba(205,127,50,0.1),rgba(10,8,32,0.8));border-color:rgba(205,127,50,0.3);"';
+      const rankColor = i === 0 ? '#FFD700' : (i === 1 ? '#C0C0C0' : (i === 2 ? '#CD7F32' : '#6B6B8C'));
+      return `<div class="nw-reward ${p.isMe ? 'unlocked' : ''}" ${rankCls}>
+        <div class="nw-reward-icon" style="font-size:18px;color:${rankColor};font-weight:900;width:24px;text-align:center;">${i+1}</div>
+        <div class="nw-reward-body"><div class="nw-reward-name" style="color:${p.isMe ? 'var(--neon)' : '#F0EBFF'}">${p.name}${p.isMe ? ' (' + (currentLang === 'ru' ? 'ты' : 'you') + ')' : ''}</div></div>
+        <div class="nw-reward-count" style="color:${p.isMe ? 'var(--neon)' : 'var(--gold)'};min-width:auto;">${p.score.toLocaleString()} 💎</div>
+      </div>`;
+    }).join('');
+  }
+  function startDailyRun() {
+    initAudio();
+    showLaunchAnimation(() => {
+      switchScreen('battle');
+      if (battle) battle.stop();
+      battle = new BattleEngine('battleCanvas');
+      battle.isDailyRun = true;
+      battle.dailySeed = getDailySeed();
+      battle.start();
+    });
+  }
+
+  // ============ INIT ============
+  const savedLang = localStorage.getItem('vd_lang');
+  if (savedLang) currentLang = savedLang;
+  const savedSound = localStorage.getItem('vd_sound');
+  if (savedSound !== null) soundOn = savedSound === '1';
+  const savedVib = localStorage.getItem('vd_vibration');
+  if (savedVib !== null) vibrationOn = savedVib === '1';
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === currentLang));
+  applyI18n();
+
+  if (sessionStorage.getItem('vd_entered')) { document.getElementById('onboarding').style.display = 'none'; document.getElementById('app').classList.add('show'); checkDailyReset(); renderAll(); checkStoryProgress(); }
+  else { sessionStorage.setItem('vd_entered', '1'); }
+</script>
+
+</body>
+</html>
