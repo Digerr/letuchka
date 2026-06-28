@@ -1566,32 +1566,42 @@
       this.ship.x = Math.max(this.ship.size, Math.min(this.W - this.ship.size, this.ship.x));
       this.ship.y = Math.max(playTop + this.ship.size, Math.min(playBottom - this.ship.size, this.ship.y));
 
-      // Auto-shoot
+      // Auto-shoot — fires in the direction the ship is facing
       this.ship.shootCooldown -= dt;
       const fireRateUpgrade = s.upgrades.fireRate || 0;
       const fireMult = eff.fireRateMult || 1;
       const fireRate = Math.max(100, (600 - fireRateUpgrade * 100) / fireMult);
       const noShoot = eff.noShoot || false;
-      if (!noShoot && this.ship.shootCooldown <= 0 && this.drones.length > 0) {
-        // Find nearest drone
-        let nearest = null, minDist = Infinity;
-        this.drones.forEach(d => { const dx = d.x - this.ship.x, dy = d.y - this.ship.y; const dist = Math.sqrt(dx*dx + dy*dy); if (dist < minDist) { minDist = dist; nearest = d; } });
-        if (nearest && minDist < 400) {
-          const angle = Math.atan2(nearest.y - this.ship.y, nearest.x - this.ship.x);
-          const damageUpgrade = s.upgrades.damage || 0;
-          const dmgMult = eff.dmgMult || 1;
-          const damage = (1 + damageUpgrade) * dmgMult;
-          if (eff.fanShot) {
-            // 3-way fan
-            [-0.25, 0, 0.25].forEach(off => {
-              this.bullets.push({ x: this.ship.x, y: this.ship.y, vx: Math.cos(angle + off) * 600, vy: Math.sin(angle + off) * 600, life: 1500, damage });
-            });
-          } else {
-            this.bullets.push({ x: this.ship.x, y: this.ship.y, vx: Math.cos(angle) * 600, vy: Math.sin(angle) * 600, life: 1500, damage });
-          }
-          this.ship.shootCooldown = fireRate;
-          SOUNDS.shoot();
+      // Default ship angle is -PI/2 (pointing up). If not moving, keep facing up.
+      const shootAngle = this.ship.angle;
+      // Direction vector the nose is pointing
+      const dirX = Math.cos(shootAngle);
+      const dirY = Math.sin(shootAngle);
+      // Find nearest drone IN FRONT of the ship (within 90° cone)
+      let nearest = null, minDist = Infinity;
+      this.drones.forEach(d => {
+        const dx = d.x - this.ship.x, dy = d.y - this.ship.y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if (dist > 500) return; // only shoot at close drones
+        // Dot product > 0 means drone is in front (within 90° cone)
+        const dot = (dx / dist) * dirX + (dy / dist) * dirY;
+        if (dot > 0.3 && dist < minDist) { minDist = dist; nearest = d; }
+      });
+      // If no drone in front, just shoot forward
+      const hasTarget = nearest !== null;
+      if (!noShoot && this.ship.shootCooldown <= 0) {
+        const damageUpgrade = s.upgrades.damage || 0;
+        const dmgMult = eff.dmgMult || 1;
+        const damage = (1 + damageUpgrade) * dmgMult;
+        if (eff.fanShot) {
+          [-0.25, 0, 0.25].forEach(off => {
+            this.bullets.push({ x: this.ship.x, y: this.ship.y, vx: Math.cos(shootAngle + off) * 600, vy: Math.sin(shootAngle + off) * 600, life: 1500, damage });
+          });
+        } else {
+          this.bullets.push({ x: this.ship.x, y: this.ship.y, vx: Math.cos(shootAngle) * 600, vy: Math.sin(shootAngle) * 600, life: 1500, damage });
         }
+        this.ship.shootCooldown = fireRate;
+        SOUNDS.shoot();
       }
 
       // Spawn plasma
