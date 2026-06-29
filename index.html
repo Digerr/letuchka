@@ -8,7 +8,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="app-version" content="1.6.2">
+<meta name="app-version" content="1.7.0">
 <title>LETUCHKA — Прорыв блокады</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -231,6 +231,30 @@
   .hm-fly-text { line-height: 1; }
   .hm-fly-arrow { font-size: 18px; opacity: 0.6; line-height: 1; margin-left: 4px; }
 
+  /* DAILY STREAK — retention card with 7-day track */
+  .hm-streak-card { background: linear-gradient(135deg, rgba(255, 179, 71, 0.08), rgba(10, 8, 32, 0.85)); border: 1px solid rgba(255, 179, 71, 0.25); border-radius: 18px; padding: 14px 16px; position: relative; overflow: hidden; }
+  .hm-streak-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--gold), #FF6B35, var(--gold), transparent); }
+  .hm-streak-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .hm-streak-icon { font-size: 28px; filter: drop-shadow(0 0 8px rgba(255, 179, 71, 0.5)); animation: streakPulse 2s ease-in-out infinite; }
+  @keyframes streakPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+  .hm-streak-body { flex: 1; min-width: 0; }
+  .hm-streak-title { font-size: 13px; font-weight: 900; color: #F0EBFF; }
+  .hm-streak-sub { font-size: 11px; color: var(--gold); font-weight: 700; margin-top: 2px; }
+  .hm-streak-claim { background: linear-gradient(135deg, var(--gold), #F59E0B); color: #060B1A; border: none; padding: 8px 14px; font-size: 11px; font-weight: 900; cursor: pointer; font-family: inherit; border-radius: 999px; letter-spacing: 0.08em; text-transform: uppercase; box-shadow: 0 4px 12px rgba(255, 179, 71, 0.3); transition: all 0.2s ease; flex-shrink: 0; }
+  .hm-streak-claim:hover:not(:disabled) { transform: translateY(-1px) scale(1.03); box-shadow: 0 6px 16px rgba(255, 179, 71, 0.5); }
+  .hm-streak-claim:active:not(:disabled) { transform: scale(0.96); }
+  .hm-streak-claim:disabled { background: rgba(255, 179, 71, 0.15); color: #6B7B9F; cursor: default; box-shadow: none; }
+  .hm-streak-claim.ready { animation: streakClaimGlow 1.5s ease-in-out infinite; }
+  @keyframes streakClaimGlow { 0%, 100% { box-shadow: 0 4px 12px rgba(255, 179, 71, 0.3); } 50% { box-shadow: 0 4px 20px rgba(255, 179, 71, 0.7); } }
+  .hm-streak-track { display: flex; gap: 4px; }
+  .hm-streak-day { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 2px; border-radius: 10px; background: rgba(255, 179, 71, 0.05); border: 1px solid rgba(255, 179, 71, 0.1); transition: all 0.3s ease; position: relative; }
+  .hm-streak-day.claimed { background: rgba(255, 179, 71, 0.15); border-color: rgba(255, 179, 71, 0.4); }
+  .hm-streak-day.current { background: linear-gradient(135deg, rgba(255, 179, 71, 0.25), rgba(255, 107, 53, 0.15)); border-color: var(--gold); box-shadow: 0 0 12px rgba(255, 179, 71, 0.4); }
+  .hm-streak-day-num { font-size: 9px; font-weight: 900; color: #6B7B9F; letter-spacing: 0.05em; }
+  .hm-streak-day.claimed .hm-streak-day-num, .hm-streak-day.current .hm-streak-day-num { color: var(--gold); }
+  .hm-streak-day-icon { font-size: 14px; line-height: 1; }
+  .hm-streak-day-check { position: absolute; top: -2px; right: -2px; width: 14px; height: 14px; border-radius: 50%; background: var(--success); color: #060B1A; font-size: 9px; font-weight: 900; display: flex; align-items: center; justify-content: center; }
+
   /* QUICK ACTIONS — 2-column grid, color-coded tiles */
   .hm-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .hm-tile { position: relative; display: flex; align-items: center; gap: 12px; padding: 14px 14px; border-radius: 16px; cursor: pointer; font-family: inherit; border: 1px solid rgba(124, 92, 252, 0.18); background: linear-gradient(180deg, rgba(20, 16, 46, 0.9) 0%, rgba(10, 8, 32, 0.95) 100%); transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); overflow: hidden; text-align: left; }
@@ -270,6 +294,13 @@
   .hm-mission-bar { flex: 1; height: 5px; background: rgba(0, 229, 204, 0.1); border-radius: 999px; overflow: hidden; }
   .hm-mission-fill { height: 100%; background: linear-gradient(90deg, var(--neon), var(--neon-cyan)); border-radius: 999px; box-shadow: 0 0 6px rgba(0, 229, 204, 0.6); transition: width 0.5s ease; }
   .hm-mission-progress { font-size: 11px; color: var(--neon-cyan); font-weight: 900; font-variant-numeric: tabular-nums; flex-shrink: 0; }
+
+  /* ONLINE PLAYERS — live community counter */
+  .hm-online-card { display: flex; align-items: center; gap: 10px; background: linear-gradient(135deg, rgba(0, 229, 204, 0.04), rgba(10, 8, 32, 0.6)); border: 1px solid rgba(0, 229, 204, 0.1); border-radius: 14px; padding: 10px 14px; }
+  .hm-online-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); box-shadow: 0 0 8px var(--success); animation: onlinePulse 1.5s ease-in-out infinite; flex-shrink: 0; }
+  @keyframes onlinePulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.8); } }
+  .hm-online-text { flex: 1; font-size: 12px; font-weight: 900; color: var(--neon-cyan); font-variant-numeric: tabular-nums; }
+  .hm-online-label { font-size: 9px; color: #6B7B9F; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; }
 
   /* Tight screens — keep grid 2-col but trim padding */
   @media (max-width: 360px) {
@@ -337,6 +368,8 @@
   .go-btn-primary { background: linear-gradient(135deg, var(--neon), #7C3AED); color: #060B1A; box-shadow: 0 8px 24px rgba(124,92,252,0.4); }
   .go-btn-primary:hover { transform: translateY(-2px); }
   .go-btn-secondary { background: rgba(10, 8, 32, 0.8); color: var(--text); border: 1px solid rgba(124,92,252,0.15); }
+  .go-btn-share { background: linear-gradient(135deg, #00E5CC, #00B8D4); color: #060B1A; box-shadow: 0 8px 24px rgba(0,229,204,0.35); }
+  .go-btn-share:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(0,229,204,0.5); }
   .go-btn-ghost { background: transparent; color: #6B6B8C; }
 
   /* SHIPYARD */
@@ -1098,6 +1131,21 @@
           </div>
         </div>
 
+        <!-- DAILY STREAK — retention mechanic -->
+        <div class="hm-section">
+          <div class="hm-streak-card" id="hmStreakCard">
+            <div class="hm-streak-header">
+              <div class="hm-streak-icon">🔥</div>
+              <div class="hm-streak-body">
+                <div class="hm-streak-title" data-i18n="streak_title"></div>
+                <div class="hm-streak-sub" id="hmStreakSub">—</div>
+              </div>
+              <button class="hm-streak-claim" id="hmStreakClaim" onclick="claimStreak()" data-i18n="streak_claim"></button>
+            </div>
+            <div class="hm-streak-track" id="hmStreakTrack"></div>
+          </div>
+        </div>
+
         <!-- DAILY RUN compact banner -->
         <div class="hm-section">
           <div class="dr-card" onclick="switchScreen('dailyrun')">
@@ -1182,6 +1230,15 @@
           </div>
         </div>
 
+        <!-- ONLINE PLAYERS — pseudo-live counter (seeded by date until backend is connected) -->
+        <div class="hm-section">
+          <div class="hm-online-card">
+            <div class="hm-online-dot"></div>
+            <div class="hm-online-text"><span id="hmOnlineCount">—</span> <span data-i18n="streak_players_suffix"></span></div>
+            <div class="hm-online-label" data-i18n="streak_players_online"></div>
+          </div>
+        </div>
+
       </div>
     </div>
 
@@ -1227,6 +1284,7 @@
       </div>
       <div class="go-actions">
         <button class="go-btn go-btn-primary" onclick="startBattle()" data-i18n="go_again"></button>
+        <button class="go-btn go-btn-share" onclick="shareResult()" data-i18n="go_share"></button>
         <button class="go-btn go-btn-secondary" onclick="switchScreen('shipyard')" data-i18n="go_shipyard"></button>
         <button class="go-btn go-btn-ghost" onclick="switchScreen('home')" data-i18n="go_home"></button>
       </div>
@@ -1460,7 +1518,7 @@
           <div class="se-info-icon">⚙️</div>
           <div class="se-info-body">
             <div class="se-info-label" data-i18n="se_version_label"></div>
-            <div class="se-info-value">v<span class="accent" id="seVersionNum">1.6.2</span> · <span data-i18n="se_build"></span></div>
+            <div class="se-info-value">v<span class="accent" id="seVersionNum">1.7.0</span> · <span data-i18n="se_build"></span></div>
             <div class="se-info-sub" data-i18n="se_version_sub"></div>
           </div>
         </div>
@@ -1573,13 +1631,21 @@
       launch: 'ЛЕТЕТЬ',
       hm_qs_sub: 'Награды каждый день', hm_cm_sub: 'Сигналы из гиперпространства', hm_rf_sub: 'Пригласи друзей · бонусы', hm_fq_sub: 'Механики · советы', hm_ad_sub: 'Листинг Q4 2026', hm_se_sub: 'Язык · звук · сброс',
       hm_mission_label: 'МИССИЯ ДНЯ',
+      streak_title: 'Дневной стрик',
+      streak_claim: 'ЗАБРАТЬ',
+      streak_day: 'День',
+      streak_today: 'Сегодня',
+      streak_claimed_today: 'Забрано ✓',
+      streak_next: 'Следующая награда: День',
+      streak_players_online: 'Сегодня летает',
+      streak_players_suffix: 'капитанов',
       rf_tile: 'Рефералы',
       nav_home: 'Главная', nav_shipyard: 'Верфь', nav_quests: 'Задания', nav_comms: 'Связь', nav_faq: 'FAQ', nav_settings: 'Настройки',
       joy_hint: 'Веди палец в любом месте — корабль летит за ним',
       go_title: 'РЕЙС ОКОНЧЕН', go_sub: 'Корабль уничтожен. Плазмоид спасён.',
       gr_plasma: 'ПЛАЗМОИД', gr_glory: 'СЛАВА',
       gs_kills: 'Дронов сбито', gs_time: 'Время в рейсе', gs_plasma_collected: 'Плазмоида собрано',
-      go_again: 'ЛЕТЕТЬ СНОВА', go_shipyard: 'В ВЕРФЬ', go_home: 'НА ГЛАВНУЮ',
+      go_again: 'ЛЕТЕТЬ СНОВА', go_share: '📤 ПОДЕЛИТЬСЯ', go_shipyard: 'В ВЕРФЬ', go_home: 'НА ГЛАВНУЮ',
       sy_title: 'Космическая <em>верфь</em>', sy_sub: 'Апгрейды корабля · прокачка',
       sy_balance: 'БАЛАНС ПЛАЗМОИДА',
       qu_title: 'Задания <em>капитана</em>', qu_sub: 'Выполняй · получай награды',
@@ -1711,13 +1777,21 @@
       launch: 'LAUNCH',
       hm_qs_sub: 'Daily rewards', hm_cm_sub: 'Hyperspace signals', hm_rf_sub: 'Invite friends · bonuses', hm_fq_sub: 'Mechanics · tips', hm_ad_sub: 'Listing Q4 2026', hm_se_sub: 'Language · sound · reset',
       hm_mission_label: 'MISSION OF THE DAY',
+      streak_title: 'Daily Streak',
+      streak_claim: 'CLAIM',
+      streak_day: 'Day',
+      streak_today: 'Today',
+      streak_claimed_today: 'Claimed ✓',
+      streak_next: 'Next reward: Day',
+      streak_players_online: 'Flying today',
+      streak_players_suffix: 'captains',
       rf_tile: 'Referrals',
       nav_home: 'Home', nav_shipyard: 'Shipyard', nav_quests: 'Quests', nav_comms: 'Comms', nav_faq: 'FAQ', nav_settings: 'Settings',
       joy_hint: 'Drag finger anywhere — ship follows',
       go_title: 'MISSION ENDED', go_sub: 'Ship destroyed. Plasmoid saved.',
       gr_plasma: 'PLASMOID', gr_glory: 'GLORY',
       gs_kills: 'Drones killed', gs_time: 'Time in battle', gs_plasma_collected: 'Plasmoid collected',
-      go_again: 'LAUNCH AGAIN', go_shipyard: 'TO SHIPYARD', go_home: 'GO HOME',
+      go_again: 'LAUNCH AGAIN', go_share: '📤 SHARE', go_shipyard: 'TO SHIPYARD', go_home: 'GO HOME',
       sy_title: 'Cosmic <em>shipyard</em>', sy_sub: 'Ship upgrades · progression',
       sy_balance: 'PLASMOID BALANCE',
       qu_title: 'Captain\'s <em>quests</em>', qu_sub: 'Complete · earn rewards',
@@ -1909,6 +1983,20 @@
     { id: 's5', icon: '⭐', text: { ru: 'Достигни 5000 славы', en: 'Reach 5000 glory' }, target: 5000, type: 'glory', reward: { type: 'stars', amount: 100 } }
   ];
 
+  // Daily streak rewards — Day 7 = skin, Day 30 = legendary
+  const STREAK_REWARDS = [
+    { day: 1, reward: { type: 'plasmoid', amount: 500 }, label: { ru: '500 ◈', en: '500 ◈' } },
+    { day: 2, reward: { type: 'plasmoid', amount: 1000 }, label: { ru: '1,000 ◈', en: '1,000 ◈' } },
+    { day: 3, reward: { type: 'stars', amount: 10 }, label: { ru: '10 ★', en: '10 ★' } },
+    { day: 4, reward: { type: 'plasmoid', amount: 2500 }, label: { ru: '2,500 ◈', en: '2,500 ◈' } },
+    { day: 5, reward: { type: 'stars', amount: 20 }, label: { ru: '20 ★', en: '20 ★' } },
+    { day: 6, reward: { type: 'plasmoid', amount: 5000 }, label: { ru: '5,000 ◈', en: '5,000 ◈' } },
+    { day: 7, reward: { type: 'lootbox', amount: 1 }, label: { ru: '🎁 Контейнер', en: '🎁 Container' } },
+    { day: 14, reward: { type: 'stars', amount: 50 }, label: { ru: '50 ★', en: '50 ★' } },
+    { day: 21, reward: { type: 'plasmoid', amount: 20000 }, label: { ru: '20,000 ◈', en: '20,000 ◈' } },
+    { day: 30, reward: { type: 'stars', amount: 200 }, label: { ru: '👑 200 ★ Легендарный', en: '👑 200 ★ Legendary' } }
+  ];
+
   const CHAPTERS = [
     { num: 1, name: { ru: 'ПЕРВЫЙ ВЫЛЕТ', en: 'FIRST LAUNCH' }, tagline: { ru: 'Тишина. Бесконечная темнота. И ты.', en: 'Silence. Endless dark. And you.' }, trigger: () => true, messages: [
       { from: 'system', text: { ru: 'Корабль активирован. Перед тобой — открытый космос. Вокруг разбросан плазмоид. Собирай. Наблюдатели уже заметили тебя.', en: 'Ship activated. Before you — open space. Plasmoid scattered around. Collect. Watchers already noticed you.' } }
@@ -1981,7 +2069,11 @@
       miningModules: JSON.parse(localStorage.getItem('vd_mining') || '[]'),
       miningLastCollect: parseInt(localStorage.getItem('vd_mining_collect') || Date.now().toString()),
       airdropTasks: JSON.parse(localStorage.getItem('vd_airdrop_tasks') || '[]'),
-      airdropWallet: localStorage.getItem('vd_airdrop_wallet') || ''
+      airdropWallet: localStorage.getItem('vd_airdrop_wallet') || '',
+      // Streak system
+      streak: parseInt(localStorage.getItem('vd_streak') || '0'),
+      streakLastClaim: localStorage.getItem('vd_streak_last') || '',
+      streakClaimed: JSON.parse(localStorage.getItem('vd_streak_claimed') || '[]')
     };
   }
   function saveState(s) {
@@ -2008,6 +2100,9 @@
     if (s.miningLastCollect !== undefined) localStorage.setItem('vd_mining_collect', s.miningLastCollect.toString());
     if (s.airdropTasks !== undefined) localStorage.setItem('vd_airdrop_tasks', JSON.stringify(s.airdropTasks));
     if (s.airdropWallet !== undefined) localStorage.setItem('vd_airdrop_wallet', s.airdropWallet);
+    if (s.streak !== undefined) localStorage.setItem('vd_streak', s.streak.toString());
+    if (s.streakLastClaim !== undefined) localStorage.setItem('vd_streak_last', s.streakLastClaim);
+    if (s.streakClaimed !== undefined) localStorage.setItem('vd_streak_claimed', JSON.stringify(s.streakClaimed));
   }
 
   function getTitle() {
@@ -2021,11 +2116,129 @@
   function checkDailyReset() {
     const s = getState();
     const today = new Date().toDateString();
+    // Streak logic: increment if first visit today, reset if skipped a day
+    if (s.streakLastClaim !== today) {
+      if (s.streakLastClaim) {
+        const last = new Date(s.streakLastClaim);
+        const now = new Date(today);
+        const diffDays = Math.floor((now - last) / 86400000);
+        if (diffDays === 1) {
+          // Consecutive day — increment streak
+          s.streak = (s.streak || 0) + 1;
+        } else if (diffDays > 1) {
+          // Skipped a day — reset streak
+          s.streak = 1;
+          s.streakClaimed = []; // reset claimed rewards
+        }
+        // diffDays === 0 means already claimed today (shouldn't happen due to check above)
+      } else {
+        // First ever visit
+        s.streak = 1;
+      }
+      s.streakLastClaim = today;
+      saveState(s);
+    }
     if (s.dailyDate !== today) { s.dailyProgress = {}; s.dailyClaimed = []; s.dailyDate = today; saveState(s); }
     const week = getWeekKey();
     if (s.weeklyDate !== week) { s.weeklyProgress = {}; s.weeklyClaimed = []; s.weeklyDate = week; saveState(s); }
   }
   function getWeekKey() { const d = new Date(); const onejan = new Date(d.getFullYear(), 0, 1); const week = Math.ceil(((d - onejan) / 86400000 + onejan.getDay() + 1) / 7); return `${d.getFullYear()}-W${week}`; }
+
+  // ============ STREAK SYSTEM ============
+  function getStreakClaimableToday() {
+    // Returns the STREAK_REWARDS entry the player can claim today (based on current streak), or null if already claimed
+    const s = getState();
+    const today = new Date().toDateString();
+    if (s.streakLastClaim === today && s.streakClaimed && s.streakClaimed.includes(today)) return null;
+    // Find the highest reward day that player's current streak has reached
+    let claimable = null;
+    for (const r of STREAK_REWARDS) {
+      if (s.streak >= r.day) claimable = r;
+    }
+    return claimable;
+  }
+  function renderStreak() {
+    const s = getState();
+    const sub = document.getElementById('hmStreakSub');
+    const claimBtn = document.getElementById('hmStreakClaim');
+    const track = document.getElementById('hmStreakTrack');
+    if (!sub || !claimBtn || !track) return;
+    // Sub text
+    const claimable = getStreakClaimableToday();
+    if (claimable) {
+      sub.textContent = currentLang === 'ru' ? `День ${s.streak} · доступно: ${claimable.label.ru}` : `Day ${s.streak} · available: ${claimable.label.en}`;
+      claimBtn.disabled = false;
+      claimBtn.classList.add('ready');
+      claimBtn.textContent = t('streak_claim');
+    } else {
+      // Find next reward day
+      const next = STREAK_REWARDS.find(r => r.day > s.streak) || STREAK_REWARDS[STREAK_REWARDS.length - 1];
+      sub.textContent = `${t('streak_next')} ${next.day} (${next.label[currentLang]})`;
+      claimBtn.disabled = true;
+      claimBtn.classList.remove('ready');
+      claimBtn.textContent = t('streak_claimed_today');
+    }
+    // Track: show first 7 days (the visible track)
+    const today = new Date().toDateString();
+    const claimedToday = s.streakClaimed && s.streakClaimed.includes(today);
+    track.innerHTML = STREAK_REWARDS.slice(0, 7).map(r => {
+      const isClaimed = s.streak > r.day || (s.streak === r.day && claimedToday);
+      const isCurrent = s.streak === r.day && !claimedToday;
+      const cls = isClaimed ? 'claimed' : (isCurrent ? 'current' : '');
+      const check = isClaimed ? '<div class="hm-streak-day-check">✓</div>' : '';
+      return `<div class="hm-streak-day ${cls}">
+        ${check}
+        <div class="hm-streak-day-num">${t('streak_day')} ${r.day}</div>
+        <div class="hm-streak-day-icon">${r.reward.type === 'lootbox' ? '🎁' : (r.reward.type === 'stars' ? '★' : '◈')}</div>
+      </div>`;
+    }).join('');
+  }
+  function claimStreak() {
+    const claimable = getStreakClaimableToday();
+    if (!claimable) return;
+    const s = getState();
+    const today = new Date().toDateString();
+    // Apply reward
+    if (claimable.reward.type === 'plasmoid') s.plasmoid += claimable.reward.amount;
+    else if (claimable.reward.type === 'stars') s.stars += claimable.reward.amount;
+    else if (claimable.reward.type === 'lootbox') {
+      s.lootboxes = [...(s.lootboxes || []), { id: Date.now(), acquiredAt: Date.now() }];
+    }
+    // Mark as claimed today
+    s.streakClaimed = [...(s.streakClaimed || []), today];
+    saveState(s);
+    SOUNDS.quest();
+    vibrate([30, 30, 60]);
+    const labelText = claimable.label[currentLang];
+    showToast(t('streak_claim') + ': ' + labelText, 'gold');
+    // Update UI
+    document.getElementById('topPlasma').textContent = Math.floor(s.plasmoid).toLocaleString();
+    document.getElementById('starsCount').textContent = s.stars;
+    renderStreak();
+    renderHome();
+  }
+
+  // ============ ONLINE PLAYERS (pseudo-live until backend) ============
+  function renderOnlineCount() {
+    const el = document.getElementById('hmOnlineCount');
+    if (!el) return;
+    // Seeded by date: base 800-1500 + hour-of-day variance (more players in evening)
+    const d = new Date();
+    const seed = d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
+    // Pseudo-random base for the day (800-1500)
+    const base = 800 + (Math.sin(seed * 0.001) * 0.5 + 0.5) * 700;
+    // Hour-of-day multiplier: peak at 19-22h (1.5x), low at 4-6h (0.5x)
+    const hour = d.getHours();
+    let hourMult = 1.0;
+    if (hour >= 19 && hour <= 22) hourMult = 1.5;
+    else if (hour >= 16 && hour <= 23) hourMult = 1.25;
+    else if (hour >= 4 && hour <= 6) hourMult = 0.5;
+    else if (hour >= 0 && hour <= 8) hourMult = 0.7;
+    // Small live jitter ±5% (changes every minute)
+    const minuteJitter = 0.95 + (Math.sin(d.getMinutes() * 0.1) * 0.5 + 0.5) * 0.1;
+    const count = Math.floor(base * hourMult * minuteJitter);
+    el.textContent = count.toLocaleString();
+  }
 
   // ============ ONBOARDING ============
   let obAnimId = null;
@@ -2095,7 +2308,9 @@
     if (name === 'battle') {} else { if (battle) battle.stop(); }
   }
 
-  function renderAll() { renderHome(); renderShipyard(); renderMining(); renderAirdrop(); renderProfile(); renderQuests(); renderComms(); renderFAQ(); renderReferrals(); renderDailyRun(); updateBadges(); updateEnergyUI(); updateTopbarAvatar(); }
+  function renderAll() { renderHome(); renderShipyard(); renderMining(); renderAirdrop(); renderProfile(); renderQuests(); renderComms(); renderFAQ(); renderReferrals(); renderDailyRun(); renderStreak(); renderOnlineCount(); updateBadges(); updateEnergyUI(); updateTopbarAvatar(); }
+  // Online count auto-refresh every 60s
+  setInterval(() => { if (document.getElementById('home').classList.contains('active')) renderOnlineCount(); }, 60000);
 
   function renderHome() {
     const s = getState();
@@ -2104,6 +2319,8 @@
     document.getElementById('topPlasma').textContent = Math.floor(s.plasmoid).toLocaleString();
     const _topLevelEl = document.getElementById('topLevel'); if (_topLevelEl) _topLevelEl.textContent = getLevel(s).level;
     document.getElementById('starsCount').textContent = s.stars;
+    renderStreak();
+    renderOnlineCount();
     // Show first unclaimed daily quest as mission
     const unclaimed = DAILY_QUESTS.find(q => !s.dailyClaimed.includes(q.id));
     if (unclaimed) {
@@ -2289,6 +2506,7 @@
       const hasShield = eff.noShield ? false : (s.upgrades.shield ? true : (eff.freeShield ? true : false));
       this.ship = { x: this.W / 2, y: this.H / 2, vx: 0, vy: 0, angle: -Math.PI / 2, hp: baseHp, maxHp: baseHp, shield: hasShield, size: 16, shootCooldown: 0, invincibility: 0 };
       this.plasmoid = []; this.drones = []; this.bullets = []; this.particles = [];
+      this.damageTexts = []; // floating damage numbers (-247 ◈ style)
       // HARD CAPS to prevent freeze on long runs
       this.MAX_DRONES = 60;
       this.MAX_BULLETS = 120;
@@ -2661,6 +2879,8 @@
             const lostPlasma = Math.floor(this.plasmaCollected * 0.15);
             this.plasmaCollected -= lostPlasma;
             this.spawnExplosion(this.ship.x, this.ship.y, '#FF4D6D');
+            // Floating damage number — show plasma lost
+            if (lostPlasma > 0) this.spawnDamageText(this.ship.x, this.ship.y, '-' + lostPlasma + ' ◈', '#FF4D6D');
             SOUNDS.damage(); vibrate([80, 40, 80]); // Haptic pattern: damage
             if (this.ship.hp <= 0) this.endBattle();
           }
@@ -2735,6 +2955,13 @@
         const p = this.particles[i];
         p.x += p.vx; p.y += p.vy; p.life -= 0.03; p.vx *= 0.95; p.vy *= 0.95;
         if (p.life <= 0) this.particles.splice(i, 1);
+      }
+      // Update damage texts (floating -247 ◈ numbers)
+      for (let i = this.damageTexts.length - 1; i >= 0; i--) {
+        const dt2 = this.damageTexts[i];
+        dt2.y += dt2.vy * (dt / 1000);
+        dt2.life -= dt / 1000;
+        if (dt2.life <= 0) this.damageTexts.splice(i, 1);
       }
 
       // COMBO: countdown timer (window raised 3s → 5s for better scaling with low fire-rate)
@@ -2829,6 +3056,7 @@
     }
     spawnExplosion(x, y, color) { for (let i = 0; i < 10; i++) { const a = (i / 10) * Math.PI * 2; this.particles.push({ x, y, vx: Math.cos(a) * (1 + Math.random() * 3), vy: Math.sin(a) * (1 + Math.random() * 3), life: 1, color, size: 3 }); } }
     spawnCollectEffect(x, y) { for (let i = 0; i < 6; i++) { const a = (i / 6) * Math.PI * 2; this.particles.push({ x, y, vx: Math.cos(a) * 0.5, vy: Math.sin(a) * 0.5, life: 1, color: '#00E5CC', size: 2 }); } }
+    spawnDamageText(x, y, text, color) { this.damageTexts.push({ x, y: y - 20, text, color, life: 1.5, vy: -40 }); }
     endBattle() {
       // Guard: prevent multiple calls in the same frame
       if (this.ended) return;
@@ -3098,7 +3326,19 @@
       }
       // Particles
       this.particles.forEach(p => { ctx.fillStyle = p.color; ctx.globalAlpha = p.life; ctx.beginPath(); ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2); ctx.fill(); });
+      // Damage texts (floating -247 ◈)
+      this.damageTexts.forEach(dt2 => {
+        ctx.globalAlpha = Math.min(1, dt2.life);
+        ctx.fillStyle = dt2.color;
+        ctx.font = 'bold 18px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.shadowColor = dt2.color;
+        ctx.shadowBlur = 8;
+        ctx.fillText(dt2.text, dt2.x, dt2.y);
+        ctx.shadowBlur = 0;
+      });
       ctx.globalAlpha = 1;
+      ctx.textAlign = 'left';
     }
   }
 
@@ -3645,6 +3885,30 @@
     } else {
       switchScreen('gameover');
     }
+  }
+  function shareResult() {
+    const s = getState();
+    // Gather last run stats (battle object still has them)
+    const kills = battle ? battle.kills : 0;
+    const plasma = battle ? battle.plasmaCollected : 0;
+    const time = battle ? Math.floor(battle.elapsedTime) : 0;
+    const maxCombo = battle ? battle.maxCombo : 0;
+    const timeStr = formatTime(time);
+    const title = getTitle();
+    const playerName = s.tgName || (currentLang === 'ru' ? 'Капитан' : 'Captain');
+    // Compose share text
+    const text = currentLang === 'ru'
+      ? `🚀 ${playerName} прорвался через блокаду в LETUCHKA!\n\n◈ Плазмоид: ${plasma.toLocaleString()}\n💀 Дронов: ${kills}\n⏱ Время: ${timeStr}\n🔥 Макс комбо: ×${maxCombo}\n⭐ Титул: ${title}\n\nЗаходи в @LetuchkaGameBot и побей мой рекорд!`
+      : `🚀 ${playerName} broke through the blockade in LETUCHKA!\n\n◈ Plasmoid: ${plasma.toLocaleString()}\n💀 Drones: ${kills}\n⏱ Time: ${timeStr}\n🔥 Max combo: ×${maxCombo}\n⭐ Title: ${title}\n\nJoin @LetuchkaGameBot and beat my score!`;
+    const url = 'https://t.me/share/url?url=' + encodeURIComponent('https://t.me/LetuchkaGameBot?start=ref_' + (s.tgId || 'share')) + '&text=' + encodeURIComponent(text);
+    if (tg && tg.openTelegramLink) {
+      tg.openTelegramLink(url);
+    } else if (tg && tg.openLink) {
+      tg.openLink(url);
+    } else {
+      window.open(url, '_blank');
+    }
+    vibrate(30);
   }
   function openLootbox(index) {
     const s = getState();
@@ -4353,8 +4617,8 @@
   else { sessionStorage.setItem('vd_entered', '1'); }
 </script>
 
-<!-- Version badge: helps detect stale Telegram cache. If you don't see "v1.6.2" here, you're viewing a cached old version. -->
-<div class="ver-badge" id="verBadge">v1.6.2</div>
+<!-- Version badge: helps detect stale Telegram cache. If you don't see "v1.7.0" here, you're viewing a cached old version. -->
+<div class="ver-badge" id="verBadge">v1.7.0</div>
 
 </body>
 </html>
