@@ -8,7 +8,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="app-version" content="1.8.1">
+<meta name="app-version" content="1.9.0">
 <title>LETUCHKA — Прорыв блокады</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
@@ -406,6 +406,44 @@
   .qu-sub { font-size: 11px; color: #6B6B8C; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; }
   .qu-tabs { max-width: 540px; margin: 0 auto 16px; padding: 0 16px; display: flex; gap: 6px; background: rgba(10, 8, 32, 0.6); padding: 4px; border-radius: 999px; border: 1px solid rgba(124, 92, 252, 0.1); }
   .qu-tab { flex: 1; background: transparent; border: none; color: #6B6B8C; padding: 10px; font-size: 12px; font-weight: 800; cursor: pointer; border-radius: 999px; transition: all 0.25s ease; font-family: inherit; }
+
+  /* LEADERBOARD tabs + list */
+  .lb-tabs { max-width: 540px; margin: 0 auto 16px; padding: 0 16px; display: flex; gap: 6px; background: rgba(10, 8, 32, 0.6); padding: 4px; border-radius: 999px; border: 1px solid rgba(0, 229, 204, 0.15); }
+  .lb-tab { flex: 1; background: transparent; border: none; color: #6B7B9F; padding: 10px; font-size: 11px; font-weight: 800; cursor: pointer; border-radius: 999px; transition: all 0.25s ease; font-family: inherit; letter-spacing: 0.05em; text-transform: uppercase; }
+  .lb-tab.active { background: linear-gradient(135deg, var(--neon-cyan), #00B8D4); color: #060B1A; box-shadow: 0 4px 14px rgba(0, 229, 204, 0.3); }
+  .lb-row { display: flex; align-items: center; gap: 12px; padding: 12px 14px; margin-bottom: 6px; background: linear-gradient(180deg, rgba(20, 16, 46, 0.9) 0%, rgba(10, 8, 32, 0.95) 100%); border: 1px solid rgba(124, 92, 252, 0.12); border-radius: 14px; transition: all 0.3s ease; }
+  .lb-row.me { border-color: var(--neon-cyan); background: linear-gradient(135deg, rgba(0, 229, 204, 0.08), rgba(10, 8, 32, 0.95)); box-shadow: 0 0 16px rgba(0, 229, 204, 0.15); }
+  .lb-rank { width: 32px; height: 32px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 900; flex-shrink: 0; background: rgba(124, 92, 252, 0.1); color: #6B7B9F; }
+  .lb-rank.gold { background: linear-gradient(135deg, #FFD700, #F59E0B); color: #060B1A; box-shadow: 0 0 12px rgba(255, 215, 0, 0.4); }
+  .lb-rank.silver { background: linear-gradient(135deg, #C0C0C0, #94A3B8); color: #060B1A; }
+  .lb-rank.bronze { background: linear-gradient(135deg, #CD7F32, #B45309); color: #060B1A; }
+  .lb-name { flex: 1; font-size: 13px; font-weight: 800; color: #F0EBFF; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .lb-row.me .lb-name { color: var(--neon-cyan); }
+  .lb-score { font-size: 13px; font-weight: 900; color: var(--gold); font-variant-numeric: tabular-nums; flex-shrink: 0; }
+  .lb-empty { text-align: center; padding: 40px 16px; color: #6B7B9F; font-size: 12px; font-style: italic; }
+
+  /* BATTLE PASS card */
+  .bp-card { background: linear-gradient(135deg, rgba(255, 179, 71, 0.08), rgba(124, 92, 252, 0.06), rgba(10, 8, 32, 0.9)); border: 1px solid rgba(255, 179, 71, 0.25); border-radius: 20px; padding: 18px; position: relative; overflow: hidden; }
+  .bp-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--gold), var(--neon), var(--gold), transparent); }
+  .bp-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+  .bp-season-icon { font-size: 32px; filter: drop-shadow(0 0 12px rgba(255, 179, 71, 0.5)); }
+  .bp-season-body { flex: 1; }
+  .bp-season-name { font-size: 16px; font-weight: 900; color: #F0EBFF; }
+  .bp-season-status { font-size: 11px; color: var(--gold); font-weight: 700; margin-top: 2px; }
+  .bp-soon-badge { background: linear-gradient(135deg, var(--gold), #F59E0B); color: #060B1A; padding: 4px 10px; border-radius: 999px; font-size: 9px; font-weight: 900; letter-spacing: 0.1em; text-transform: uppercase; box-shadow: 0 0 12px rgba(255, 179, 71, 0.4); animation: bpSoonPulse 2s ease-in-out infinite; }
+  @keyframes bpSoonPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+  .bp-progress-wrap { margin-bottom: 16px; }
+  .bp-progress-label { display: flex; justify-content: space-between; font-size: 11px; color: #6B7B9F; font-weight: 800; margin-bottom: 6px; }
+  .bp-progress-label .mono { color: var(--gold); }
+  .bp-progress-bar { height: 8px; background: rgba(255, 179, 71, 0.1); border-radius: 999px; overflow: hidden; }
+  .bp-progress-fill { height: 100%; background: linear-gradient(90deg, var(--gold), #F59E0B); border-radius: 999px; box-shadow: 0 0 8px rgba(255, 179, 71, 0.5); transition: width 0.5s ease; }
+  .bp-rewards-track { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 8px; -ms-overflow-style: none; scrollbar-width: none; }
+  .bp-rewards-track::-webkit-scrollbar { display: none; }
+  .bp-reward { min-width: 56px; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 4px; background: rgba(255, 179, 71, 0.05); border: 1px solid rgba(255, 179, 71, 0.15); border-radius: 10px; opacity: 0.5; }
+  .bp-reward-num { font-size: 8px; font-weight: 900; color: var(--gold); letter-spacing: 0.05em; }
+  .bp-reward-icon { font-size: 20px; filter: grayscale(0.5); }
+  .bp-reward-label { font-size: 7px; color: #6B7B9F; font-weight: 700; text-align: center; line-height: 1.2; }
+  .bp-notice { margin-top: 14px; padding: 10px 12px; background: rgba(124, 92, 252, 0.06); border: 1px solid rgba(124, 92, 252, 0.15); border-radius: 10px; font-size: 11px; color: #8A8AB0; text-align: center; line-height: 1.5; }
   .qu-tab.active { background: linear-gradient(135deg, var(--neon-cyan), #0891B2); color: #060B1A; }
   .qu-list { max-width: 540px; margin: 0 auto; padding: 0 16px; display: flex; flex-direction: column; gap: 10px; }
   .qu-card { background: rgba(10, 8, 32, 0.8); border: 1px solid rgba(124, 92, 252, 0.12); border-radius: 16px; padding: 14px; }
@@ -1205,6 +1243,23 @@
               </div>
               <div class="hm-tile-badge cyan" id="navAirdropBadgeHome">!</div>
             </button>
+            <button class="hm-tile hm-tile-pink" onclick="switchScreen('leaderboard')">
+              <div class="hm-tile-glow"></div>
+              <div class="hm-tile-icon">📊</div>
+              <div class="hm-tile-body">
+                <div class="hm-tile-name" data-i18n="nav_leaderboard"></div>
+                <div class="hm-tile-sub" data-i18n="hm_lb_sub"></div>
+              </div>
+            </button>
+            <button class="hm-tile hm-tile-gold" onclick="switchScreen('battlepass')">
+              <div class="hm-tile-glow"></div>
+              <div class="hm-tile-icon">🏆</div>
+              <div class="hm-tile-body">
+                <div class="hm-tile-name" data-i18n="nav_battlepass"></div>
+                <div class="hm-tile-sub" data-i18n="hm_bp_sub"></div>
+              </div>
+              <div class="hm-tile-badge" style="background:var(--gold);color:#060B1A;">!</div>
+            </button>
             <button class="hm-tile hm-tile-gray" onclick="switchScreen('settings')">
               <div class="hm-tile-glow"></div>
               <div class="hm-tile-icon">⚙</div>
@@ -1375,6 +1430,52 @@
       </div>
     </div>
 
+    <!-- GLOBAL LEADERBOARD -->
+    <div id="leaderboard" class="screen">
+      <div class="qu-header">
+        <div class="qu-title" data-i18n="lb_title"></div>
+        <div class="qu-sub mono" data-i18n="lb_sub"></div>
+      </div>
+      <div style="max-width:540px;margin:0 auto;padding:0 16px;">
+        <div class="lb-tabs">
+          <button class="lb-tab active" data-tab="glory" onclick="switchLeaderboardTab('glory')" data-i18n="lb_tab_glory"></button>
+          <button class="lb-tab" data-tab="best" onclick="switchLeaderboardTab('best')" data-i18n="lb_tab_best"></button>
+          <button class="lb-tab" data-tab="kills" onclick="switchLeaderboardTab('kills')" data-i18n="lb_tab_kills"></button>
+        </div>
+        <div id="lbList"></div>
+      </div>
+    </div>
+
+    <!-- BATTLE PASS (coming soon) -->
+    <div id="battlepass" class="screen">
+      <div class="qu-header">
+        <div class="qu-title" data-i18n="bp_title"></div>
+        <div class="qu-sub mono" data-i18n="bp_sub"></div>
+      </div>
+      <div style="max-width:540px;margin:0 auto;padding:0 16px;">
+        <div class="bp-card">
+          <div class="bp-header">
+            <div class="bp-season-icon">🏆</div>
+            <div class="bp-season-body">
+              <div class="bp-season-name" data-i18n="bp_season_name"></div>
+              <div class="bp-season-status" data-i18n="bp_status_soon"></div>
+            </div>
+            <div class="bp-soon-badge" data-i18n="bp_soon"></div>
+          </div>
+          <div class="bp-progress-wrap">
+            <div class="bp-progress-label">
+              <span data-i18n="bp_level"></span>: <span class="mono">0 / 30</span>
+            </div>
+            <div class="bp-progress-bar">
+              <div class="bp-progress-fill" style="width:0%;"></div>
+            </div>
+          </div>
+          <div class="bp-rewards-track" id="bpRewardsTrack"></div>
+          <div class="bp-notice" data-i18n="bp_notice"></div>
+        </div>
+      </div>
+    </div>
+
     <!-- MINING -->
     <div id="mining" class="screen">
       <div class="qu-header" style="margin-bottom:16px;">
@@ -1519,7 +1620,7 @@
           <div class="se-info-icon">⚙️</div>
           <div class="se-info-body">
             <div class="se-info-label" data-i18n="se_version_label"></div>
-            <div class="se-info-value">v<span class="accent" id="seVersionNum">1.8.1</span> · <span data-i18n="se_build"></span></div>
+            <div class="se-info-value">v<span class="accent" id="seVersionNum">1.9.0</span> · <span data-i18n="se_build"></span></div>
             <div class="se-info-sub" data-i18n="se_version_sub"></div>
           </div>
         </div>
@@ -1640,6 +1741,18 @@
       streak_next: 'Следующая награда: День',
       streak_players_online: 'Сегодня летает',
       streak_players_suffix: 'капитанов',
+      nav_leaderboard: 'Топ', nav_battlepass: 'Батлпасс',
+      hm_lb_sub: 'Лучшие капитаны', hm_bp_sub: 'Сезон 1 · Скоро',
+      lb_title: 'Глобальный <em>топ</em>', lb_sub: 'Лучшие капитаны галактики',
+      lb_tab_glory: 'Слава', lb_tab_best: 'Рекорд', lb_tab_kills: 'Киллы',
+      lb_empty: 'Пока пусто. Стань первым!',
+      lb_loading: 'Загрузка...',
+      bp_title: 'Боевой <em>пропуск</em>', bp_sub: 'Сезон 1 · Прорыв блокады',
+      bp_season_name: 'Сезон 1: Прорыв блокады',
+      bp_status_soon: 'Стартует скоро',
+      bp_soon: 'СКОРО',
+      bp_level: 'Уровень',
+      bp_notice: 'Боевой пропуск с 30 уровнями наград запустится после релиза. Следите за новостями в канале!',
       rf_tile: 'Рефералы',
       nav_home: 'Главная', nav_shipyard: 'Верфь', nav_quests: 'Задания', nav_comms: 'Связь', nav_faq: 'FAQ', nav_settings: 'Настройки',
       joy_hint: 'Веди палец в любом месте — корабль летит за ним',
@@ -1786,6 +1899,18 @@
       streak_next: 'Next reward: Day',
       streak_players_online: 'Flying today',
       streak_players_suffix: 'captains',
+      nav_leaderboard: 'Top', nav_battlepass: 'Battle Pass',
+      hm_lb_sub: 'Best captains', hm_bp_sub: 'Season 1 · Soon',
+      lb_title: 'Global <em>top</em>', lb_sub: 'Best captains in the galaxy',
+      lb_tab_glory: 'Glory', lb_tab_best: 'Best Run', lb_tab_kills: 'Kills',
+      lb_empty: 'Empty so far. Be the first!',
+      lb_loading: 'Loading...',
+      bp_title: 'Battle <em>Pass</em>', bp_sub: 'Season 1 · Blockade Break',
+      bp_season_name: 'Season 1: Blockade Break',
+      bp_status_soon: 'Starting soon',
+      bp_soon: 'SOON',
+      bp_level: 'Level',
+      bp_notice: 'Battle Pass with 30 reward levels launches after release. Follow news in the channel!',
       rf_tile: 'Referrals',
       nav_home: 'Home', nav_shipyard: 'Shipyard', nav_quests: 'Quests', nav_comms: 'Comms', nav_faq: 'FAQ', nav_settings: 'Settings',
       joy_hint: 'Drag finger anywhere — ship follows',
@@ -1969,19 +2094,26 @@
   const DAILY_QUESTS = [
     { id: 'd1', icon: '◈', text: { ru: 'Собери 2000 плазмоида', en: 'Collect 2000 plasmoid' }, target: 2000, type: 'plasmoid', reward: { type: 'plasmoid', amount: 500 } },
     { id: 'd2', icon: '💀', text: { ru: 'Убей 50 дронов', en: 'Kill 50 drones' }, target: 50, type: 'kills', reward: { type: 'plasmoid', amount: 500 } },
-    { id: 'd3', icon: '⏱', text: { ru: 'Проживи 3 минуты в рейсе', en: 'Survive 3 minutes' }, target: 180, type: 'time', reward: { type: 'stars', amount: 20 } }
+    { id: 'd3', icon: '⏱', text: { ru: 'Проживи 3 минуты в рейсе', en: 'Survive 3 minutes' }, target: 180, type: 'time', reward: { type: 'stars', amount: 20 } },
+    { id: 'd4', icon: '◈', text: { ru: 'Собери 5000 плазмоида', en: 'Collect 5000 plasmoid' }, target: 5000, type: 'plasmoid', reward: { type: 'plasmoid', amount: 1000 } },
+    { id: 'd5', icon: '💀', text: { ru: 'Убей 100 дронов', en: 'Kill 100 drones' }, target: 100, type: 'kills', reward: { type: 'stars', amount: 10 } },
+    { id: 'd6', icon: '🔥', text: { ru: 'Достигни комбо ×15', en: 'Reach combo ×15' }, target: 15, type: 'combo', reward: { type: 'plasmoid', amount: 800 } }
   ];
   const WEEKLY_QUESTS = [
     { id: 'w1', icon: '🚀', text: { ru: '10 рейсов за неделю', en: '10 runs this week' }, target: 10, type: 'runs', reward: { type: 'plasmoid', amount: 3000 } },
     { id: 'w2', icon: '💀', text: { ru: '500 убийств дронов', en: '500 drone kills' }, target: 500, type: 'kills', reward: { type: 'stars', amount: 30 } },
-    { id: 'w3', icon: '◈', text: { ru: '5000 плазмоида', en: '5000 plasmoid' }, target: 5000, type: 'plasmoid', reward: { type: 'stars', amount: 50 } }
+    { id: 'w3', icon: '◈', text: { ru: '5000 плазмоида', en: '5000 plasmoid' }, target: 5000, type: 'plasmoid', reward: { type: 'stars', amount: 50 } },
+    { id: 'w4', icon: '🚀', text: { ru: '20 рейсов за неделю', en: '20 runs this week' }, target: 20, type: 'runs', reward: { type: 'stars', amount: 40 } },
+    { id: 'w5', icon: '◈', text: { ru: 'Накопи 1,000,000 плазмоида', en: 'Accumulate 1,000,000 plasmoid' }, target: 1000000, type: 'plasmoid', reward: { type: 'stars', amount: 100 } }
   ];
   const STORY_QUESTS = [
     { id: 's1', icon: '🚀', text: { ru: 'Соверши первый вылет', en: 'First launch' }, target: 1, type: 'runs', reward: { type: 'stars', amount: 10 } },
     { id: 's2', icon: '💀', text: { ru: 'Убей первого дрона', en: 'Kill first drone' }, target: 1, type: 'kills', reward: { type: 'stars', amount: 10 } },
     { id: 's3', icon: '🛠', text: { ru: 'Купи первый апгрейд', en: 'Buy first upgrade' }, target: 1, type: 'upgrades', reward: { type: 'stars', amount: 10 } },
     { id: 's4', icon: '⏱', text: { ru: 'Проживи 90 секунд', en: 'Survive 90 seconds' }, target: 90, type: 'time', reward: { type: 'stars', amount: 20 } },
-    { id: 's5', icon: '⭐', text: { ru: 'Достигни 5000 славы', en: 'Reach 5000 glory' }, target: 5000, type: 'glory', reward: { type: 'stars', amount: 100 } }
+    { id: 's5', icon: '⭐', text: { ru: 'Достигни 5000 славы', en: 'Reach 5000 glory' }, target: 5000, type: 'glory', reward: { type: 'stars', amount: 100 } },
+    { id: 's6', icon: '🛠', text: { ru: 'Открой все апгрейды', en: 'Unlock all upgrades' }, target: 6, type: 'upgrades', reward: { type: 'stars', amount: 150 } },
+    { id: 's7', icon: '⭐', text: { ru: 'Достигни 10000 славы', en: 'Reach 10000 glory' }, target: 10000, type: 'glory', reward: { type: 'stars', amount: 200 } }
   ];
 
   // Daily streak rewards — Day 7 = skin, Day 30 = legendary
@@ -2317,6 +2449,8 @@
     if (name === 'faq') renderFAQ();
     if (name === 'referrals') renderReferrals();
     if (name === 'dailyrun') renderDailyRun();
+    if (name === 'leaderboard') renderLeaderboard();
+    if (name === 'battlepass') renderBattlePass();
     if (name === 'battle') {} else { if (battle) battle.stop(); }
   }
 
@@ -3135,6 +3269,7 @@
       updateQuestProgress('kills', this.kills);
       updateQuestProgress('time', Math.floor(this.elapsedTime));
       updateQuestProgress('runs', 1);
+      updateQuestProgress('combo', this.maxCombo);
       checkStoryProgress();
       // Update Game Over screen stats
       document.getElementById('grPlasma').textContent = this.plasmaCollected;
@@ -4273,6 +4408,84 @@
     }
   }
 
+  // ============ GLOBAL LEADERBOARD ============
+  let lbTab = 'glory';
+  function switchLeaderboardTab(tab) {
+    lbTab = tab;
+    document.querySelectorAll('.lb-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+    renderLeaderboard();
+  }
+  async function fetchGlobalLeaderboard(metric) {
+    if (!sb) return null;
+    try {
+      const { data, error } = await sb.from('players')
+        .select('tg_id, tg_name, tg_username, glory, best_run, total_kills')
+        .order(metric, { ascending: false })
+        .limit(50);
+      if (error) throw error;
+      return data;
+    } catch (e) {
+      console.warn('[Supabase] fetchGlobalLeaderboard failed:', e);
+      return null;
+    }
+  }
+  function renderLeaderboard() {
+    const list = document.getElementById('lbList');
+    if (!list) return;
+    // Show loading immediately
+    list.innerHTML = `<div class="lb-empty">${t('lb_loading')}</div>`;
+    if (!sb) {
+      list.innerHTML = `<div class="lb-empty">${t('lb_empty')}</div>`;
+      return;
+    }
+    fetchGlobalLeaderboard(lbTab).then(data => {
+      if (!data || data.length === 0) {
+        list.innerHTML = `<div class="lb-empty">${t('lb_empty')}</div>`;
+        return;
+      }
+      const myId = tgUser ? tgUser.id : 0;
+      const scoreField = lbTab === 'glory' ? 'glory' : (lbTab === 'best' ? 'best_run' : 'total_kills');
+      const scoreLabel = lbTab === 'glory' ? '' : (lbTab === 'best' ? ' ◈' : ' 💀');
+      list.innerHTML = data.map((p, i) => {
+        const rank = i + 1;
+        let rankCls = '';
+        if (rank === 1) rankCls = 'gold';
+        else if (rank === 2) rankCls = 'silver';
+        else if (rank === 3) rankCls = 'bronze';
+        const name = p.tg_name || p.tg_username || ('Captain ' + p.tg_id);
+        const isMe = p.tg_id === myId;
+        const score = (p[scoreField] || 0).toLocaleString();
+        return `<div class="lb-row ${isMe ? 'me' : ''}">
+          <div class="lb-rank ${rankCls}">${rank}</div>
+          <div class="lb-name">${name}${isMe ? ' (' + (currentLang === 'ru' ? 'ты' : 'you') + ')' : ''}</div>
+          <div class="lb-score">${score}${scoreLabel}</div>
+        </div>`;
+      }).join('');
+    });
+  }
+
+  // ============ BATTLE PASS (stub) ============
+  const BP_REWARDS = [
+    { lvl: 1, icon: '◈', label: '500' },
+    { lvl: 5, icon: '★', label: '10' },
+    { lvl: 10, icon: '◈', label: '5K' },
+    { lvl: 15, icon: '🎁', label: 'Box' },
+    { lvl: 20, icon: '★', label: '50' },
+    { lvl: 25, icon: '🚀', label: 'Skin' },
+    { lvl: 30, icon: '👑', label: 'LEGEND' }
+  ];
+  function renderBattlePass() {
+    const track = document.getElementById('bpRewardsTrack');
+    if (!track) return;
+    track.innerHTML = BP_REWARDS.map(r => `
+      <div class="bp-reward">
+        <div class="bp-reward-num">LVL ${r.lvl}</div>
+        <div class="bp-reward-icon">${r.icon}</div>
+        <div class="bp-reward-label">${r.label}</div>
+      </div>
+    `).join('');
+  }
+
   // ============ DAILY RUN ============
   function getDailySeed() {
     const d = new Date();
@@ -4884,8 +5097,8 @@
   else { sessionStorage.setItem('vd_entered', '1'); }
 </script>
 
-<!-- Version badge: helps detect stale Telegram cache. If you don't see "v1.8.1" here, you're viewing a cached old version. -->
-<div class="ver-badge" id="verBadge">v1.8.1</div>
+<!-- Version badge: helps detect stale Telegram cache. If you don't see "v1.9.0" here, you're viewing a cached old version. -->
+<div class="ver-badge" id="verBadge">v1.9.0</div>
 
 </body>
 </html>
