@@ -288,6 +288,69 @@
   .loot-result { font-size: 18px; color: var(--gold); font-weight: 900; margin: 20px 0; padding: 16px; background: rgba(255,179,71,0.1); border-radius: 14px; border: 1px solid rgba(255,179,71,0.3); animation: lootResultPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
   @keyframes lootResultPop { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 
+  /* MINING SCREEN */
+  .mn-card { background: linear-gradient(180deg, rgba(20, 16, 46, 0.9) 0%, rgba(10, 8, 32, 0.95) 100%); border: 1px solid rgba(124, 92, 252, 0.15); border-radius: 18px; padding: 16px; margin-bottom: 10px; display: flex; align-items: center; gap: 14px; box-shadow: 0 6px 20px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05); transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); position: relative; overflow: hidden; }
+  .mn-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent); }
+  .mn-card:hover { border-color: rgba(124, 92, 252, 0.35); transform: translateY(-2px); box-shadow: 0 12px 28px rgba(0,0,0,0.4), 0 0 20px rgba(124,92,252,0.12); }
+  .mn-card.owned { border-color: rgba(0, 229, 204, 0.3); background: linear-gradient(135deg, rgba(0,229,204,0.06), rgba(10,8,32,0.95)); }
+  .mn-card.owned::before { background: linear-gradient(90deg, transparent, var(--neon-cyan), var(--neon), transparent); }
+  .mn-icon { width: 52px; height: 52px; border-radius: 14px; flex-shrink: 0; background: linear-gradient(135deg, rgba(0,229,204,0.2), rgba(0,229,204,0.05)); border: 1px solid rgba(0,229,204,0.3); display: flex; align-items: center; justify-content: center; font-size: 26px; }
+  .mn-body { flex: 1; min-width: 0; }
+  .mn-name { font-size: 14px; font-weight: 800; color: #F0EBFF; }
+  .mn-profit { font-size: 12px; color: var(--neon-cyan); font-weight: 800; margin-top: 2px; }
+  .mn-desc { font-size: 11px; color: #6B7B9F; margin-top: 2px; }
+  .mn-action { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+  .mn-cost { font-size: 12px; font-weight: 800; color: var(--neon); }
+  .mn-buy { background: linear-gradient(135deg, var(--neon), #5B3FBC); color: #060B1A; border: none; padding: 8px 14px; font-size: 11px; font-weight: 900; cursor: pointer; font-family: inherit; border-radius: 999px; letter-spacing: 0.05em; text-transform: uppercase; box-shadow: 0 4px 12px rgba(124,92,252,0.3); transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  .mn-buy:hover:not(:disabled) { transform: translateY(-1px) scale(1.03); }
+  .mn-buy:disabled { background: rgba(124,92,252,0.15); color: #6B7B9F; cursor: not-allowed; box-shadow: none; }
+  .mn-buy.maxed { background: rgba(45, 212, 191, 0.15); color: var(--success); cursor: default; }
+  .mn-summary { max-width: 540px; margin: 0 auto 16px; padding: 0 16px; }
+  .mn-summary-card { background: linear-gradient(135deg, rgba(0,229,204,0.08), rgba(10,8,32,0.9)); border: 1px solid rgba(0,229,204,0.25); border-radius: 20px; padding: 18px; text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,0.3); position: relative; overflow: hidden; }
+  .mn-summary-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--neon-cyan), var(--neon), transparent); }
+  .mn-summary-label { font-size: 10px; color: #6B7B9F; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 6px; }
+  .mn-summary-value { font-size: 32px; color: var(--neon-cyan); font-weight: 900; line-height: 1; text-shadow: 0 0 20px rgba(0,229,204,0.4); }
+  .mn-summary-sub { font-size: 11px; color: #6B7B9F; margin-top: 6px; }
+  .mn-summary-sub span { color: var(--neon-cyan); }
+  .mn-collect-btn { display: block; margin: 14px auto 0; background: linear-gradient(135deg, var(--neon-cyan), #00BFA6); color: #060B1A; border: none; padding: 14px 32px; font-size: 13px; font-weight: 900; cursor: pointer; font-family: inherit; border-radius: 999px; letter-spacing: 0.05em; text-transform: uppercase; box-shadow: 0 6px 18px rgba(0,229,204,0.3); transition: all 0.25s ease; }
+  .mn-collect-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(0,229,204,0.4); }
+  .mn-collect-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+  /* ENERGY BAR */
+  .energy-bar { display: flex; align-items: center; gap: 6px; background: rgba(0,229,204,0.08); padding: 6px 12px; border-radius: 999px; border: 1px solid rgba(0,229,204,0.2); }
+  .energy-icon { font-size: 14px; }
+  .energy-text { font-size: 11px; font-weight: 800; color: var(--neon-cyan); }
+  .energy-dots { display: flex; gap: 2px; }
+  .energy-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(0,229,204,0.15); }
+  .energy-dot.filled { background: var(--neon-cyan); box-shadow: 0 0 4px rgba(0,229,204,0.5); }
+
+  /* AIRDROP SCREEN */
+  .ad-task { background: linear-gradient(180deg, rgba(20, 16, 46, 0.9) 0%, rgba(10, 8, 32, 0.95) 100%); border: 1px solid rgba(124, 92, 252, 0.15); border-radius: 16px; padding: 14px 16px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; transition: all 0.3s ease; }
+  .ad-task:hover { border-color: rgba(124, 92, 252, 0.3); }
+  .ad-task.done { border-color: rgba(45, 212, 191, 0.3); background: linear-gradient(135deg, rgba(45,212,191,0.06), rgba(10,8,32,0.95)); }
+  .ad-task-icon { width: 40px; height: 40px; border-radius: 12px; background: linear-gradient(135deg, rgba(124,92,252,0.2), rgba(124,92,252,0.05)); border: 1px solid rgba(124,92,252,0.3); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+  .ad-task.done .ad-task-icon { background: linear-gradient(135deg, rgba(45,212,191,0.2), rgba(45,212,191,0.05)); border-color: rgba(45,212,191,0.3); }
+  .ad-task-body { flex: 1; }
+  .ad-task-name { font-size: 13px; font-weight: 800; color: #F0EBFF; }
+  .ad-task-reward { font-size: 11px; color: var(--neon-cyan); font-weight: 700; margin-top: 2px; }
+  .ad-task-btn { background: var(--neon); color: #060B1A; border: none; padding: 8px 16px; font-size: 11px; font-weight: 900; cursor: pointer; font-family: inherit; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.05em; transition: all 0.2s ease; flex-shrink: 0; }
+  .ad-task-btn:hover { transform: scale(1.05); }
+  .ad-task-btn.done-btn { background: rgba(45,212,191,0.15); color: var(--success); cursor: default; }
+  .ad-wallet { background: linear-gradient(135deg, rgba(0,229,204,0.08), rgba(10,8,32,0.9)); border: 1px solid rgba(0,229,204,0.25); border-radius: 20px; padding: 20px; text-align: center; margin-bottom: 16px; }
+  .ad-wallet-icon { font-size: 48px; margin-bottom: 12px; }
+  .ad-wallet-title { font-size: 18px; font-weight: 900; color: #F0EBFF; margin-bottom: 6px; }
+  .ad-wallet-desc { font-size: 12px; color: #6B7B9F; margin-bottom: 16px; line-height: 1.5; }
+  .ad-wallet-input { width: 100%; background: rgba(6,11,26,0.5); border: 1px solid rgba(0,229,204,0.15); color: var(--neon-cyan); padding: 12px 16px; border-radius: 12px; font-family: 'Space Grotesk', monospace; font-size: 13px; font-weight: 600; outline: none; text-align: center; margin-bottom: 10px; }
+  .ad-wallet-input::placeholder { color: #6B7B9F; }
+  .ad-wallet-btn { width: 100%; background: linear-gradient(135deg, var(--neon-cyan), #00BFA6); color: #060B1A; border: none; padding: 14px; font-size: 13px; font-weight: 900; cursor: pointer; font-family: inherit; border-radius: 12px; text-transform: uppercase; letter-spacing: 0.05em; transition: all 0.25s ease; }
+  .ad-wallet-btn:hover { transform: translateY(-2px); }
+  .ad-listing { background: linear-gradient(135deg, rgba(255,179,71,0.08), rgba(10,8,32,0.9)); border: 1px solid rgba(255,179,71,0.25); border-radius: 16px; padding: 16px; text-align: center; margin-bottom: 16px; }
+  .ad-listing-badge { display: inline-block; background: rgba(255,179,71,0.15); color: var(--gold); padding: 4px 14px; border-radius: 999px; font-size: 10px; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 10px; }
+  .ad-listing-title { font-size: 16px; font-weight: 900; color: #F0EBFF; margin-bottom: 6px; }
+  .ad-listing-date { font-size: 13px; color: var(--gold); font-weight: 700; }
+  .ad-listing-progress { height: 6px; background: rgba(255,179,71,0.1); border-radius: 999px; overflow: hidden; margin-top: 12px; }
+  .ad-listing-fill { height: 100%; background: linear-gradient(90deg, var(--gold), #FF8C42); border-radius: 999px; }
+
   /* REFERRAL SCREEN */
   .rf-card { background: rgba(10, 8, 32, 0.8); border: 1px solid rgba(124, 92, 252, 0.12); border-radius: 16px; padding: 14px 16px; margin-bottom: 10px; }
   .rf-link-row { display: flex; gap: 8px; }
@@ -568,6 +631,10 @@
     <div class="topbar-logo mono">LETUCHKA</div>
     <div class="topbar-title-badge mono" id="topTitle">ИСКАТЕЛЬ</div>
     <div class="topbar-right">
+      <div class="energy-bar" id="energyBar">
+        <span class="energy-icon">⚡</span>
+        <span class="energy-text" id="energyText">5/5</span>
+      </div>
       <div class="topbar-pill"><span>★</span><span id="starsCount">50</span></div>
     </div>
   </div>
@@ -746,6 +813,51 @@
       </div>
     </div>
 
+    <!-- MINING -->
+    <div id="mining" class="screen">
+      <div class="qu-header" style="margin-bottom:16px;">
+        <div class="qu-title" data-i18n="mn_title"></div>
+        <div class="qu-sub mono" data-i18n="mn_sub"></div>
+      </div>
+      <div class="mn-summary">
+        <div class="mn-summary-card">
+          <div class="mn-summary-label mono" data-i18n="mn_passive_income"></div>
+          <div class="mn-summary-value mono" id="mnTotalIncome">0/ч</div>
+          <div class="mn-summary-sub"><span id="mnPending">0</span> $PLASMA <span data-i18n="mn_pending"></span></div>
+          <button class="mn-collect-btn" id="mnCollectBtn" onclick="collectMining()" data-i18n="mn_collect"></button>
+        </div>
+      </div>
+      <div style="max-width:540px;margin:0 auto;padding:0 16px;">
+        <div style="font-size:11px;font-weight:800;color:#6B7B9F;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:12px;padding-left:4px;" data-i18n="mn_modules"></div>
+        <div id="mnList"></div>
+      </div>
+    </div>
+
+    <!-- AIRDROP -->
+    <div id="airdrop" class="screen">
+      <div class="qu-header" style="margin-bottom:16px;">
+        <div class="qu-title" data-i18n="ad_title"></div>
+        <div class="qu-sub mono" data-i18n="ad_sub"></div>
+      </div>
+      <div style="max-width:540px;margin:0 auto;padding:0 16px;">
+        <div class="ad-listing">
+          <div class="ad-listing-badge" data-i18n="ad_badge"></div>
+          <div class="ad-listing-title" data-i18n="ad_listing_title"></div>
+          <div class="ad-listing-date">Q4 2026</div>
+          <div class="ad-listing-progress"><div class="ad-listing-fill" id="adProgress" style="width:0%;"></div></div>
+          <div style="font-size:10px;color:#6B7B9F;margin-top:6px;"><span id="adTasksDone">0</span>/5 <span data-i18n="ad_tasks_done"></span></div>
+        </div>
+        <div class="ad-wallet" id="adWalletSection">
+          <div class="ad-wallet-icon">👛</div>
+          <div class="ad-wallet-title" data-i18n="ad_wallet_title"></div>
+          <div class="ad-wallet-desc" data-i18n="ad_wallet_desc"></div>
+          <input class="ad-wallet-input" id="adWalletInput" placeholder="UQ... / EQ..." autocomplete="off">
+          <button class="ad-wallet-btn" onclick="saveWallet()" data-i18n="ad_wallet_btn"></button>
+        </div>
+        <div id="adTasks"></div>
+      </div>
+    </div>
+
     <!-- SETTINGS -->
     <div id="settings" class="screen">
       <div class="se-header">
@@ -807,9 +919,9 @@
 
   <div class="nav">
     <button class="nav-btn active" data-screen="home" onclick="switchScreen('home')"><div class="nav-btn-icon-wrap"><div class="nav-btn-icon">⌂</div></div><span data-i18n="nav_home"></span></button>
+    <button class="nav-btn" data-screen="mining" onclick="switchScreen('mining')"><div class="nav-btn-icon-wrap"><div class="nav-btn-icon">⛏</div></div><span data-i18n="nav_mining"></span></button>
     <button class="nav-btn" data-screen="shipyard" onclick="switchScreen('shipyard')"><div class="nav-btn-icon-wrap"><div class="nav-btn-icon">⚙</div></div><span data-i18n="nav_shipyard"></span></button>
-    <button class="nav-btn" data-screen="quests" onclick="switchScreen('quests')"><div class="nav-btn-icon-wrap"><div class="nav-btn-icon">✦</div></div><span data-i18n="nav_quests"></span><div class="nav-badge cyan" id="navQuestBadge">3</div></button>
-    <button class="nav-btn" data-screen="referrals" onclick="switchScreen('referrals')"><div class="nav-btn-icon-wrap"><div class="nav-btn-icon">⬡</div></div><span data-i18n="nav_refs"></span></button>
+    <button class="nav-btn" data-screen="airdrop" onclick="switchScreen('airdrop')"><div class="nav-btn-icon-wrap"><div class="nav-btn-icon">◆</div></div><span data-i18n="nav_airdrop"></span><div class="nav-badge cyan" id="navAirdropBadge">!</div></button>
     <button class="nav-btn" data-screen="settings" onclick="switchScreen('settings')"><div class="nav-btn-icon-wrap"><div class="nav-btn-icon">☰</div></div><span data-i18n="nav_settings"></span></button>
   </div>
 </div>
@@ -931,6 +1043,15 @@
       art_sub: 'Выбери модификатор на этот рейс. Каждый рейс — новый билд.',
       art_skip: 'Играть без модуля',
       hst_fire: 'СКОР.СТР', hst_dmg: 'УРОН', hst_rad: 'РАДИУС', hst_hp: 'ПРОЧН',
+      nav_mining: 'Майнинг', nav_airdrop: 'Airdrop',
+      mn_title: 'Майнинг <em>ферма</em>', mn_sub: 'Пассивный доход $PLASMA в час',
+      mn_passive_income: 'ДОХОД В ЧАС', mn_pending: 'готово к сбору', mn_collect: 'СОБРАТЬ',
+      mn_modules: 'МОДУЛИ ДОБЫЧИ',
+      ad_title: '$PLASMA <em>Airdrop</em>', ad_sub: 'Листинг Q4 2026 · выполни задания',
+      ad_badge: 'ЛИСТИНГ Q4 2026', ad_listing_title: 'Листинг $PLASMA на биржах',
+      ad_tasks_done: 'заданий выполнено',
+      ad_wallet_title: 'Привяжите TON кошелёк', ad_wallet_desc: 'Укажите адрес TON-кошелька для получения $PLASMA при листинге',
+      ad_wallet_btn: 'ПРИВЯЗАТЬ КОШЕЛЁК',
       titles: ['Искатель','Новичок','Штурман','Капитан','Командор','Адмирал','Звездоходец','Галактический Лорд','Бог Вселенной'],
       faq: {
         q1: 'Как управлять кораблём?',
@@ -1030,6 +1151,15 @@
       art_sub: 'Choose a modifier for this run. Every run — a new build.',
       art_skip: 'Play without module',
       hst_fire: 'FIRE', hst_dmg: 'DMG', hst_rad: 'RADIUS', hst_hp: 'HULL',
+      nav_mining: 'Mining', nav_airdrop: 'Airdrop',
+      mn_title: 'Mining <em>farm</em>', mn_sub: 'Passive $PLASMA income per hour',
+      mn_passive_income: 'HOURLY INCOME', mn_pending: 'ready to collect', mn_collect: 'COLLECT',
+      mn_modules: 'MINING MODULES',
+      ad_title: '$PLASMA <em>Airdrop</em>', ad_sub: 'Listing Q4 2026 · complete tasks',
+      ad_badge: 'LISTING Q4 2026', ad_listing_title: '$PLASMA listing on exchanges',
+      ad_tasks_done: 'tasks completed',
+      ad_wallet_title: 'Link your TON wallet', ad_wallet_desc: 'Enter your TON wallet address to receive $PLASMA at listing',
+      ad_wallet_btn: 'LINK WALLET',
       titles: ['Seeker','Novice','Navigator','Captain','Commander','Admiral','Starwalker','Galactic Lord','God of Universe'],
       faq: {
         q1: 'How to control the ship?',
@@ -1196,7 +1326,14 @@
       readMessages: JSON.parse(localStorage.getItem('vd_read_msgs') || '[]'),
       tgId: parseInt(localStorage.getItem('vd_tg_id') || '0'),
       tgName: localStorage.getItem('vd_tg_name') || '',
-      tgUsername: localStorage.getItem('vd_tg_username') || ''
+      tgUsername: localStorage.getItem('vd_tg_username') || '',
+      energy: parseInt(localStorage.getItem('vd_energy') || '5'),
+      maxEnergy: 5,
+      lastEnergyTime: parseInt(localStorage.getItem('vd_energy_time') || Date.now().toString()),
+      miningModules: JSON.parse(localStorage.getItem('vd_mining') || '[]'),
+      miningLastCollect: parseInt(localStorage.getItem('vd_mining_collect') || Date.now().toString()),
+      airdropTasks: JSON.parse(localStorage.getItem('vd_airdrop_tasks') || '[]'),
+      airdropWallet: localStorage.getItem('vd_airdrop_wallet') || ''
     };
   }
   function saveState(s) {
@@ -1217,6 +1354,12 @@
     if (s.tgId !== undefined) localStorage.setItem('vd_tg_id', s.tgId.toString());
     if (s.tgName !== undefined) localStorage.setItem('vd_tg_name', s.tgName);
     if (s.tgUsername !== undefined) localStorage.setItem('vd_tg_username', s.tgUsername);
+    if (s.energy !== undefined) localStorage.setItem('vd_energy', s.energy.toString());
+    if (s.lastEnergyTime !== undefined) localStorage.setItem('vd_energy_time', s.lastEnergyTime.toString());
+    if (s.miningModules !== undefined) localStorage.setItem('vd_mining', JSON.stringify(s.miningModules));
+    if (s.miningLastCollect !== undefined) localStorage.setItem('vd_mining_collect', s.miningLastCollect.toString());
+    if (s.airdropTasks !== undefined) localStorage.setItem('vd_airdrop_tasks', JSON.stringify(s.airdropTasks));
+    if (s.airdropWallet !== undefined) localStorage.setItem('vd_airdrop_wallet', s.airdropWallet);
   }
 
   function getTitle() {
@@ -1275,7 +1418,7 @@
     initTelegram();
     document.getElementById('onboarding').classList.add('hide');
     if (obAnimId) cancelAnimationFrame(obAnimId);
-    setTimeout(() => { document.getElementById('onboarding').style.display = 'none'; document.getElementById('app').classList.add('show'); checkDailyReset(); renderAll(); checkStoryProgress(); }, 600);
+    setTimeout(() => { document.getElementById('onboarding').style.display = 'none'; document.getElementById('app').classList.add('show'); checkDailyReset(); renderAll(); checkStoryProgress(); checkEnergyRegen(); setInterval(checkEnergyRegen, 30000); setInterval(() => { if (document.getElementById('mining').classList.contains('active')) renderMining(); }, 5000); }, 600);
   }
 
   // ============ SCREENS ============
@@ -1290,8 +1433,10 @@
       tgBackButton(true);
     }
     if (name === 'home') renderHome();
-    if (name !== 'shipyard') stopHangar(); // Stop hangar animation when leaving shipyard
+    if (name !== 'shipyard') stopHangar();
     if (name === 'shipyard') renderShipyard();
+    if (name === 'mining') renderMining();
+    if (name === 'airdrop') renderAirdrop();
     if (name === 'quests') renderQuests();
     if (name === 'comms') { renderComms(); markMessagesRead(); }
     if (name === 'faq') renderFAQ();
@@ -1300,7 +1445,7 @@
     if (name === 'battle') {} else { if (battle) battle.stop(); }
   }
 
-  function renderAll() { renderHome(); renderShipyard(); renderQuests(); renderComms(); renderFAQ(); renderReferrals(); renderDailyRun(); updateBadges(); }
+  function renderAll() { renderHome(); renderShipyard(); renderMining(); renderAirdrop(); renderQuests(); renderComms(); renderFAQ(); renderReferrals(); renderDailyRun(); updateBadges(); updateEnergyUI(); }
 
   function renderHome() {
     const s = getState();
@@ -1400,11 +1545,15 @@
   let battle = null;
   function startBattle() {
     initAudio();
-    // GUARD: kill any existing battle engine first
-    if (battle) {
-      battle.stop();
-      battle = null;
+    // Check energy
+    const s = getState();
+    if (s.energy <= 0) {
+      showToast(currentLang === 'ru' ? 'Нет энергии! Жди восстановления или купи за ★' : 'No energy! Wait or buy with ★', 'danger');
+      return;
     }
+    spendEnergy();
+    // GUARD: kill any existing battle engine first
+    if (battle) { battle.stop(); battle = null; }
     showArtifactSelection(() => {
       showLaunchAnimation(() => {
         // Double-check: kill again in case another battle started during animation
@@ -2896,6 +3045,202 @@
     });
   }
 
+  // ============ MINING + ENERGY + AIRDROP ============
+  const MINING_MODULES = [
+    { id: 'm1', icon: '🛰', name: { ru: 'Спутник-ретранслятор', en: 'Relay Satellite' }, desc: { ru: 'Базовый спутник на орбите', en: 'Basic orbiting satellite' }, profit: 50, cost: 500, maxLevel: 10, costMult: 1.6 },
+    { id: 'm2', icon: '⛏', name: { ru: 'Шахта на астероиде', en: 'Asteroid Mine' }, desc: { ru: 'Добыча на астероидах', en: 'Mining on asteroids' }, profit: 200, cost: 2500, maxLevel: 10, costMult: 1.7 },
+    { id: 'm3', icon: '🏭', name: { ru: 'Плазма-завод', en: 'Plasma Plant' }, desc: { ru: 'Промышленная переработка', en: 'Industrial processing' }, profit: 800, cost: 12000, maxLevel: 10, costMult: 1.8 },
+    { id: 'm4', icon: '🔆', name: { ru: 'Солнечный сборщик', en: 'Solar Harvester' }, desc: { ru: 'Энергия из звёзд', en: 'Energy from stars' }, profit: 3000, cost: 60000, maxLevel: 10, costMult: 1.9 },
+    { id: 'm5', icon: '🕳', name: { ru: 'Чёрная дыра', en: 'Black Hole Tap' }, desc: { ru: 'Энергия из сингулярности', en: 'Energy from singularity' }, profit: 12000, cost: 300000, maxLevel: 10, costMult: 2.0 },
+    { id: 'm6', icon: '🌌', name: { ru: 'Квазар-ядро', en: 'Quasar Core' }, desc: { ru: 'Древняя энергия галактики', en: 'Ancient galaxy energy' }, profit: 50000, cost: 1500000, maxLevel: 10, costMult: 2.1 }
+  ];
+
+  const AIRDROP_TASKS = [
+    { id: 't1', icon: '📢', name: { ru: 'Подписаться на канал', en: 'Subscribe to channel' }, url: 'https://t.me/letuchka_news', reward: { ru: '+500 $PLASMA', en: '+500 $PLASMA' }, plasmaReward: 500 },
+    { id: 't2', icon: '👥', name: { ru: 'Пригласить 3 друзей', en: 'Invite 3 friends' }, url: '', reward: { ru: '+1000 $PLASMA', en: '+1000 $PLASMA' }, plasmaReward: 1000 },
+    { id: 't3', icon: '🎮', name: { ru: 'Сыграть 10 рейдов', en: 'Play 10 raids' }, url: '', reward: { ru: '+2000 $PLASMA', en: '+2000 $PLASMA' }, plasmaReward: 2000 },
+    { id: 't4', icon: '⚡', name: { ru: 'Купить любой апгрейд', en: 'Buy any upgrade' }, url: '', reward: { ru: '+10 ★', en: '+10 ★' }, starsReward: 10 },
+    { id: 't5', icon: '🐋', name: { ru: 'Убить БОССА', en: 'Kill a BOSS' }, url: '', reward: { ru: '+50 ★', en: '+50 ★' }, starsReward: 50 }
+  ];
+
+  function getMiningTotalProfit() {
+    const s = getState();
+    let total = 0;
+    s.miningModules.forEach(m => {
+      const mod = MINING_MODULES.find(x => x.id === m.id);
+      if (mod) total += mod.profit * m.level;
+    });
+    return total;
+  }
+
+  function getMiningCost(mod, currentLevel) {
+    return Math.floor(mod.cost * Math.pow(mod.costMult, currentLevel));
+  }
+
+  function getPendingPlasma() {
+    const s = getState();
+    const profitPerSec = getMiningTotalProfit() / 3600;
+    const elapsed = (Date.now() - s.miningLastCollect) / 1000;
+    return Math.floor(profitPerSec * elapsed);
+  }
+
+  function renderMining() {
+    const s = getState();
+    const totalProfit = getMiningTotalProfit();
+    const pending = getPendingPlasma();
+    document.getElementById('mnTotalIncome').textContent = totalProfit.toLocaleString() + '/ч';
+    document.getElementById('mnPending').textContent = pending.toLocaleString();
+    document.getElementById('mnCollectBtn').disabled = pending <= 0;
+    const list = document.getElementById('mnList');
+    list.innerHTML = MINING_MODULES.map(mod => {
+      const owned = s.miningModules.find(m => m.id === mod.id);
+      const level = owned ? owned.level : 0;
+      const maxed = level >= mod.maxLevel;
+      const cost = maxed ? 0 : getMiningCost(mod, level);
+      const canBuy = !maxed && s.plasma >= cost;
+      const profit = mod.profit * level;
+      return `<div class="mn-card ${level > 0 ? 'owned' : ''}">
+        <div class="mn-icon">${mod.icon}</div>
+        <div class="mn-body">
+          <div class="mn-name">${mod.name[currentLang]} ${level > 0 ? '<span style="color:var(--neon-cyan);font-size:11px;">Lv.' + level + '</span>' : ''}</div>
+          <div class="mn-profit">+${(mod.profit * (level + (maxed ? 0 : 1))).toLocaleString()}/ч ${level > 0 ? '(тек: +' + profit.toLocaleString() + '/ч)' : ''}</div>
+          <div class="mn-desc">${mod.desc[currentLang]}</div>
+        </div>
+        <div class="mn-action">
+          ${maxed ? '<div class="mn-cost" style="color:var(--success)">MAX</div><button class="mn-buy maxed">✓</button>' : `<div class="mn-cost">${cost.toLocaleString()} $P</div><button class="mn-buy" ${canBuy ? '' : 'disabled'} onclick="buyMining('${mod.id}')">${currentLang === 'ru' ? 'КУПИТЬ' : 'BUY'}</button>`}
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function buyMining(id) {
+    const mod = MINING_MODULES.find(m => m.id === id);
+    if (!mod) return;
+    const s = getState();
+    const owned = s.miningModules.find(m => m.id === id);
+    const level = owned ? owned.level : 0;
+    if (level >= mod.maxLevel) return;
+    const cost = getMiningCost(mod, level);
+    if (s.plasma < cost) { showToast(t('not_enough'), 'danger'); return; }
+    s.plasma -= cost;
+    if (owned) { owned.level++; }
+    else { s.miningModules = [...s.miningModules, { id, level: 1 }]; }
+    saveState(s);
+    SOUNDS.buy();
+    showToast(t('purchased'), 'success');
+    renderMining();
+    renderHome();
+  }
+
+  function collectMining() {
+    const s = getState();
+    const pending = getPendingPlasma();
+    if (pending <= 0) return;
+    s.plasma += pending;
+    s.miningLastCollect = Date.now();
+    saveState(s);
+    SOUNDS.collect();
+    showToast(`+${pending.toLocaleString()} $PLASMA`, 'cyan');
+    renderMining();
+    renderHome();
+  }
+
+  // ============ ENERGY SYSTEM ============
+  const ENERGY_REGEN_MS = 10 * 60 * 1000; // 10 minutes per energy
+  function checkEnergyRegen() {
+    const s = getState();
+    const now = Date.now();
+    const elapsed = now - s.lastEnergyTime;
+    const regenCount = Math.floor(elapsed / ENERGY_REGEN_MS);
+    if (regenCount > 0 && s.energy < s.maxEnergy) {
+      s.energy = Math.min(s.maxEnergy, s.energy + regenCount);
+      s.lastEnergyTime = s.lastEnergyTime + (regenCount * ENERGY_REGEN_MS);
+      // If energy is maxed, don't keep counting
+      if (s.energy >= s.maxEnergy) s.lastEnergyTime = now;
+      saveState(s);
+    }
+    updateEnergyUI();
+  }
+
+  function updateEnergyUI() {
+    const s = getState();
+    document.getElementById('energyText').textContent = `${s.energy}/${s.maxEnergy}`;
+  }
+
+  function spendEnergy() {
+    const s = getState();
+    if (s.energy <= 0) return false;
+    s.energy--;
+    if (s.energy === s.maxEnergy - 1) s.lastEnergyTime = Date.now();
+    saveState(s);
+    updateEnergyUI();
+    return true;
+  }
+
+  // ============ AIRDROP ============
+  function renderAirdrop() {
+    const s = getState();
+    const tasksDone = s.airdropTasks.length;
+    const progress = (tasksDone / AIRDROP_TASKS.length) * 100;
+    document.getElementById('adProgress').style.width = progress + '%';
+    document.getElementById('adTasksDone').textContent = tasksDone;
+    // Wallet
+    const walletInput = document.getElementById('adWalletInput');
+    if (s.airdropWallet) { walletInput.value = s.airdropWallet; }
+    // Tasks
+    const list = document.getElementById('adTasks');
+    list.innerHTML = AIRDROP_TASKS.map(task => {
+      const done = s.airdropTasks.includes(task.id);
+      return `<div class="ad-task ${done ? 'done' : ''}">
+        <div class="ad-task-icon">${task.icon}</div>
+        <div class="ad-task-body">
+          <div class="ad-task-name">${task.name[currentLang]}</div>
+          <div class="ad-task-reward">${task.reward[currentLang]}</div>
+        </div>
+        ${done ? '<button class="ad-task-btn done-btn">✓</button>' : `<button class="ad-task-btn" onclick="doAirdropTask('${task.id}')">${currentLang === 'ru' ? 'ВЫПОЛНИТЬ' : 'DO'}</button>`}
+      </div>`;
+    }).join('');
+    // Hide badge if all done
+    const badge = document.getElementById('navAirdropBadge');
+    if (tasksDone >= AIRDROP_TASKS.length && s.airdropWallet) badge.classList.remove('show');
+    else badge.classList.add('show');
+  }
+
+  function doAirdropTask(id) {
+    const task = AIRDROP_TASKS.find(t => t.id === id);
+    if (!task) return;
+    const s = getState();
+    if (s.airdropTasks.includes(id)) return;
+    // Open URL if exists, otherwise mark as done
+    if (task.url) {
+      if (tg && tg.openTelegramLink) tg.openTelegramLink(task.url);
+      else window.open(task.url, '_blank');
+    }
+    // Mark as done (in demo, instant; in prod, would verify)
+    setTimeout(() => {
+      s.airdropTasks = [...s.airdropTasks, id];
+      if (task.plasmaReward) s.plasma += task.plasmaReward;
+      if (task.starsReward) s.stars += task.starsReward;
+      saveState(s);
+      SOUNDS.quest();
+      showToast(task.reward[currentLang], 'success');
+      renderAirdrop();
+      renderHome();
+    }, task.url ? 2000 : 0);
+  }
+
+  function saveWallet() {
+    const input = document.getElementById('adWalletInput');
+    const addr = input.value.trim();
+    if (!addr || addr.length < 10) { showToast(currentLang === 'ru' ? 'Неверный адрес' : 'Invalid address', 'danger'); return; }
+    const s = getState();
+    s.airdropWallet = addr;
+    saveState(s);
+    SOUNDS.buy();
+    showToast(currentLang === 'ru' ? 'Кошелёк привязан!' : 'Wallet linked!', 'success');
+    renderAirdrop();
+  }
+
   // ============ INIT ============
   const savedLang = localStorage.getItem('vd_lang');
   if (savedLang) currentLang = savedLang;
@@ -2906,7 +3251,7 @@
   document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === currentLang));
   applyI18n();
 
-  if (sessionStorage.getItem('vd_entered')) { document.getElementById('onboarding').style.display = 'none'; document.getElementById('app').classList.add('show'); checkDailyReset(); renderAll(); checkStoryProgress(); }
+  if (sessionStorage.getItem('vd_entered')) { document.getElementById('onboarding').style.display = 'none'; document.getElementById('app').classList.add('show'); checkDailyReset(); renderAll(); checkStoryProgress(); checkEnergyRegen(); setInterval(checkEnergyRegen, 30000); setInterval(() => { if (document.getElementById('mining').classList.contains('active')) renderMining(); }, 5000); }
   else { sessionStorage.setItem('vd_entered', '1'); }
 </script>
 
