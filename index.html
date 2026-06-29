@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#03020A">
 <title>LETUCHKA — Прорыв блокады</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body { width: 100%; min-height: 100vh; background: #03020A; color: #C7D2FE; font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; overflow: hidden; -webkit-font-smoothing: antialiased; user-select: none; -webkit-user-select: none; font-weight: 700; }
@@ -1050,7 +1051,26 @@
     buy: () => { playTone(500, 0.08, 'triangle', 0.1); setTimeout(() => playTone(700, 0.08, 'triangle', 0.1), 80); setTimeout(() => playTone(1000, 0.12, 'triangle', 0.1), 160); },
     quest: () => { [600, 800, 1000].forEach((f, i) => setTimeout(() => playTone(f, 0.1, 'sine', 0.1), i * 80)); }
   };
-  function vibrate(ms) { if (vibrationOn && navigator.vibrate) navigator.vibrate(ms); }
+  function vibrate(ms) {
+    if (!vibrationOn) return;
+    // Use Telegram HapticFeedback if available, otherwise fall back to navigator.vibrate
+    if (tg && tg.HapticFeedback) {
+      if (typeof ms === 'number') {
+        // Map duration to impact type
+        if (ms <= 15) tgHaptic('light');
+        else if (ms <= 50) tgHaptic('medium');
+        else if (ms <= 100) tgHaptic('heavy');
+        else tgHaptic('rigid');
+      } else if (Array.isArray(ms)) {
+        // Array pattern — use notification for complex patterns
+        const total = ms.reduce((a, b) => a + b, 0);
+        if (total > 200) tgNotify('warning');
+        else tgHaptic('heavy');
+      }
+    } else if (navigator.vibrate) {
+      navigator.vibrate(ms);
+    }
+  }
 
   // ============ DATA ============
   const UPGRADES = [
@@ -1142,7 +1162,10 @@
       dailyDate: localStorage.getItem('vd_daily_date') || '',
       weeklyDate: localStorage.getItem('vd_weekly_date') || '',
       unlockedChapters: JSON.parse(localStorage.getItem('vd_chapters') || '[1]'),
-      readMessages: JSON.parse(localStorage.getItem('vd_read_msgs') || '[]')
+      readMessages: JSON.parse(localStorage.getItem('vd_read_msgs') || '[]'),
+      tgId: parseInt(localStorage.getItem('vd_tg_id') || '0'),
+      tgName: localStorage.getItem('vd_tg_name') || '',
+      tgUsername: localStorage.getItem('vd_tg_username') || ''
     };
   }
   function saveState(s) {
@@ -1160,6 +1183,9 @@
     if (s.dailyRunDate !== undefined) localStorage.setItem('vd_daily_run_date', s.dailyRunDate);
     if (s.unlockedChapters !== undefined) localStorage.setItem('vd_chapters', JSON.stringify(s.unlockedChapters));
     if (s.readMessages !== undefined) localStorage.setItem('vd_read_msgs', JSON.stringify(s.readMessages));
+    if (s.tgId !== undefined) localStorage.setItem('vd_tg_id', s.tgId.toString());
+    if (s.tgName !== undefined) localStorage.setItem('vd_tg_name', s.tgName);
+    if (s.tgUsername !== undefined) localStorage.setItem('vd_tg_username', s.tgUsername);
   }
 
   function getTitle() {
@@ -1215,6 +1241,7 @@
 
   function enterApp() {
     initAudio();
+    initTelegram();
     document.getElementById('onboarding').classList.add('hide');
     if (obAnimId) cancelAnimationFrame(obAnimId);
     setTimeout(() => { document.getElementById('onboarding').style.display = 'none'; document.getElementById('app').classList.add('show'); checkDailyReset(); renderAll(); checkStoryProgress(); }, 600);
@@ -1225,6 +1252,12 @@
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(name).classList.add('active');
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.screen === name));
+    // Telegram BackButton: show on sub-screens, hide on home/battle
+    if (name === 'home' || name === 'battle' || name === 'gameover') {
+      tgBackButton(false);
+    } else {
+      tgBackButton(true);
+    }
     if (name === 'home') renderHome();
     if (name === 'shipyard') renderShipyard();
     if (name === 'quests') renderQuests();
@@ -1335,10 +1368,16 @@
   let battle = null;
   function startBattle() {
     initAudio();
+    // GUARD: kill any existing battle engine first
+    if (battle) {
+      battle.stop();
+      battle = null;
+    }
     showArtifactSelection(() => {
       showLaunchAnimation(() => {
+        // Double-check: kill again in case another battle started during animation
+        if (battle) { battle.stop(); battle = null; }
         switchScreen('battle');
-        if (battle) battle.stop();
         battle = new BattleEngine('battleCanvas');
         battle.start();
       });
@@ -1443,6 +1482,8 @@
     }
     setupInput() {
       this.canvas.style.touchAction = 'none';
+      // Disable Telegram vertical swipes for game canvas
+      if (tg && tg.disableVerticalSwipes) tg.disableVerticalSwipes();
       const getPos = (e) => { const rect = this.canvas.getBoundingClientRect(); return { x: e.clientX - rect.left, y: e.clientY - rect.top }; };
       const onDown = (e) => {
         e.preventDefault();
@@ -2189,9 +2230,16 @@
   // ============ HANGAR PREVIEW ============
   let hangarAnimId = null;
   function renderHangar() {
-    if (hangarAnimId) cancelAnimationFrame(hangarAnimId);
+    // GUARD: cancel existing loop FIRST, then verify it's cancelled before starting new
+    if (hangarAnimId) {
+      cancelAnimationFrame(hangarAnimId);
+      hangarAnimId = null;
+    }
     const canvas = document.getElementById('hangarCanvas');
     if (!canvas) return;
+    // Only render if shipyard screen is active (avoid running in background)
+    const shipyardActive = document.getElementById('shipyard') && document.getElementById('shipyard').classList.contains('active');
+    if (!shipyardActive) return;
     const ctx = canvas.getContext('2d');
     const W = canvas.width, H = canvas.height;
     const s = getState();
@@ -2540,10 +2588,68 @@
   function resetProgress() {
     if (!confirm(currentLang === 'ru' ? 'Сбросить весь прогресс?' : 'Reset all progress?')) return;
     Object.keys(localStorage).filter(k => k.startsWith('vd_')).forEach(k => localStorage.removeItem(k));
+    sessionStorage.removeItem('vd_entered');
     location.reload();
   }
 
-  // ============ TOAST ============
+  // ============ TELEGRAM WEB APP INTEGRATION ============
+  let tg = null;
+  let tgUser = null;
+  function initTelegram() {
+    if (window.Telegram && window.Telegram.WebApp) {
+      tg = window.Telegram.WebApp;
+      tg.ready();
+      tg.expand();
+      // Get user data
+      if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+        tgUser = tg.initDataUnsafe.user;
+        // Save user info
+        const s = getState();
+        if (!s.tgId || s.tgId !== tgUser.id) {
+          s.tgId = tgUser.id;
+          s.tgName = tgUser.first_name || '';
+          s.tgUsername = tgUser.username || '';
+          saveState(s);
+        }
+      }
+      // Apply Telegram theme colors as fallback
+      if (tg.themeParams) {
+        // Keep our custom dark theme, but respect some params
+        // document.documentElement.style.setProperty('--bg', tg.themeParams.bg_color || '#03020A');
+      }
+      // Configure back button
+      if (tg.BackButton) {
+        tg.BackButton.onClick(() => {
+          // Go back to home from any sub-screen
+          const activeScreen = document.querySelector('.screen.active');
+          if (activeScreen && activeScreen.id !== 'home' && activeScreen.id !== 'battle') {
+            switchScreen('home');
+            tg.BackButton.hide();
+          }
+        });
+      }
+      // Request vertical swipes to be disabled for game canvas
+      if (tg.disableVerticalSwipes) tg.disableVerticalSwipes();
+    }
+  }
+  function tgHaptic(type) {
+    // type: 'light', 'medium', 'heavy', 'rigid', 'soft'
+    if (tg && tg.HapticFeedback) {
+      tg.HapticFeedback.impactOccurred(type);
+    }
+  }
+  function tgNotify(type) {
+    // type: 'error', 'success', 'warning'
+    if (tg && tg.HapticFeedback) {
+      tg.HapticFeedback.notificationOccurred(type);
+    }
+  }
+  function tgBackButton(show) {
+    if (tg && tg.BackButton) {
+      if (show) tg.BackButton.show();
+      else tg.BackButton.hide();
+    }
+  }
   function showToast(msg, type = '') { const el = document.getElementById('toast'); el.textContent = msg; el.className = 'toast ' + type; el.classList.add('show'); clearTimeout(el._tm); el._tm = setTimeout(() => el.classList.remove('show'), 2400); }
 
   // ============ REVIVE / LOOTBOX / REFERRALS ============
