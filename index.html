@@ -117,6 +117,10 @@
   @keyframes logoShipFloat { 0%, 100% { transform: translateY(0) rotate(-5deg); } 50% { transform: translateY(-2px) rotate(5deg); } }
   .topbar-title-badge { background: rgba(0, 229, 204, 0.08); padding: 5px 10px; border-radius: 999px; border: 1px solid rgba(0, 229, 204, 0.2); font-size: 9px; font-weight: 800; color: var(--neon-cyan); letter-spacing: 0.08em; max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .topbar-right { display: flex; align-items: center; gap: 6px; }
+  .topbar-currency { display: flex; align-items: center; gap: 4px; padding: 5px 10px; border-radius: 999px; font-size: 12px; font-weight: 900; }
+  .topbar-currency-plasma { background: rgba(0, 229, 204, 0.1); border: 1px solid rgba(0, 229, 204, 0.25); color: var(--neon-cyan); }
+  .topbar-currency-stars { background: rgba(255, 179, 71, 0.1); border: 1px solid rgba(255, 179, 71, 0.25); color: var(--gold); }
+  .topbar-currency-icon { font-size: 12px; }
   .topbar-pill { display: flex; align-items: center; gap: 4px; background: rgba(255, 179, 71, 0.08); padding: 5px 10px; border-radius: 999px; border: 1px solid rgba(255, 179, 71, 0.2); font-size: 11px; font-weight: 800; color: var(--gold); }
 
   .screens-wrap { flex: 1; position: relative; overflow: hidden; }
@@ -731,13 +735,20 @@
       <span class="topbar-level-label">LVL</span>
     </div>
     <div class="topbar-right">
+      <div class="topbar-currency topbar-currency-plasma">
+        <span class="topbar-currency-icon">◈</span>
+        <span id="topPlasma">0</span>
+      </div>
+      <div class="topbar-currency topbar-currency-stars">
+        <span class="topbar-currency-icon">★</span>
+        <span id="starsCount">50</span>
+      </div>
       <div class="energy-bar" id="energyBar">
         <span class="energy-icon">⚡</span>
         <span class="energy-text" id="energyText">5/5</span>
       </div>
-      <div class="topbar-pill"><span>★</span><span id="starsCount">50</span></div>
       <div class="topbar-avatar" id="topbarAvatar" onclick="switchScreen('profile')">
-        <div class="topbar-avatar-placeholder" id="topbarAvatarPlaceholder">?</div>
+        <div class="topbar-avatar-placeholder">?</div>
       </div>
     </div>
   </div>
@@ -1219,10 +1230,10 @@
         a12: 'Лутбоксы выпадают из золотых дронов (появляются каждые 45-75 сек) и из боссов (3 штуки). Открываешь в Верфи: бесплатно через 3 часа или мгновенно за 100★. Внутри: плазма, звёзды или скин корабля.',
         q13: 'Зачем приглашать друзей?',
         a13: '3 приглашённых капитана разблокируют 4-й и 5-й уровни апгрейдов в Верфи. Без рефералов ты не сможешь прокачать корабль до максимума. Делись ссылкой в разделе «Флот».',
-        q14: 'Что такое $PLASMA?',
-        a14: '$PLASMA — внутриигровой токен. Ты добываешь его двумя способами: активно (в бою — собираешь кристаллы) и пассивно (на Майнинг-ферме — модули генерируют $PLASMA каждый час). $PLASMA тратится на апгрейды корабля и модули майнинга.',
+        q14: 'Какие валюты в игре и за что они отвечают?',
+        a14: 'В игре 2 валюты:\n\n◈ $PLASMA — игровая валюта. Добывается: в бою (сбор кристаллов), пассивно (майнинг-ферма). Тратится: апгрейды корабля в Верфи, модули майнинга. После листинга Q4 2026 — конвертируется в TON.\n\n★ Кристаллы — премиум-валюта. Получаешь: за достижения, кейсы, рефералов, airdrop-задания. Тратится: воскрешение после смерти (50★), мгновенное открытие лутбокса (100★).\n\nОбе валюты всегда видны в шапке сверху.',
         q15: 'Что такое Майнинг-ферма?',
-        a15: 'Вкладка «Майнинг» — это пассивный доход. Ты покупаешь модули (спутник, шахта, завод, чёрная дыра, квазар) за $PLASMA. Каждый модуль генерирует $PLASMA каждый час, даже когда ты не в игре. Накопленное нужно собирать кнопкой «СОБРАТЬ».',
+        a15: 'Вкладка «Майнинг» — это пассивный доход. Ты покупаешь модули (спутник, шахта, завод, чёрная дыра, квазар) за $PLASMA. Каждый модуль генерирует $PLASMA каждый час, даже когда ты не в игре. Накопленное нужно собирать кнопкой «СОБРАТЬ». Чем больше модулей — тем больше пассивный доход.',
         q16: 'Что такое энергия?',
         a16: 'Энергия нужна для рейдов (боёв). У тебя 5 энергии максимум. Каждый рейд тратит 1 энергию. 1 энергия восстанавливается каждые 10 минут. Нет энергии — нельзя летать. Энергия накапливается даже когда ты не в игре.',
         q17: 'Когда листинг $PLASMA?',
@@ -1231,8 +1242,8 @@
         a18: 'Фиксированный курс: 100,000 $PLASMA = 1 TON. Калькулятор доступен в Профиле → вкладка «Конвертер». Там видно сколько TON стоит твой текущий баланс. Конвертация будет доступна после листинга.',
         q19: 'Что такое Airdrop?',
         a19: 'Airdrop — раздача $PLASMA держателям перед листингом. Чтобы участвовать: выполни 5 заданий во вкладке «Airdrop» (подписка на канал, приглашение друзей, рейды, апгрейды, убийство босса) и привяжи TON-кошелёк (привязка будет доступна позже).',
-        q20: 'Советы новичку',
-        a20: '1. Сначала прокачай Радиус добычи — будешь собирать плазму быстрее.\n2. Потом Скорострельность — выживешь дольше.\n3. Не пытайся собрать всю плазму — иногда лучше уворачиваться.\n4. Используй абилки! Они бесплатны и спасают жизнь.\n5. Строй комбо — больше плазмы с каждого дрона.\n6. Заходи каждый день за стриком — награды растут.\n7. Покупай модули майнинга — пассивный доход работает 24/7.\n8. Выбирай артефакт под ситуацию: «Танк» для выживания, «Берсерк» для урона.'
+        q20: 'Где что тратить — шпаргалка',
+        a20: '◈ $PLASMA (игровая):\n• Апгрейды корабля в Верфи (радиус, скорострельность, урон, скорость, HP, щит)\n• Модули майнинг-фермы (спутник, шахта, завод и т.д.)\n\n★ Кристаллы (премиум):\n• Воскрешение после смерти (50★)\n• Мгновенное открытие лутбокса (100★)\n\n⚡ Энергия:\n• 1 рейд = 1 энергия, 5 максимум, 1/10мин\n\nКристаллы НЕ покупаются за $PLASMA и наоборот. Это две независимые валюты.'
       }
     },
     en: {
@@ -1346,10 +1357,10 @@
         a12: 'Lootboxes drop from golden drones (appear every 45-75 sec) and from bosses (3 each). Open in Shipyard: free after 3 hours or instantly for 100★. Inside: plasma, stars, or ship skin.',
         q13: 'Why invite friends?',
         a13: '3 invited captains unlock upgrade levels 4 and 5 in the Shipyard. Without referrals you cannot max out your ship. Share your link in the "Fleet" section.',
-        q14: 'What is $PLASMA?',
-        a14: '$PLASMA is the in-game token. You earn it two ways: actively (in battle — collect crystals) and passively (on the Mining farm — modules generate $PLASMA every hour). $PLASMA is spent on ship upgrades and mining modules.',
+        q14: 'What currencies exist and what are they for?',
+        a14: 'There are 2 currencies:\n\n◈ $PLASMA — in-game currency. Earned: in battle (collect crystals), passively (mining farm). Spent on: ship upgrades in Shipyard, mining modules. After Q4 2026 listing — convertible to TON.\n\n★ Crystals — premium currency. Earned: from achievements, cases, referrals, airdrop tasks. Spent on: revive after death (50★), instant lootbox opening (100★).\n\nBoth currencies are always visible in the top bar.',
         q15: 'What is the Mining farm?',
-        a15: 'The "Mining" tab is passive income. You buy modules (satellite, mine, plant, black hole, quasar) with $PLASMA. Each module generates $PLASMA every hour, even when you are not playing. Accumulated plasma must be collected with the "COLLECT" button.',
+        a15: 'The "Mining" tab is passive income. You buy modules (satellite, mine, plant, black hole, quasar) with $PLASMA. Each module generates $PLASMA every hour, even when you are not playing. Accumulated plasma must be collected with the "COLLECT" button. More modules = more passive income.',
         q16: 'What is energy?',
         a16: 'Energy is needed for raids (battles). You have 5 energy max. Each raid costs 1 energy. 1 energy regenerates every 10 minutes. No energy = no flying. Energy accumulates even when you are offline.',
         q17: 'When is the $PLASMA listing?',
@@ -1358,8 +1369,8 @@
         a18: 'Fixed rate: 100,000 $PLASMA = 1 TON. Calculator available in Profile → "Converter" tab. There you can see how much TON your current balance is worth. Conversion will be available after listing.',
         q19: 'What is the Airdrop?',
         a19: 'Airdrop is a $PLASMA distribution to holders before listing. To participate: complete 5 tasks in the "Airdrop" tab (subscribe to channel, invite friends, raids, upgrades, kill a boss) and link your TON wallet (linking will be available later).',
-        q20: 'Tips for beginners',
-        a20: '1. Upgrade Collect Radius first — collect plasma faster.\n2. Then Fire Rate — survive longer.\n3. Don\'t try to collect all plasma — sometimes better to dodge.\n4. Use abilities! They\'re free and save lives.\n5. Build combo — more plasma per drone.\n6. Come back daily for streak — rewards grow.\n7. Buy mining modules — passive income works 24/7.\n8. Pick artifact for the situation: "Tank" for survival, "Berserker" for damage.'
+        q20: 'Spending cheat sheet',
+        a20: '◈ $PLASMA (in-game):\n• Ship upgrades in Shipyard (radius, fire rate, damage, speed, HP, shield)\n• Mining farm modules (satellite, mine, plant, etc.)\n\n★ Crystals (premium):\n• Revive after death (50★)\n• Instant lootbox opening (100★)\n\n⚡ Energy:\n• 1 raid = 1 energy, 5 max, 1/10min\n\nCrystals CANNOT be bought with $PLASMA and vice versa. These are two independent currencies.'
       }
     }
   };
@@ -1622,6 +1633,7 @@
     const s = getState();
     document.getElementById('pbPlasma').textContent = Math.floor(s.plasma).toLocaleString();
     document.getElementById('pbRate').textContent = '+' + getMiningTotalProfit().toLocaleString() + '/ч';
+    document.getElementById('topPlasma').textContent = Math.floor(s.plasma).toLocaleString();
     document.getElementById('topLevel').textContent = getLevel(s).level;
     document.getElementById('starsCount').textContent = s.stars;
     // Show first unclaimed daily quest as mission
@@ -2377,6 +2389,9 @@
       document.getElementById('gsTime').textContent = formatTime(this.elapsedTime);
       document.getElementById('gsPlasmaCollected').textContent = this.plasmaCollected;
       document.getElementById('gsMaxCombo').textContent = '×' + this.maxCombo;
+      // Update topbar
+      document.getElementById('topPlasma').textContent = Math.floor(s.plasma).toLocaleString();
+      document.getElementById('starsCount').textContent = s.stars;
       // Switch to game over screen
       switchScreen('gameover');
     }
@@ -2792,6 +2807,8 @@
     updateQuestProgress('upgrades', 1); // This reads/writes state separately
     showToast(t('purchased'), 'success');
     // Re-render AFTER state is saved — reads fresh state
+    const freshS = getState();
+    document.getElementById('topPlasma').textContent = Math.floor(freshS.plasma).toLocaleString();
     renderShipyard();
     renderHome();
     checkStoryProgress();
@@ -2855,7 +2872,9 @@
     s[key] = [...claimedArr, qid];
     saveState(s);
     SOUNDS.quest();
-    showToast(t('quest_done') + ' +' + q.reward.amount + (q.reward.type === 'plasma' ? ' 💎' : ' ★'), 'success');
+    showToast(t('quest_done') + ' +' + q.reward.amount + (q.reward.type === 'plasma' ? ' $P' : ' ★'), 'success');
+    document.getElementById('topPlasma').textContent = Math.floor(s.plasma).toLocaleString();
+    document.getElementById('starsCount').textContent = s.stars;
     renderQuests(); renderHome(); updateBadges();
   }
   function updateQuestProgress(type, amount) {
@@ -3308,6 +3327,8 @@
     saveState(s);
     SOUNDS.buy();
     showToast(t('purchased'), 'success');
+    const freshS = getState();
+    document.getElementById('topPlasma').textContent = Math.floor(freshS.plasma).toLocaleString();
     renderMining();
     renderHome();
   }
@@ -3321,6 +3342,7 @@
     saveState(s);
     SOUNDS.collect();
     showToast(`+${pending.toLocaleString()} $PLASMA`, 'cyan');
+    document.getElementById('topPlasma').textContent = Math.floor(s.plasma).toLocaleString();
     renderMining();
     renderHome();
   }
