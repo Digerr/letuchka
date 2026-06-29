@@ -864,7 +864,7 @@
       <div class="sy-balance">
         <div class="sy-balance-card">
           <div class="sy-balance-label mono" data-i18n="sy_balance"></div>
-          <div class="sy-balance-value mono" id="syBalance">0 💎</div>
+          <div class="sy-balance-value mono" id="syBalance">0 $P</div>
         </div>
       </div>
       <div class="sy-list" id="syList"></div>
@@ -2704,7 +2704,7 @@
   function getUpgradeCost(up, currentLevel) { return Math.floor(up.baseCost * Math.pow(up.costMult, currentLevel)); }
   function renderShipyard() {
     const s = getState();
-    document.getElementById('syBalance').textContent = Math.floor(s.plasma) + ' 💎';
+    document.getElementById('syBalance').textContent = Math.floor(s.plasma).toLocaleString() + ' $P';
     // Update hangar stats
     const dmgUp = s.upgrades.damage || 0;
     const fireUp = s.upgrades.fireRate || 0;
@@ -2759,8 +2759,8 @@
       for (let i = 0; i < up.maxLevel; i++) dots += `<div class="sy-dot ${i < level ? 'filled' : ''}"></div>`;
       let actionHtml = '';
       if (maxed) actionHtml = '<div class="sy-cost" style="color:#34D399">MAX</div><button class="sy-buy maxed">✓</button>';
-      else if (needsRefs) actionHtml = `<div class="sy-cost">${cost} 💎</div><div class="sy-lock-badge">🔒 ${s.invited}/3</div><button class="sy-buy" disabled onclick="showToast(t('need_referrals'),'danger')">${currentLang === 'ru' ? 'ЗАБЛОКИРОВАНО' : 'LOCKED'}</button>`;
-      else actionHtml = `<div class="sy-cost">${cost} 💎</div><button class="sy-buy" ${canBuy ? '' : 'disabled'} onclick="buyUpgrade('${up.id}')">${currentLang === 'ru' ? 'КУПИТЬ' : 'BUY'}</button>`;
+      else if (needsRefs) actionHtml = `<div class="sy-cost">${cost.toLocaleString()} $P</div><div class="sy-lock-badge">🔒 ${s.invited}/3</div><button class="sy-buy" disabled onclick="showToast(t('need_referrals'),'danger')">${currentLang === 'ru' ? 'ЗАБЛОКИРОВАНО' : 'LOCKED'}</button>`;
+      else actionHtml = `<div class="sy-cost">${cost.toLocaleString()} $P</div><button class="sy-buy" ${canBuy ? '' : 'disabled'} onclick="buyUpgrade('${up.id}')">${currentLang === 'ru' ? 'КУПИТЬ' : 'BUY'}</button>`;
       return `<div class="sy-card">
         <div class="sy-icon">${up.icon}</div>
         <div class="sy-body">
@@ -2787,11 +2787,13 @@
     if (s.plasma < cost) { showToast(t('not_enough'), 'danger'); return; }
     s.plasma -= cost;
     s.upgrades[id] = level + 1;
-    saveState(s);
+    saveState(s); // Save FIRST
     SOUNDS.buy();
-    updateQuestProgress('upgrades', 1);
+    updateQuestProgress('upgrades', 1); // This reads/writes state separately
     showToast(t('purchased'), 'success');
-    renderShipyard(); renderHome();
+    // Re-render AFTER state is saved — reads fresh state
+    renderShipyard();
+    renderHome();
     checkStoryProgress();
   }
 
