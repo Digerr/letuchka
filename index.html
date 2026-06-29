@@ -2016,11 +2016,13 @@
       }
       const score = this.plasmaCollected + this.kills * 20 + Math.floor(this.elapsedTime) * 2;
       if (score > s.bestRun) s.bestRun = score;
+      // FIX: save state FIRST, before updateQuestProgress (which reads/writes localStorage internally)
+      saveState(s);
+      // Now update quest progress (reads saved state, adds progress, saves again)
       updateQuestProgress('plasma', this.plasmaCollected);
       updateQuestProgress('kills', this.kills);
       updateQuestProgress('time', Math.floor(this.elapsedTime));
       updateQuestProgress('runs', 1);
-      saveState(s);
       checkStoryProgress();
       // Update Game Over screen stats
       document.getElementById('grPlasma').textContent = this.plasmaCollected;
@@ -2029,7 +2031,7 @@
       document.getElementById('gsTime').textContent = formatTime(this.elapsedTime);
       document.getElementById('gsPlasmaCollected').textContent = this.plasmaCollected;
       document.getElementById('gsMaxCombo').textContent = '×' + this.maxCombo;
-      // Switch instantly (no setTimeout)
+      // Switch to game over screen
       switchScreen('gameover');
     }
     updateHUD() {
@@ -2685,7 +2687,15 @@
     if (ov) ov.classList.remove('show');
     if (battle) {
       clearInterval(battle._reviveInterval);
-      battle.finalizeBattle();
+      try {
+        battle.finalizeBattle();
+      } catch(e) {
+        console.error('finalizeBattle error:', e);
+        // Fallback: still switch to gameover even if error
+        switchScreen('gameover');
+      }
+    } else {
+      switchScreen('gameover');
     }
   }
   function openLootbox(index) {
