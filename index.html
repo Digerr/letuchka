@@ -45,7 +45,10 @@
   #app.show { opacity: 1; }
 
   .topbar { position: fixed; top: 0; left: 0; right: 0; height: 60px; z-index: 40; display: flex; align-items: center; justify-content: space-between; padding: 0 14px; background: rgba(3, 2, 10, 0.92); backdrop-filter: blur(24px) saturate(180%); -webkit-backdrop-filter: blur(24px) saturate(180%); border-bottom: 1px solid rgba(124, 92, 252, 0.12); }
-  .topbar-logo { font-size: 13px; font-weight: 900; color: var(--neon); letter-spacing: 0.15em; text-shadow: 0 0 12px rgba(124,92,252,0.4); }
+  .topbar-logo { font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 700; background: linear-gradient(135deg, #7C5CFC 0%, #00E5CC 50%, #FF4D8D 100%); background-size: 200% 200%; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 0.15em; animation: logoGradient 6s ease-in-out infinite; display: flex; align-items: center; gap: 6px; }
+  @keyframes logoGradient { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+  .topbar-logo-ship { width: 20px; height: 20px; animation: logoShipFloat 3s ease-in-out infinite; }
+  @keyframes logoShipFloat { 0%, 100% { transform: translateY(0) rotate(-5deg); } 50% { transform: translateY(-2px) rotate(5deg); } }
   .topbar-title-badge { background: rgba(0, 229, 204, 0.08); padding: 5px 10px; border-radius: 999px; border: 1px solid rgba(0, 229, 204, 0.2); font-size: 9px; font-weight: 800; color: var(--neon-cyan); letter-spacing: 0.08em; max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .topbar-right { display: flex; align-items: center; gap: 6px; }
   .topbar-pill { display: flex; align-items: center; gap: 4px; background: rgba(255, 179, 71, 0.08); padding: 5px 10px; border-radius: 999px; border: 1px solid rgba(255, 179, 71, 0.2); font-size: 11px; font-weight: 800; color: var(--gold); }
@@ -77,7 +80,9 @@
   .hq-btn { background: rgba(10, 8, 32, 0.7); border: 1px solid rgba(124, 92, 252, 0.15); padding: 14px 4px; cursor: pointer; font-family: inherit; display: flex; flex-direction: column; align-items: center; gap: 4px; border-radius: 16px; transition: all 0.25s ease; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); position: relative; }
   .hq-btn:hover { background: rgba(124, 92, 252, 0.1); border-color: var(--neon); transform: translateY(-2px); }
   .hq-btn-icon { font-size: 22px; }
-  .hq-btn-label { font-size: 10px; font-weight: 800; color: var(--text); letter-spacing: 0.05em; }
+  .hq-btn-label { font-size: 10px; font-weight: 800; color: #E0E7FF; letter-spacing: 0.05em; }
+  .hq-btn-icon { font-size: 22px; transition: transform 0.3s ease; filter: drop-shadow(0 0 6px rgba(124, 92, 252, 0.4)); }
+  .hq-btn:hover .hq-btn-icon { transform: scale(1.1); filter: drop-shadow(0 0 10px rgba(0, 229, 204, 0.5)); }
   .hq-badge { position: absolute; top: -4px; right: -4px; background: var(--danger); color: #fff; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px; font-size: 10px; font-weight: 800; display: none; align-items: center; justify-content: center; }
   .hq-badge.show { display: flex; }
   .hq-badge.cyan { background: var(--neon-cyan); color: #060B1A; }
@@ -431,11 +436,17 @@
   .hq-btn:hover::before { opacity: 1; }
   .hq-btn-icon { font-size: 22px; transition: transform 0.3s ease; }
   .hq-btn:hover .hq-btn-icon { transform: scale(1.1); }
-  .hq-btn-label { font-size: 10px; font-weight: 800; color: var(--text); letter-spacing: 0.05em; }
+  .hq-btn-label { font-size: 10px; font-weight: 800; color: #E0E7FF; letter-spacing: 0.05em; }
+  .hq-btn-icon { font-size: 22px; transition: transform 0.3s ease; filter: drop-shadow(0 0 6px rgba(124, 92, 252, 0.4)); }
+  .hq-btn:hover .hq-btn-icon { transform: scale(1.1); filter: drop-shadow(0 0 10px rgba(0, 229, 204, 0.5)); }
 
   /* Nav buttons — premium glass with active glow */
   .nav { background: rgba(3, 2, 10, 0.95); backdrop-filter: blur(32px) saturate(180%); -webkit-backdrop-filter: blur(32px) saturate(180%); border-top: 1px solid rgba(124, 92, 252, 0.15); box-shadow: 0 -8px 32px rgba(0,0,0,0.5), 0 -1px 0 rgba(124, 92, 252, 0.1) inset; }
-  .nav-btn { border-radius: 14px; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); position: relative; }
+  .nav-btn { border-radius: 14px; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); position: relative; overflow: hidden; }
+  .nav-btn::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--neon), var(--neon-cyan), var(--neon-pink), transparent); background-size: 200% 100%; opacity: 0; transition: opacity 0.3s ease; animation: navShimmer 3s linear infinite; }
+  .nav-btn.active::after { opacity: 1; }
+  .nav-btn:hover::after { opacity: 0.5; }
+  @keyframes navShimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
   .nav-btn:active { transform: scale(0.92); }
   .nav-btn.active { color: var(--neon); }
   .nav-btn.active .nav-btn-icon-wrap { background: linear-gradient(135deg, rgba(124, 92, 252, 0.2), rgba(0, 229, 204, 0.1)); box-shadow: 0 0 16px rgba(124, 92, 252, 0.3), inset 0 1px 0 rgba(255,255,255,0.1); }
@@ -628,7 +639,14 @@
 <!-- APP -->
 <div id="app">
   <div class="topbar">
-    <div class="topbar-logo mono">LETUCHKA</div>
+    <div class="topbar-logo mono">
+      <svg class="topbar-logo-ship" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M10 1L17 14L13 17L7 17L3 14L10 1Z" fill="url(#shipGrad)" stroke="#00E5CC" stroke-width="0.5"/>
+        <circle cx="10" cy="9" r="2" fill="#00E5CC"/>
+        <defs><linearGradient id="shipGrad" x1="10" y1="1" x2="10" y2="17"><stop stop-color="#7C5CFC"/><stop offset="1" stop-color="#5B3FBC"/></linearGradient></defs>
+      </svg>
+      LETUCHKA
+    </div>
     <div class="topbar-title-badge mono" id="topTitle">ИСКАТЕЛЬ</div>
     <div class="topbar-right">
       <div class="energy-bar" id="energyBar">
