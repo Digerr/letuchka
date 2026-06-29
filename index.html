@@ -8,7 +8,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="app-version" content="1.5.1">
+<meta name="app-version" content="1.5.2">
 <title>LETUCHKA — Прорыв блокады</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1435,22 +1435,6 @@
         <div class="se-sub mono" data-i18n="se_sub"></div>
       </div>
       <div class="se-list">
-        <div class="se-info-card">
-          <div class="se-info-icon">⚙️</div>
-          <div class="se-info-body">
-            <div class="se-info-label" data-i18n="se_version_label"></div>
-            <div class="se-info-value">v<span class="accent" id="seVersionNum">1.5.1</span> · <span data-i18n="se_build"></span></div>
-            <div class="se-info-sub" data-i18n="se_version_sub"></div>
-          </div>
-        </div>
-        <div class="se-info-card dev">
-          <div class="se-info-icon">🛠</div>
-          <div class="se-info-body">
-            <div class="se-info-label" data-i18n="se_dev_label"></div>
-            <div class="se-info-value">made by <span class="accent">SKUFI4</span></div>
-            <div class="se-info-sub" data-i18n="se_dev_sub"></div>
-          </div>
-        </div>
         <div class="se-divider"><span data-i18n="se_prefs"></span></div>
         <div class="se-card">
           <div class="se-info">
@@ -1471,6 +1455,23 @@
           <div class="se-toggle on" id="seVibration" onclick="toggleSetting('vibration', this)"></div>
         </div>
         <button class="se-reset" onclick="resetProgress()" data-i18n="se_reset"></button>
+        <div class="se-divider"><span data-i18n="se_about"></span></div>
+        <div class="se-info-card">
+          <div class="se-info-icon">⚙️</div>
+          <div class="se-info-body">
+            <div class="se-info-label" data-i18n="se_version_label"></div>
+            <div class="se-info-value">v<span class="accent" id="seVersionNum">1.5.2</span> · <span data-i18n="se_build"></span></div>
+            <div class="se-info-sub" data-i18n="se_version_sub"></div>
+          </div>
+        </div>
+        <div class="se-info-card dev">
+          <div class="se-info-icon">🛠</div>
+          <div class="se-info-body">
+            <div class="se-info-label" data-i18n="se_dev_label"></div>
+            <div class="se-info-value">made by <span class="accent">SKUFI4</span></div>
+            <div class="se-info-sub" data-i18n="se_dev_sub"></div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -1596,6 +1597,7 @@
       se_dev_label: 'Разработчик',
       se_dev_sub: 'Капитан корабля · код · арт · геймдизайн',
       se_prefs: 'ПРЕДПОЧТЕНИЯ',
+      se_about: 'О ПРИЛОЖЕНИИ',
       not_enough: 'Недостаточно $PLASMOID',
       purchased: 'Апгрейд куплен',
       maxed: 'Максимальный уровень',
@@ -1733,6 +1735,7 @@
       se_dev_label: 'Developer',
       se_dev_sub: 'Ship captain · code · art · game design',
       se_prefs: 'PREFERENCES',
+      se_about: 'ABOUT',
       not_enough: 'Not enough $PLASMOID',
       purchased: 'Upgrade purchased',
       maxed: 'Max level',
@@ -3944,10 +3947,12 @@
       const offset2 = MN_RING_CIRC * (1 - fillPct2);
       const ringEl2 = document.getElementById('mnRingFg');
       if (ringEl2) ringEl2.setAttribute('stroke-dashoffset', offset2.toFixed(2));
-      // Floating "+X" numbers every 3 seconds
+      // Floating "+X" numbers every 3 seconds — only if there's actual accumulated value
       if (Date.now() - miningLastFloatTime > 3000 && liveProfit > 0) {
         miningLastFloatTime = Date.now();
-        spawnMiningFloat(livePerSec * 3);
+        const floatAmount = livePerSec * 3;
+        // Only spawn if there's something to show (avoid "+0" spam on low-profit farms)
+        if (floatAmount >= 0.01) spawnMiningFloat(floatAmount);
       }
     }, 1000);
   }
@@ -3984,7 +3989,12 @@
     if (!card) return;
     const float = document.createElement('div');
     float.className = 'mn-float-num';
-    float.textContent = '+' + Math.floor(amount).toLocaleString();
+    // Format: show decimals for small amounts (<10), integers for larger
+    let displayText;
+    if (amount < 1) displayText = '+' + amount.toFixed(2);
+    else if (amount < 10) displayText = '+' + amount.toFixed(1);
+    else displayText = '+' + Math.floor(amount).toLocaleString();
+    float.textContent = displayText;
     float.style.left = (38 + Math.random() * 24) + '%';
     float.style.top = '46%';
     card.appendChild(float);
@@ -4306,8 +4316,8 @@
   else { sessionStorage.setItem('vd_entered', '1'); }
 </script>
 
-<!-- Version badge: helps detect stale Telegram cache. If you don't see "v1.5.1" here, you're viewing a cached old version. -->
-<div class="ver-badge" id="verBadge">v1.5.1</div>
+<!-- Version badge: helps detect stale Telegram cache. If you don't see "v1.5.2" here, you're viewing a cached old version. -->
+<div class="ver-badge" id="verBadge">v1.5.2</div>
 
 </body>
 </html>
