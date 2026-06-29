@@ -359,6 +359,19 @@
   .loot-result { font-size: 18px; color: var(--gold); font-weight: 900; margin: 20px 0; padding: 16px; background: rgba(255,179,71,0.1); border-radius: 14px; border: 1px solid rgba(255,179,71,0.3); animation: lootResultPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
   @keyframes lootResultPop { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 
+  /* Plasma balance banner on Home */
+  .plasma-banner { width: 100%; max-width: 540px; padding: 0 14px; margin-bottom: 12px; }
+  .plasma-banner-card { background: linear-gradient(135deg, rgba(0,229,204,0.12) 0%, rgba(124,92,252,0.06) 50%, rgba(10,8,32,0.9) 100%); border: 1px solid rgba(0, 229, 204, 0.3); border-radius: 20px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 8px 24px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05); position: relative; overflow: hidden; }
+  .plasma-banner-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--neon-cyan), var(--neon), transparent); }
+  .plasma-banner-left { display: flex; align-items: center; gap: 12px; }
+  .plasma-banner-icon { width: 44px; height: 44px; border-radius: 14px; background: linear-gradient(135deg, rgba(0,229,204,0.2), rgba(0,229,204,0.05)); border: 1px solid rgba(0,229,204,0.3); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+  .plasma-banner-info { display: flex; flex-direction: column; gap: 2px; }
+  .plasma-banner-label { font-size: 9px; color: #6B7B9F; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; }
+  .plasma-banner-value { font-size: 24px; font-weight: 900; color: var(--neon-cyan); line-height: 1; text-shadow: 0 0 12px rgba(0,229,204,0.3); }
+  .plasma-banner-right { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+  .plasma-banner-rate { font-size: 11px; color: var(--neon); font-weight: 800; }
+  .plasma-banner-rate-label { font-size: 8px; color: #6B7B9F; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+
   /* MINING SCREEN */
   .mn-card { background: linear-gradient(180deg, rgba(20, 16, 46, 0.9) 0%, rgba(10, 8, 32, 0.95) 100%); border: 1px solid rgba(124, 92, 252, 0.15); border-radius: 18px; padding: 16px; margin-bottom: 10px; display: flex; align-items: center; gap: 14px; box-shadow: 0 6px 20px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05); transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); position: relative; overflow: hidden; }
   .mn-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent); }
@@ -732,10 +745,20 @@
   <div class="screens-wrap">
     <!-- HOME -->
     <div id="home" class="screen active">
-      <div class="home-stats">
-        <div class="hs-card"><div class="hs-icon">◈</div><div class="hs-value cyan" id="hsPlasma">0</div><div class="hs-label" data-i18n="hs_plasma"></div></div>
-        <div class="hs-card"><div class="hs-icon">★</div><div class="hs-value gold" id="hsGlory">0</div><div class="hs-label" data-i18n="hs_glory"></div></div>
-        <div class="hs-card"><div class="hs-icon">♛</div><div class="hs-value" id="hsBest">0</div><div class="hs-label" data-i18n="hs_best"></div></div>
+      <div class="plasma-banner">
+        <div class="plasma-banner-card">
+          <div class="plasma-banner-left">
+            <div class="plasma-banner-icon">◈</div>
+            <div class="plasma-banner-info">
+              <div class="plasma-banner-label">$PLASMA</div>
+              <div class="plasma-banner-value" id="pbPlasma">0</div>
+            </div>
+          </div>
+          <div class="plasma-banner-right">
+            <div class="plasma-banner-rate" id="pbRate">+0/ч</div>
+            <div class="plasma-banner-rate-label" data-i18n="pb_rate_label"></div>
+          </div>
+        </div>
       </div>
       <div class="home-launch">
         <button class="launch-btn" onclick="startBattle()">
@@ -1089,7 +1112,8 @@
       ob_title: 'Прорыв<br><em>блокады.</em>',
       ob_sub: 'Ты — капитан ЛЕТУЧКИ. Собирай плазму. Отстреливай дронов Наблюдателей. Прорывайся через блокаду. Чем дольше живёшь — тем больше награда.',
       ob_begin: 'Взлёт',
-      hs_plasma: 'ПЛАЗМА', hs_glory: 'СЛАВА', hs_best: 'РЕКОРД',
+      hs_plasma: '$PLASMA', hs_glory: 'СЛАВА', hs_best: 'РЕКОРД',
+      pb_rate_label: 'ДОХОД/Ч',
       launch: 'ЛЕТЕТЬ',
       nav_home: 'Главная', nav_shipyard: 'Верфь', nav_quests: 'Задания', nav_comms: 'Связь', nav_faq: 'FAQ', nav_settings: 'Настройки',
       joy_hint: 'Веди палец в любом месте — корабль летит за ним',
@@ -1108,13 +1132,13 @@
       se_sound: 'Звук', se_sound_desc: 'Звуковые эффекты',
       se_vibration: 'Вибрация', se_vibration_desc: 'Тактильная отдача',
       se_reset: 'СБРОСИТЬ ПРОГРЕСС',
-      not_enough: 'Недостаточно плазмы',
+      not_enough: 'Недостаточно $PLASMA',
       purchased: 'Апгрейд куплен',
       maxed: 'Максимальный уровень',
       quest_done: 'Задание выполнено',
       chapter_unlocked: 'Глава разблокирована',
       need_referrals: 'Нужно 3 приглашённых капитана',
-      not_enough_stars: 'Недостаточно звёзд',
+      not_enough_stars: 'Недостаточно кристаллов',
       ref_copied: 'Ссылка скопирована',
       ref_invited: 'Новый капитан присоединился!',
       revive_title: 'КОРАБЛЬ ПОВРЕЖДЁН',
@@ -1181,8 +1205,8 @@
         a5: 'Комбо растёт за каждое убийство без перерыва (3 секунды). Чем выше комбо — тем больше плазмы с дронов. На ×10 счётчик становится бирюзовым, на ×20 — розовым. Получил урон = комбо обнуляется!',
         q6: 'Что такое слава и титулы?',
         a6: 'Слава растёт от убийств дронов и времени в рейсе. От неё зависит твой титул: от Искателя до Бога Вселенной (9 титулов). Чем выше титул — тем престижнее. Слава также определяет твой уровень игрока.',
-        q7: 'Зачем нужны звёзды (★)?',
-        a7: 'Звёзды — премиум-валюта. За них можно: воскреснуть после смерти (50★), мгновенно открыть лутбокс (100★). Получаешь за кейсы, достижения и рефералов.',
+        q7: 'Зачем нужны кристаллы (★)?',
+        a7: 'Кристаллы — премиум-валюта. За них можно: воскреснуть после смерти (50★), мгновенно открыть лутбокс (100★). Получаешь за кейсы, достижения и рефералов.',
         q8: 'Что такое модули дрейфа (артефакты)?',
         a8: 'Перед каждым рейсом тебе предлагают 3 случайных модификатора. Каждый даёт бонус и штраф. Например: +100% урон, но -2 HP. Выбирай билд под свой стиль игры. Можно пропустить и играть без модуля.',
         q9: 'Как работают абилки?',
@@ -1215,7 +1239,8 @@
       ob_title: 'Break the<br><em>blockade.</em>',
       ob_sub: 'You are a LETUCHKA captain. Collect plasma. Shoot Watcher drones. Break through the blockade. The longer you survive — the bigger the reward.',
       ob_begin: 'Launch',
-      hs_plasma: 'PLASMA', hs_glory: 'GLORY', hs_best: 'BEST',
+      hs_plasma: '$PLASMA', hs_glory: 'GLORY', hs_best: 'BEST',
+      pb_rate_label: 'INCOME/H',
       launch: 'LAUNCH',
       nav_home: 'Home', nav_shipyard: 'Shipyard', nav_quests: 'Quests', nav_comms: 'Comms', nav_faq: 'FAQ', nav_settings: 'Settings',
       joy_hint: 'Drag finger anywhere — ship follows',
@@ -1234,13 +1259,13 @@
       se_sound: 'Sound', se_sound_desc: 'Sound effects',
       se_vibration: 'Vibration', se_vibration_desc: 'Haptic feedback',
       se_reset: 'RESET PROGRESS',
-      not_enough: 'Not enough plasma',
+      not_enough: 'Not enough $PLASMA',
       purchased: 'Upgrade purchased',
       maxed: 'Max level',
       quest_done: 'Quest completed',
       chapter_unlocked: 'Chapter unlocked',
       need_referrals: 'Need 3 invited captains',
-      not_enough_stars: 'Not enough stars',
+      not_enough_stars: 'Not enough crystals',
       ref_copied: 'Link copied',
       ref_invited: 'New captain joined!',
       revive_title: 'SHIP DAMAGED',
@@ -1307,8 +1332,8 @@
         a5: 'Combo grows with each kill without a break (3 seconds). Higher combo = more plasma per drone. At ×10 the counter turns teal, at ×20 — pink. Take damage = combo resets to zero!',
         q6: 'What are glory and titles?',
         a6: 'Glory grows from drone kills and survival time. It determines your title: from Seeker to God of Universe (9 titles). Higher title = more prestige. Glory also determines your player level.',
-        q7: 'What are stars (★) for?',
-        a7: 'Stars are premium currency. Use them to: revive after death (50★), instantly open a lootbox (100★). Earned from cases, achievements, and referrals.',
+        q7: 'What are crystals (★) for?',
+        a7: 'Crystals are premium currency. Use them to: revive after death (50★), instantly open a lootbox (100★). Earned from cases, achievements, and referrals.',
         q8: 'What are drift modules (artifacts)?',
         a8: 'Before each run you choose 1 of 3 random modifiers. Each gives a bonus and a penalty. For example: +100% damage, but -2 HP. Pick a build that suits your playstyle. You can skip and play without a module.',
         q9: 'How do abilities work?',
@@ -1595,10 +1620,9 @@
 
   function renderHome() {
     const s = getState();
-    document.getElementById('hsPlasma').textContent = Math.floor(s.plasma);
-    document.getElementById('hsGlory').textContent = s.glory;
-    document.getElementById('hsBest').textContent = s.bestRun;
-    document.getElementById('topTitle').textContent = getTitle().toUpperCase();
+    document.getElementById('pbPlasma').textContent = Math.floor(s.plasma).toLocaleString();
+    document.getElementById('pbRate').textContent = '+' + getMiningTotalProfit().toLocaleString() + '/ч';
+    document.getElementById('topLevel').textContent = getLevel(s).level;
     document.getElementById('starsCount').textContent = s.stars;
     // Show first unclaimed daily quest as mission
     const unclaimed = DAILY_QUESTS.find(q => !s.dailyClaimed.includes(q.id));
