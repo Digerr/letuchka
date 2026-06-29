@@ -8,7 +8,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="app-version" content="1.5.2">
+<meta name="app-version" content="1.6.0">
 <title>LETUCHKA — Прорыв блокады</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1055,7 +1055,7 @@
       </div>
       <div class="topbar-pill topbar-pill-stars">
         <span class="topbar-pill-icon">★</span>
-        <span class="topbar-pill-value mono" id="starsCount">50</span>
+        <span class="topbar-pill-value mono" id="starsCount">0</span>
       </div>
       <div class="topbar-pill topbar-pill-energy" id="energyBar">
         <span class="topbar-pill-icon">⚡</span>
@@ -1460,7 +1460,7 @@
           <div class="se-info-icon">⚙️</div>
           <div class="se-info-body">
             <div class="se-info-label" data-i18n="se_version_label"></div>
-            <div class="se-info-value">v<span class="accent" id="seVersionNum">1.5.2</span> · <span data-i18n="se_build"></span></div>
+            <div class="se-info-value">v<span class="accent" id="seVersionNum">1.6.0</span> · <span data-i18n="se_build"></span></div>
             <div class="se-info-sub" data-i18n="se_version_sub"></div>
           </div>
         </div>
@@ -1691,15 +1691,15 @@
         q15: 'Что такое Майнинг-ферма?',
         a15: 'Вкладка «Майнинг» — это пассивный доход. Ты покупаешь модули (спутник, шахта, завод, чёрная дыра, квазар) за $PLASMOID. Каждый модуль генерирует $PLASMOID каждый час, даже когда ты не в игре. Накопленное нужно собирать кнопкой «СОБРАТЬ». Чем больше модулей — тем больше пассивный доход.',
         q16: 'Что такое энергия?',
-        a16: 'Энергия нужна для рейдов (боёв). У тебя 5 энергии максимум. Каждый рейд тратит 1 энергию. 1 энергия восстанавливается каждые 10 минут. Нет энергии — нельзя летать. Энергия накапливается даже когда ты не в игре.',
+        a16: 'Энергия нужна для рейдов (боёв). У тебя 5 энергии максимум. Каждый рейд тратит 1 энергию. 1 энергия восстанавливается каждые 30 минут (полное восстановление — 2.5 часа). Нет энергии — нельзя летать. Энергия накапливается даже когда ты не в игре.',
         q17: 'Когда листинг $PLASMOID?',
         a17: 'Листинг $PLASMOID на биржах запланирован на Q4 2026. Точная дата будет объявлена в канале. До листинга $PLASMOID — внутриигровая валюта. После листинга — торгуемый токен, который можно будет обменять на TON.',
         q18: 'Какой курс обмена $PLASMOID на TON?',
-        a18: 'Фиксированный курс: 100,000 $PLASMOID = 1 TON. Калькулятор доступен в Профиле → вкладка «Конвертер». Там видно сколько TON стоит твой текущий баланс. Конвертация будет доступна после листинга.',
+        a18: 'Точный курс обмена $PLASMOID на TON будет определён на момент листинга в Q4 2026. Предварительная оценка: ~10,000,000 $PLASMOID = 1 TON. Калькулятор доступен в Профиле → вкладка «Конвертер». Конвертация будет доступна после листинга.',
         q19: 'Что такое Airdrop?',
         a19: 'Airdrop — раздача $PLASMOID держателям перед листингом. Чтобы участвовать: выполни 5 заданий во вкладке «Airdrop» (подписка на канал, приглашение друзей, рейды, апгрейды, убийство босса) и привяжи TON-кошелёк (привязка будет доступна позже).',
         q20: 'Где что тратить — шпаргалка',
-        a20: '◈ $PLASMOID (игровая):\n• Апгрейды корабля в Верфи (радиус, скорострельность, урон, скорость, HP, щит)\n• Модули майнинг-фермы (спутник, шахта, завод и т.д.)\n\n★ Кристаллы (премиум):\n• Воскрешение после смерти (50★)\n• Мгновенное открытие лутбокса (100★)\n\n⚡ Энергия:\n• 1 рейд = 1 энергия, 5 максимум, 1/10мин\n\nКристаллы НЕ покупаются за $PLASMOID и наоборот. Это две независимые валюты.'
+        a20: '◈ $PLASMOID (игровая):\n• Апгрейды корабля в Верфи (радиус, скорострельность, урон, скорость, HP, щит)\n• Модули майнинг-фермы (спутник, шахта, завод и т.д.)\n\n★ Кристаллы (премиум):\n• Воскрешение после смерти (50★)\n• Мгновенное открытие лутбокса (100★)\n\n⚡ Энергия:\n• 1 рейд = 1 энергия, 5 максимум, 1/30мин\n\nКристаллы НЕ покупаются за $PLASMOID и наоборот. Это две независимые валюты.'
       }
     },
     en: {
@@ -1829,15 +1829,15 @@
         q15: 'What is the Mining farm?',
         a15: 'The "Mining" tab is passive income. You buy modules (satellite, mine, plant, black hole, quasar) with $PLASMOID. Each module generates $PLASMOID every hour, even when you are not playing. Accumulated plasmoid must be collected with the "COLLECT" button. More modules = more passive income.',
         q16: 'What is energy?',
-        a16: 'Energy is needed for raids (battles). You have 5 energy max. Each raid costs 1 energy. 1 energy regenerates every 10 minutes. No energy = no flying. Energy accumulates even when you are offline.',
+        a16: 'Energy is needed for raids (battles). You have 5 energy max. Each raid costs 1 energy. 1 energy regenerates every 30 minutes (full recharge takes 2.5 hours). No energy = no flying. Energy accumulates even when you are offline.',
         q17: 'When is the $PLASMOID listing?',
         a17: '$PLASMOID listing on exchanges is planned for Q4 2026. The exact date will be announced in the channel. Before listing, $PLASMOID is an in-game currency. After listing — a tradeable token that can be exchanged for TON.',
         q18: 'What is the $PLASMOID to TON exchange rate?',
-        a18: 'Fixed rate: 100,000 $PLASMOID = 1 TON. Calculator available in Profile → "Converter" tab. There you can see how much TON your current balance is worth. Conversion will be available after listing.',
+        a18: 'The exact $PLASMOID to TON exchange rate will be determined at listing in Q4 2026. Preliminary estimate: ~10,000,000 $PLASMOID = 1 TON. Calculator available in Profile → "Converter" tab. Conversion will be available after listing.',
         q19: 'What is the Airdrop?',
         a19: 'Airdrop is a $PLASMOID distribution to holders before listing. To participate: complete 5 tasks in the "Airdrop" tab (subscribe to channel, invite friends, raids, upgrades, kill a boss) and link your TON wallet (linking will be available later).',
         q20: 'Spending cheat sheet',
-        a20: '◈ $PLASMOID (in-game):\n• Ship upgrades in Shipyard (radius, fire rate, damage, speed, HP, shield)\n• Mining farm modules (satellite, mine, plant, etc.)\n\n★ Crystals (premium):\n• Revive after death (50★)\n• Instant lootbox opening (100★)\n\n⚡ Energy:\n• 1 raid = 1 energy, 5 max, 1/10min\n\nCrystals CANNOT be bought with $PLASMOID and vice versa. These are two independent currencies.'
+        a20: '◈ $PLASMOID (in-game):\n• Ship upgrades in Shipyard (radius, fire rate, damage, speed, HP, shield)\n• Mining farm modules (satellite, mine, plant, etc.)\n\n★ Crystals (premium):\n• Revive after death (50★)\n• Instant lootbox opening (100★)\n\n⚡ Energy:\n• 1 raid = 1 energy, 5 max, 1/30min\n\nCrystals CANNOT be bought with $PLASMOID and vice versa. These are two independent currencies.'
       }
     }
   };
@@ -1883,18 +1883,18 @@
 
   // ============ DATA ============
   const UPGRADES = [
-    { id: 'radius', icon: '🎯', name: { ru: 'Радиус добычи', en: 'Collect Radius' }, desc: { ru: 'Дальность сбора плазмоида', en: 'Plasmoid pickup range' }, maxLevel: 5, baseCost: 200, costMult: 1.8 },
-    { id: 'fireRate', icon: '⚡', name: { ru: 'Скорострельность', en: 'Fire Rate' }, desc: { ru: 'Частота выстрелов', en: 'Shoot frequency' }, maxLevel: 5, baseCost: 300, costMult: 1.9 },
-    { id: 'damage', icon: '💥', name: { ru: 'Урон лазера', en: 'Laser Damage' }, desc: { ru: 'Урон по дронам', en: 'Damage per shot' }, maxLevel: 5, baseCost: 400, costMult: 2.0 },
-    { id: 'speed', icon: '🚀', name: { ru: 'Скорость корабля', en: 'Ship Speed' }, desc: { ru: 'Скорость движения', en: 'Movement speed' }, maxLevel: 5, baseCost: 250, costMult: 1.8 },
-    { id: 'maxHp', icon: '❤️', name: { ru: 'Прочность корпуса', en: 'Hull Strength' }, desc: { ru: 'Максимальное HP', en: 'Max HP' }, maxLevel: 3, baseCost: 1000, costMult: 2.5 },
-    { id: 'shield', icon: '🛡', name: { ru: 'Энергощит', en: 'Energy Shield' }, desc: { ru: 'Защита от 1 удара за рейс', en: 'Block 1 hit per run' }, maxLevel: 1, baseCost: 5000, costMult: 1 }
+    { id: 'radius', icon: '🎯', name: { ru: 'Радиус добычи', en: 'Collect Radius' }, desc: { ru: 'Дальность сбора плазмоида', en: 'Plasmoid pickup range' }, maxLevel: 5, baseCost: 800, costMult: 1.8 },
+    { id: 'fireRate', icon: '⚡', name: { ru: 'Скорострельность', en: 'Fire Rate' }, desc: { ru: 'Частота выстрелов', en: 'Shoot frequency' }, maxLevel: 5, baseCost: 1200, costMult: 1.9 },
+    { id: 'damage', icon: '💥', name: { ru: 'Урон лазера', en: 'Laser Damage' }, desc: { ru: 'Урон по дронам', en: 'Damage per shot' }, maxLevel: 5, baseCost: 1600, costMult: 2.0 },
+    { id: 'speed', icon: '🚀', name: { ru: 'Скорость корабля', en: 'Ship Speed' }, desc: { ru: 'Скорость движения', en: 'Movement speed' }, maxLevel: 5, baseCost: 1000, costMult: 1.8 },
+    { id: 'maxHp', icon: '❤️', name: { ru: 'Прочность корпуса', en: 'Hull Strength' }, desc: { ru: 'Максимальное HP', en: 'Max HP' }, maxLevel: 3, baseCost: 3500, costMult: 2.5 },
+    { id: 'shield', icon: '🛡', name: { ru: 'Энергощит', en: 'Energy Shield' }, desc: { ru: 'Защита от 1 удара за рейс', en: 'Block 1 hit per run' }, maxLevel: 1, baseCost: 15000, costMult: 1 }
   ];
 
   const DAILY_QUESTS = [
-    { id: 'd1', icon: '◈', text: { ru: 'Собери 500 плазмоида', en: 'Collect 500 plasmoid' }, target: 500, type: 'plasmoid', reward: { type: 'plasmoid', amount: 200 } },
-    { id: 'd2', icon: '💀', text: { ru: 'Убей 20 дронов', en: 'Kill 20 drones' }, target: 20, type: 'kills', reward: { type: 'plasmoid', amount: 300 } },
-    { id: 'd3', icon: '⏱', text: { ru: 'Проживи 60 секунд в рейсе', en: 'Survive 60 seconds' }, target: 60, type: 'time', reward: { type: 'stars', amount: 5 } }
+    { id: 'd1', icon: '◈', text: { ru: 'Собери 2000 плазмоида', en: 'Collect 2000 plasmoid' }, target: 2000, type: 'plasmoid', reward: { type: 'plasmoid', amount: 500 } },
+    { id: 'd2', icon: '💀', text: { ru: 'Убей 50 дронов', en: 'Kill 50 drones' }, target: 50, type: 'kills', reward: { type: 'plasmoid', amount: 500 } },
+    { id: 'd3', icon: '⏱', text: { ru: 'Проживи 3 минуты в рейсе', en: 'Survive 3 minutes' }, target: 180, type: 'time', reward: { type: 'stars', amount: 20 } }
   ];
   const WEEKLY_QUESTS = [
     { id: 'w1', icon: '🚀', text: { ru: '10 рейсов за неделю', en: '10 runs this week' }, target: 10, type: 'runs', reward: { type: 'plasmoid', amount: 3000 } },
@@ -1902,10 +1902,10 @@
     { id: 'w3', icon: '◈', text: { ru: '5000 плазмоида', en: '5000 plasmoid' }, target: 5000, type: 'plasmoid', reward: { type: 'stars', amount: 50 } }
   ];
   const STORY_QUESTS = [
-    { id: 's1', icon: '🚀', text: { ru: 'Соверши первый вылет', en: 'First launch' }, target: 1, type: 'runs', reward: { type: 'plasmoid', amount: 100 } },
-    { id: 's2', icon: '💀', text: { ru: 'Убей первого дрона', en: 'Kill first drone' }, target: 1, type: 'kills', reward: { type: 'plasmoid', amount: 100 } },
-    { id: 's3', icon: '🛠', text: { ru: 'Купи первый апгрейд', en: 'Buy first upgrade' }, target: 1, type: 'upgrades', reward: { type: 'plasmoid', amount: 200 } },
-    { id: 's4', icon: '⏱', text: { ru: 'Проживи 90 секунд', en: 'Survive 90 seconds' }, target: 90, type: 'time', reward: { type: 'plasmoid', amount: 500 } },
+    { id: 's1', icon: '🚀', text: { ru: 'Соверши первый вылет', en: 'First launch' }, target: 1, type: 'runs', reward: { type: 'stars', amount: 10 } },
+    { id: 's2', icon: '💀', text: { ru: 'Убей первого дрона', en: 'Kill first drone' }, target: 1, type: 'kills', reward: { type: 'stars', amount: 10 } },
+    { id: 's3', icon: '🛠', text: { ru: 'Купи первый апгрейд', en: 'Buy first upgrade' }, target: 1, type: 'upgrades', reward: { type: 'stars', amount: 10 } },
+    { id: 's4', icon: '⏱', text: { ru: 'Проживи 90 секунд', en: 'Survive 90 seconds' }, target: 90, type: 'time', reward: { type: 'stars', amount: 20 } },
     { id: 's5', icon: '⭐', text: { ru: 'Достигни 5000 славы', en: 'Reach 5000 glory' }, target: 5000, type: 'glory', reward: { type: 'stars', amount: 100 } }
   ];
 
@@ -1952,7 +1952,7 @@
   function getState() {
     return {
       plasmoid: parseFloat(localStorage.getItem('vd_plasma') || '0'),
-      stars: parseInt(localStorage.getItem('vd_stars') || '50'),
+      stars: parseInt(localStorage.getItem('vd_stars') || '0'),
       glory: parseInt(localStorage.getItem('vd_glory') || '0'),
       bestRun: parseInt(localStorage.getItem('vd_best') || '0'),
       totalRuns: parseInt(localStorage.getItem('vd_runs') || '0'),
@@ -3785,12 +3785,12 @@
 
   // ============ MINING + ENERGY + AIRDROP ============
   const MINING_MODULES = [
-    { id: 'm1', icon: '🛰', name: { ru: 'Спутник-ретранслятор', en: 'Relay Satellite' }, desc: { ru: 'Базовый спутник на орбите', en: 'Basic orbiting satellite' }, profit: 50, cost: 500, maxLevel: 10, costMult: 1.6 },
-    { id: 'm2', icon: '⛏', name: { ru: 'Шахта на астероиде', en: 'Asteroid Mine' }, desc: { ru: 'Добыча на астероидах', en: 'Mining on asteroids' }, profit: 200, cost: 2500, maxLevel: 10, costMult: 1.7 },
-    { id: 'm3', icon: '🏭', name: { ru: 'Завод плазмоида', en: 'Plasmoid Plant' }, desc: { ru: 'Промышленная переработка', en: 'Industrial processing' }, profit: 800, cost: 12000, maxLevel: 10, costMult: 1.8 },
-    { id: 'm4', icon: '🔆', name: { ru: 'Солнечный сборщик', en: 'Solar Harvester' }, desc: { ru: 'Энергия из звёзд', en: 'Energy from stars' }, profit: 3000, cost: 60000, maxLevel: 10, costMult: 1.9 },
-    { id: 'm5', icon: '🕳', name: { ru: 'Чёрная дыра', en: 'Black Hole Tap' }, desc: { ru: 'Энергия из сингулярности', en: 'Energy from singularity' }, profit: 12000, cost: 300000, maxLevel: 10, costMult: 2.0 },
-    { id: 'm6', icon: '🌌', name: { ru: 'Квазар-ядро', en: 'Quasar Core' }, desc: { ru: 'Древняя энергия галактики', en: 'Ancient galaxy energy' }, profit: 50000, cost: 1500000, maxLevel: 10, costMult: 2.1 }
+    { id: 'm1', icon: '🛰', name: { ru: 'Спутник-ретранслятор', en: 'Relay Satellite' }, desc: { ru: 'Базовый спутник на орбите', en: 'Basic orbiting satellite' }, profit: 12, cost: 500, maxLevel: 10, costMult: 1.6 },
+    { id: 'm2', icon: '⛏', name: { ru: 'Шахта на астероиде', en: 'Asteroid Mine' }, desc: { ru: 'Добыча на астероидах', en: 'Mining on asteroids' }, profit: 35, cost: 2500, maxLevel: 10, costMult: 1.7 },
+    { id: 'm3', icon: '🏭', name: { ru: 'Завод плазмоида', en: 'Plasmoid Plant' }, desc: { ru: 'Промышленная переработка', en: 'Industrial processing' }, profit: 90, cost: 12000, maxLevel: 10, costMult: 1.8 },
+    { id: 'm4', icon: '🔆', name: { ru: 'Солнечный сборщик', en: 'Solar Harvester' }, desc: { ru: 'Энергия из звёзд', en: 'Energy from stars' }, profit: 220, cost: 60000, maxLevel: 10, costMult: 1.9 },
+    { id: 'm5', icon: '🕳', name: { ru: 'Чёрная дыра', en: 'Black Hole Tap' }, desc: { ru: 'Энергия из сингулярности', en: 'Energy from singularity' }, profit: 550, cost: 300000, maxLevel: 10, costMult: 2.0 },
+    { id: 'm6', icon: '🌌', name: { ru: 'Квазар-ядро', en: 'Quasar Core' }, desc: { ru: 'Древняя энергия галактики', en: 'Ancient galaxy energy' }, profit: 1300, cost: 1500000, maxLevel: 10, costMult: 2.1 }
   ];
 
   const AIRDROP_TASKS = [
@@ -3826,7 +3826,7 @@
   let miningLastFloatTime = 0;
   let miningParticlesSpawned = false;
   const MN_RING_CIRC = 2 * Math.PI * 92; // ≈ 578.05
-  const MN_RING_CAP_HOURS = 4; // ring fills up over 4h of uncollected plasmoid
+  const MN_RING_CAP_HOURS = 2; // ring fills up over 2h of uncollected plasmoid (was 4h — stricter cap to keep mining as supplement, not replacement for combat)
   function renderMining() {
     const s = getState();
     const totalProfit = getMiningTotalProfit();
@@ -4088,7 +4088,7 @@
   }
 
   // ============ ENERGY SYSTEM ============
-  const ENERGY_REGEN_MS = 10 * 60 * 1000; // 10 minutes per energy
+  const ENERGY_REGEN_MS = 30 * 60 * 1000; // 30 minutes per energy (was 10 min — full recharge 2.5h, prevents unlimited play)
   function checkEnergyRegen() {
     const s = getState();
     const now = Date.now();
@@ -4186,7 +4186,7 @@
   }
 
   // ============ PROFILE + LEVEL + CONVERTER ============
-  const PLASMOID_TO_TON_RATE = 100000; // 100,000 $PLASMOID = 1 TON
+  const PLASMOID_TO_TON_RATE = 10000000; // 10,000,000 $PLASMOID = 1 TON (was 100K — old rate was economically unviable, would mean $2-3/h passive income on quasar)
   const ACHIEVEMENTS = [
     { id: 'first_blood', icon: '🩸', name: { ru: 'Первая кровь', en: 'First Blood' }, cond: s => s.totalKills >= 1 },
     { id: 'kills_100', icon: '💀', name: { ru: '100 дронов', en: '100 Kills' }, cond: s => s.totalKills >= 100 },
@@ -4316,8 +4316,8 @@
   else { sessionStorage.setItem('vd_entered', '1'); }
 </script>
 
-<!-- Version badge: helps detect stale Telegram cache. If you don't see "v1.5.2" here, you're viewing a cached old version. -->
-<div class="ver-badge" id="verBadge">v1.5.2</div>
+<!-- Version badge: helps detect stale Telegram cache. If you don't see "v1.6.0" here, you're viewing a cached old version. -->
+<div class="ver-badge" id="verBadge">v1.6.0</div>
 
 </body>
 </html>
