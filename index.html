@@ -784,7 +784,6 @@
           <div class="bh-card"><span class="bh-timer" id="bhTimer">0:00</span></div>
         </div>
       </div>
-      <button class="battle-pause" onclick="pauseBattle()">⏸</button>
       <div class="threat-indicator" id="threatIndicator"></div>
       <div id="comboDisplay" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:48px;font-weight:900;color:var(--gold);text-shadow:0 0 24px rgba(255,179,71,0.6);opacity:0;transition:opacity 0.3s ease;pointer-events:none;z-index:5;font-family:'SF Mono',monospace;"></div>
       <div class="battle-abilities">
@@ -1181,7 +1180,7 @@
         q5: 'Что такое комбо и как его растить?',
         a5: 'Комбо растёт за каждое убийство без перерыва (3 секунды). Чем выше комбо — тем больше плазмы с дронов. На ×10 счётчик становится бирюзовым, на ×20 — розовым. Получил урон = комбо обнуляется!',
         q6: 'Что такое слава и титулы?',
-        a6: 'Слава растёт от убийств дронов и времени в рейсе. От неё зависит твой титул: от Искателя до Бога Вселенной (9 титулов). Чем выше титул — тем престижнее.',
+        a6: 'Слава растёт от убийств дронов и времени в рейсе. От неё зависит твой титул: от Искателя до Бога Вселенной (9 титулов). Чем выше титул — тем престижнее. Слава также определяет твой уровень игрока.',
         q7: 'Зачем нужны звёзды (★)?',
         a7: 'Звёзды — премиум-валюта. За них можно: воскреснуть после смерти (50★), мгновенно открыть лутбокс (100★). Получаешь за кейсы, достижения и рефералов.',
         q8: 'Что такое модули дрейфа (артефакты)?',
@@ -1196,8 +1195,20 @@
         a12: 'Лутбоксы выпадают из золотых дронов (появляются каждые 45-75 сек) и из боссов (3 штуки). Открываешь в Верфи: бесплатно через 3 часа или мгновенно за 100★. Внутри: плазма, звёзды или скин корабля.',
         q13: 'Зачем приглашать друзей?',
         a13: '3 приглашённых капитана разблокируют 4-й и 5-й уровни апгрейдов в Верфи. Без рефералов ты не сможешь прокачать корабль до максимума. Делись ссылкой в разделе «Флот».',
-        q14: 'Советы новичку',
-        a14: '1. Сначала прокачай Радиус добычи — будешь собирать плазму быстрее.\n2. Потом Скорострельность — выживешь дольше.\n3. Не пытайся собрать всю плазму — иногда лучше уворачиваться.\n4. Используй абилки! Они бесплатны и спасают жизнь.\n5. Строй комбо — больше плазмы с каждого дрона.\n6. Заходи каждый день за стриком — награды растут.\n7. Выбирай артефакт под ситуацию: «Танк» для выживания, «Берсерк» для урона.'
+        q14: 'Что такое $PLASMA?',
+        a14: '$PLASMA — внутриигровой токен. Ты добываешь его двумя способами: активно (в бою — собираешь кристаллы) и пассивно (на Майнинг-ферме — модули генерируют $PLASMA каждый час). $PLASMA тратится на апгрейды корабля и модули майнинга.',
+        q15: 'Что такое Майнинг-ферма?',
+        a15: 'Вкладка «Майнинг» — это пассивный доход. Ты покупаешь модули (спутник, шахта, завод, чёрная дыра, квазар) за $PLASMA. Каждый модуль генерирует $PLASMA каждый час, даже когда ты не в игре. Накопленное нужно собирать кнопкой «СОБРАТЬ».',
+        q16: 'Что такое энергия?',
+        a16: 'Энергия нужна для рейдов (боёв). У тебя 5 энергии максимум. Каждый рейд тратит 1 энергию. 1 энергия восстанавливается каждые 10 минут. Нет энергии — нельзя летать. Энергия накапливается даже когда ты не в игре.',
+        q17: 'Когда листинг $PLASMA?',
+        a17: 'Листинг $PLASMA на биржах запланирован на Q4 2026. Точная дата будет объявлена в канале. До листинга $PLASMA — внутриигровая валюта. После листинга — торгуемый токен, который можно будет обменять на TON.',
+        q18: 'Какой курс обмена $PLASMA на TON?',
+        a18: 'Фиксированный курс: 100,000 $PLASMA = 1 TON. Калькулятор доступен в Профиле → вкладка «Конвертер». Там видно сколько TON стоит твой текущий баланс. Конвертация будет доступна после листинга.',
+        q19: 'Что такое Airdrop?',
+        a19: 'Airdrop — раздача $PLASMA держателям перед листингом. Чтобы участвовать: выполни 5 заданий во вкладке «Airdrop» (подписка на канал, приглашение друзей, рейды, апгрейды, убийство босса) и привяжи TON-кошелёк (привязка будет доступна позже).',
+        q20: 'Советы новичку',
+        a20: '1. Сначала прокачай Радиус добычи — будешь собирать плазму быстрее.\n2. Потом Скорострельность — выживешь дольше.\n3. Не пытайся собрать всю плазму — иногда лучше уворачиваться.\n4. Используй абилки! Они бесплатны и спасают жизнь.\n5. Строй комбо — больше плазмы с каждого дрона.\n6. Заходи каждый день за стриком — награды растут.\n7. Покупай модули майнинга — пассивный доход работает 24/7.\n8. Выбирай артефакт под ситуацию: «Танк» для выживания, «Берсерк» для урона.'
       }
     },
     en: {
@@ -1295,7 +1306,7 @@
         q5: 'What is combo and how to build it?',
         a5: 'Combo grows with each kill without a break (3 seconds). Higher combo = more plasma per drone. At ×10 the counter turns teal, at ×20 — pink. Take damage = combo resets to zero!',
         q6: 'What are glory and titles?',
-        a6: 'Glory grows from drone kills and survival time. It determines your title: from Seeker to God of Universe (9 titles). Higher title = more prestige.',
+        a6: 'Glory grows from drone kills and survival time. It determines your title: from Seeker to God of Universe (9 titles). Higher title = more prestige. Glory also determines your player level.',
         q7: 'What are stars (★) for?',
         a7: 'Stars are premium currency. Use them to: revive after death (50★), instantly open a lootbox (100★). Earned from cases, achievements, and referrals.',
         q8: 'What are drift modules (artifacts)?',
@@ -1310,8 +1321,20 @@
         a12: 'Lootboxes drop from golden drones (appear every 45-75 sec) and from bosses (3 each). Open in Shipyard: free after 3 hours or instantly for 100★. Inside: plasma, stars, or ship skin.',
         q13: 'Why invite friends?',
         a13: '3 invited captains unlock upgrade levels 4 and 5 in the Shipyard. Without referrals you cannot max out your ship. Share your link in the "Fleet" section.',
-        q14: 'Tips for beginners',
-        a14: '1. Upgrade Collect Radius first — collect plasma faster.\n2. Then Fire Rate — survive longer.\n3. Don\'t try to collect all plasma — sometimes better to dodge.\n4. Use abilities! They\'re free and save lives.\n5. Build combo — more plasma per drone.\n6. Come back daily for streak — rewards grow.\n7. Pick artifact for the situation: "Tank" for survival, "Berserker" for damage.'
+        q14: 'What is $PLASMA?',
+        a14: '$PLASMA is the in-game token. You earn it two ways: actively (in battle — collect crystals) and passively (on the Mining farm — modules generate $PLASMA every hour). $PLASMA is spent on ship upgrades and mining modules.',
+        q15: 'What is the Mining farm?',
+        a15: 'The "Mining" tab is passive income. You buy modules (satellite, mine, plant, black hole, quasar) with $PLASMA. Each module generates $PLASMA every hour, even when you are not playing. Accumulated plasma must be collected with the "COLLECT" button.',
+        q16: 'What is energy?',
+        a16: 'Energy is needed for raids (battles). You have 5 energy max. Each raid costs 1 energy. 1 energy regenerates every 10 minutes. No energy = no flying. Energy accumulates even when you are offline.',
+        q17: 'When is the $PLASMA listing?',
+        a17: '$PLASMA listing on exchanges is planned for Q4 2026. The exact date will be announced in the channel. Before listing, $PLASMA is an in-game currency. After listing — a tradeable token that can be exchanged for TON.',
+        q18: 'What is the $PLASMA to TON exchange rate?',
+        a18: 'Fixed rate: 100,000 $PLASMA = 1 TON. Calculator available in Profile → "Converter" tab. There you can see how much TON your current balance is worth. Conversion will be available after listing.',
+        q19: 'What is the Airdrop?',
+        a19: 'Airdrop is a $PLASMA distribution to holders before listing. To participate: complete 5 tasks in the "Airdrop" tab (subscribe to channel, invite friends, raids, upgrades, kill a boss) and link your TON wallet (linking will be available later).',
+        q20: 'Tips for beginners',
+        a20: '1. Upgrade Collect Radius first — collect plasma faster.\n2. Then Fire Rate — survive longer.\n3. Don\'t try to collect all plasma — sometimes better to dodge.\n4. Use abilities! They\'re free and save lives.\n5. Build combo — more plasma per drone.\n6. Come back daily for streak — rewards grow.\n7. Buy mining modules — passive income works 24/7.\n8. Pick artifact for the situation: "Tank" for survival, "Berserker" for damage.'
       }
     }
   };
@@ -2168,7 +2191,8 @@
         return true;
       });
 
-      // Update particles
+      // Update particles — limit max count to prevent GC freezes
+      if (this.particles.length > 80) this.particles = this.particles.slice(-80);
       this.particles = this.particles.filter(p => { p.x += p.vx; p.y += p.vy; p.life -= 0.03; p.vx *= 0.95; p.vy *= 0.95; return p.life > 0; });
 
       // COMBO: countdown timer
@@ -2234,6 +2258,8 @@
       }
     }
     updateAbilityUI() {
+      this._abTimer = (this._abTimer || 0) + 1;
+      if (this._abTimer % 6 !== 0) return; // ~100ms
       ['emp', 'boost', 'magnet'].forEach(ab => {
         const btn = document.getElementById('ab' + ab.charAt(0).toUpperCase() + ab.slice(1));
         const cd = document.getElementById('ab' + ab.charAt(0).toUpperCase() + ab.slice(1) + 'Cd');
@@ -2257,7 +2283,7 @@
       for (let i = 0; i < 5; i++) html += `<div class="ti-dot ${i <= this.threatLevel ? 'active' : ''}"></div>`;
       ti.innerHTML = html;
     }
-    spawnExplosion(x, y, color) { for (let i = 0; i < 15; i++) { const a = (i / 15) * Math.PI * 2; this.particles.push({ x, y, vx: Math.cos(a) * (1 + Math.random() * 3), vy: Math.sin(a) * (1 + Math.random() * 3), life: 1, color, size: 3 }); } }
+    spawnExplosion(x, y, color) { for (let i = 0; i < 10; i++) { const a = (i / 10) * Math.PI * 2; this.particles.push({ x, y, vx: Math.cos(a) * (1 + Math.random() * 3), vy: Math.sin(a) * (1 + Math.random() * 3), life: 1, color, size: 3 }); } }
     spawnCollectEffect(x, y) { for (let i = 0; i < 6; i++) { const a = (i / 6) * Math.PI * 2; this.particles.push({ x, y, vx: Math.cos(a) * 0.5, vy: Math.sin(a) * 0.5, life: 1, color: '#00E5CC', size: 2 }); } }
     endBattle() {
       // Guard: prevent multiple calls in the same frame
@@ -2331,6 +2357,9 @@
       switchScreen('gameover');
     }
     updateHUD() {
+      // Throttle DOM updates to every 100ms to prevent layout thrashing
+      this._hudTimer = (this._hudTimer || 0) + 1;
+      if (this._hudTimer % 6 !== 0) return; // ~100ms at 60fps
       document.getElementById('bhPlasma').textContent = this.plasmaCollected;
       document.getElementById('bhKills').textContent = this.kills;
       document.getElementById('bhTimer').textContent = formatTime(this.elapsedTime);
@@ -2889,7 +2918,7 @@
   // ============ FAQ ============
   function renderFAQ() {
     const list = document.getElementById('fqList');
-    const items = ['q1','q2','q3','q4','q5','q6','q7','q8','q9','q10','q11','q12','q13','q14'];
+    const items = ['q1','q2','q3','q4','q5','q6','q7','q8','q9','q10','q11','q12','q13','q14','q15','q16','q17','q18','q19','q20'];
     list.innerHTML = items.map((q, i) => `<div class="fq-item" id="fq${i}" onclick="toggleFAQ(${i})"><div class="fq-q"><span>${I18N[currentLang].faq[q]}</span><span class="fq-q-arrow">▼</span></div><div class="fq-a">${I18N[currentLang].faq['a' + q.slice(1)].replace(/\n/g, '<br>')}</div></div>`).join('');
   }
   function toggleFAQ(i) { document.getElementById('fq' + i).classList.toggle('open'); }
@@ -2944,6 +2973,8 @@
       }
       // Request vertical swipes to be disabled for game canvas
       if (tg.disableVerticalSwipes) tg.disableVerticalSwipes();
+      // Update avatar after TG data is loaded
+      setTimeout(() => updateTopbarAvatar(), 100);
     }
   }
   function tgHaptic(type) {
@@ -3394,13 +3425,13 @@
     const lvl = getLevel(s);
     document.getElementById('topLevel').textContent = lvl.level;
     const avatarEl = document.getElementById('topbarAvatar');
-    const placeholder = document.getElementById('topbarAvatarPlaceholder');
-    if (s.tgId && tgUser && tgUser.photo_url) {
+    if (!avatarEl) return;
+    if (tgUser && tgUser.photo_url) {
       avatarEl.innerHTML = `<img src="${tgUser.photo_url}" alt="">`;
     } else if (s.tgName) {
-      placeholder.textContent = s.tgName.charAt(0).toUpperCase();
+      avatarEl.innerHTML = `<div class="topbar-avatar-placeholder">${s.tgName.charAt(0).toUpperCase()}</div>`;
     } else {
-      placeholder.textContent = '?';
+      avatarEl.innerHTML = `<div class="topbar-avatar-placeholder">?</div>`;
     }
   }
 
