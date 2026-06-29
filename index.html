@@ -8,7 +8,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="app-version" content="1.8.0">
+<meta name="app-version" content="1.8.1">
 <title>LETUCHKA — Прорыв блокады</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
@@ -1519,7 +1519,7 @@
           <div class="se-info-icon">⚙️</div>
           <div class="se-info-body">
             <div class="se-info-label" data-i18n="se_version_label"></div>
-            <div class="se-info-value">v<span class="accent" id="seVersionNum">1.8.0</span> · <span data-i18n="se_build"></span></div>
+            <div class="se-info-value">v<span class="accent" id="seVersionNum">1.8.1</span> · <span data-i18n="se_build"></span></div>
             <div class="se-info-sub" data-i18n="se_version_sub"></div>
           </div>
         </div>
@@ -1544,7 +1544,7 @@
         <div class="rf-card">
           <div style="font-size:10px;color:#6B6B8C;font-weight:800;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:8px;" data-i18n="rf_link_label"></div>
           <div class="rf-link-row">
-            <input class="rf-link-input mono" id="rfLink" value="t.me/letuchka_bot?start=ref_HK7X9Q" readonly>
+            <input class="rf-link-input mono" id="rfLink" value="t.me/LetuchkaGameBot?start=ref_..." readonly>
             <button class="rf-link-btn" onclick="copyRefLink()" data-i18n="rf_copy"></button>
           </div>
         </div>
@@ -3911,6 +3911,7 @@
       // Refresh UI with merged values
       renderHome();
       renderShipyard?.();
+      renderReferrals?.(); // update ref link with real tg_id
     } catch (e) {
       console.error('[Supabase] syncProfile failed:', e);
       sbReady = false; // continue in offline mode
@@ -4262,6 +4263,14 @@
     const s = getState();
     document.getElementById('rfInvited').textContent = s.invited;
     document.getElementById('rfNeeded').textContent = Math.max(0, 3 - s.invited);
+    // Generate dynamic ref link with player's tg_id
+    const refLinkInput = document.getElementById('rfLink');
+    if (refLinkInput && s.tgId) {
+      refLinkInput.value = 't.me/LetuchkaGameBot?start=ref_' + s.tgId;
+    } else if (refLinkInput) {
+      // tg_id not loaded yet — show placeholder until initTelegram completes
+      refLinkInput.value = 't.me/LetuchkaGameBot?start=ref_...';
+    }
   }
 
   // ============ DAILY RUN ============
@@ -4875,8 +4884,8 @@
   else { sessionStorage.setItem('vd_entered', '1'); }
 </script>
 
-<!-- Version badge: helps detect stale Telegram cache. If you don't see "v1.8.0" here, you're viewing a cached old version. -->
-<div class="ver-badge" id="verBadge">v1.8.0</div>
+<!-- Version badge: helps detect stale Telegram cache. If you don't see "v1.8.1" here, you're viewing a cached old version. -->
+<div class="ver-badge" id="verBadge">v1.8.1</div>
 
 </body>
 </html>
