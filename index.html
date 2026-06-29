@@ -4,6 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#060B1A">
+<!-- Cache busting: Telegram Mini App caches aggressively, these meta tags tell it to always revalidate -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta name="app-version" content="1.5.1">
 <title>LETUCHKA — Прорыв блокады</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -59,9 +64,6 @@
   .topbar-avatar:hover { border-color: var(--neon-cyan); box-shadow: 0 0 12px rgba(0, 229, 204, 0.4); transform: scale(1.05); }
   .topbar-avatar img { width: 100%; height: 100%; object-fit: cover; }
   .topbar-avatar-placeholder { width: 100%; height: 100%; background: linear-gradient(135deg, var(--neon), var(--neon-cyan)); display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 900; color: #060B1A; }
-  .topbar-level { display: flex; flex-direction: column; align-items: center; gap: 1px; }
-  .topbar-level-num { font-size: 14px; font-weight: 900; color: var(--neon-cyan); line-height: 1; }
-  .topbar-level-label { font-size: 7px; font-weight: 800; color: #6B7B9F; letter-spacing: 0.1em; text-transform: uppercase; }
 
   /* PROFILE SCREEN */
   .pf-header { text-align: center; margin-bottom: 20px; padding: 0 16px; }
@@ -117,11 +119,47 @@
   @keyframes logoShipFloat { 0%, 100% { transform: translateY(0) rotate(-5deg); } 50% { transform: translateY(-2px) rotate(5deg); } }
   .topbar-title-badge { background: rgba(0, 229, 204, 0.08); padding: 5px 10px; border-radius: 999px; border: 1px solid rgba(0, 229, 204, 0.2); font-size: 9px; font-weight: 800; color: var(--neon-cyan); letter-spacing: 0.08em; max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .topbar-right { display: flex; align-items: center; gap: 6px; }
-  .topbar-currency { display: flex; align-items: center; gap: 4px; padding: 5px 10px; border-radius: 999px; font-size: 12px; font-weight: 900; }
-  .topbar-currency-plasma { background: rgba(0, 229, 204, 0.1); border: 1px solid rgba(0, 229, 204, 0.25); color: var(--neon-cyan); }
-  .topbar-currency-stars { background: rgba(255, 179, 71, 0.1); border: 1px solid rgba(255, 179, 71, 0.25); color: var(--gold); }
-  .topbar-currency-icon { font-size: 12px; }
-  .topbar-pill { display: flex; align-items: center; gap: 4px; background: rgba(255, 179, 71, 0.08); padding: 5px 10px; border-radius: 999px; border: 1px solid rgba(255, 179, 71, 0.2); font-size: 11px; font-weight: 800; color: var(--gold); }
+
+  /* ============ UNIFIED TOPBAR PILLS — all same height, padding, font ============ */
+  .topbar-pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    height: 32px; padding: 0 12px;
+    border-radius: 999px;
+    font-size: 12px; font-weight: 900;
+    line-height: 1; white-space: nowrap;
+    border: 1px solid transparent;
+    background: rgba(20, 16, 46, 0.6);
+    transition: all 0.2s ease;
+    cursor: default;
+  }
+  .topbar-pill-icon { font-size: 13px; line-height: 1; display: inline-flex; align-items: center; }
+  .topbar-pill-value { font-size: 12px; font-weight: 900; font-variant-numeric: tabular-nums; letter-spacing: 0.01em; }
+  /* Color variants — only border + text + icon tint, same geometry */
+  .topbar-pill-plasmoid { background: rgba(0, 229, 204, 0.1); border-color: rgba(0, 229, 204, 0.3); color: var(--neon-cyan); }
+  .topbar-pill-plasmoid .topbar-pill-icon { text-shadow: 0 0 8px rgba(0, 229, 204, 0.6); }
+  .topbar-pill-stars { background: rgba(255, 179, 71, 0.1); border-color: rgba(255, 179, 71, 0.3); color: var(--gold); }
+  .topbar-pill-stars .topbar-pill-icon { text-shadow: 0 0 8px rgba(255, 179, 71, 0.6); }
+  .topbar-pill-energy { background: rgba(124, 92, 252, 0.1); border-color: rgba(124, 92, 252, 0.3); color: var(--neon); }
+  .topbar-pill-energy .topbar-pill-icon { text-shadow: 0 0 8px rgba(124, 92, 252, 0.6); }
+  /* Settings pill — square-ish, same height, icon-only */
+  .topbar-pill-settings {
+    width: 32px; height: 32px; padding: 0;
+    justify-content: center; cursor: pointer;
+    background: linear-gradient(135deg, rgba(0, 229, 204, 0.15), rgba(124, 92, 252, 0.1));
+    border: 1.5px solid rgba(0, 229, 204, 0.35); color: var(--neon-cyan);
+    box-shadow: 0 0 10px rgba(0, 229, 204, 0.25), inset 0 1px 0 rgba(255,255,255,0.1);
+    position: relative; flex-shrink: 0;
+  }
+  .topbar-pill-settings::after {
+    content: ''; position: absolute; inset: -2px; border-radius: 999px;
+    border: 1.5px solid rgba(0, 229, 204, 0.4); opacity: 0;
+    animation: settingsPulse 2.4s ease-in-out infinite; pointer-events: none;
+  }
+  .topbar-pill-settings svg { width: 16px; height: 16px; transition: transform 0.5s ease; }
+  .topbar-pill-settings:hover { border-color: var(--neon-cyan); color: #fff; box-shadow: 0 0 16px rgba(0, 229, 204, 0.6); transform: translateY(-1px); }
+  .topbar-pill-settings:hover svg { animation: gearSpin 2s linear infinite; }
+  .topbar-pill-settings:active { transform: scale(0.92); }
+  /* End unified pills */
 
   .screens-wrap { flex: 1; position: relative; overflow: hidden; }
   .screen { position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; -ms-overflow-style: none; scrollbar-width: none; padding: 70px 0 100px; }
@@ -165,6 +203,84 @@
   .hm-progress { font-size: 10px; color: #8A8AB0; margin-top: 3px; }
   .hm-bar { height: 4px; background: rgba(0,229,204,0.1); border-radius: 999px; margin-top: 6px; overflow: hidden; }
   .hm-bar-fill { height: 100%; background: var(--neon-cyan); border-radius: 999px; box-shadow: 0 0 6px var(--neon-cyan); }
+
+  /* ============ HOME PAGE — redesigned ============ */
+  #home { padding-top: 70px; }
+  .hm-wrap { width: 100%; max-width: 540px; margin: 0 auto; padding: 0 14px 20px; display: flex; flex-direction: column; gap: 12px; }
+  .hm-section { width: 100%; }
+
+  /* HERO card — plasmoid balance + fly CTA */
+  .hm-hero { width: 100%; }
+  .hm-hero-card { position: relative; background: linear-gradient(135deg, rgba(124, 92, 252, 0.12) 0%, rgba(0, 229, 204, 0.06) 50%, rgba(10, 8, 32, 0.95) 100%); border: 1px solid rgba(124, 92, 252, 0.3); border-radius: 22px; padding: 18px 18px 16px; overflow: hidden; box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.06); }
+  .hm-hero-bg { position: absolute; inset: 0; background: radial-gradient(ellipse at 80% 20%, rgba(0, 229, 204, 0.18), transparent 60%), radial-gradient(ellipse at 20% 100%, rgba(124, 92, 252, 0.18), transparent 60%); pointer-events: none; }
+  .hm-hero-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--neon), var(--neon-cyan), transparent); }
+  .hm-hero-top { position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .hm-hero-label { font-size: 9px; color: #6B7B9F; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; }
+  .hm-hero-rate { font-size: 12px; color: var(--neon); font-weight: 900; padding: 4px 10px; background: rgba(124, 92, 252, 0.12); border: 1px solid rgba(124, 92, 252, 0.3); border-radius: 999px; font-variant-numeric: tabular-nums; }
+  .hm-hero-balance { position: relative; z-index: 2; display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .hm-hero-coin { width: 50px; height: 50px; border-radius: 16px; background: linear-gradient(135deg, rgba(0, 229, 204, 0.25), rgba(0, 229, 204, 0.05)); border: 1px solid rgba(0, 229, 204, 0.4); display: flex; align-items: center; justify-content: center; font-size: 26px; color: var(--neon-cyan); text-shadow: 0 0 14px rgba(0, 229, 204, 0.7); flex-shrink: 0; }
+  .hm-hero-amount { font-size: 36px; font-weight: 900; color: #F0EBFF; line-height: 1; letter-spacing: -0.02em; text-shadow: 0 0 18px rgba(0, 229, 204, 0.4); font-variant-numeric: tabular-nums; }
+
+  /* FLY button — medium size, refined */
+  .hm-fly-btn { position: relative; z-index: 2; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; background: linear-gradient(135deg, var(--neon) 0%, #00B8D4 100%); color: #060B1A; border: none; padding: 14px 20px; font-size: 15px; font-weight: 900; cursor: pointer; font-family: inherit; border-radius: 14px; letter-spacing: 0.18em; text-transform: uppercase; box-shadow: 0 8px 22px rgba(0, 229, 204, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.35), inset 0 -2px 0 rgba(0, 0, 0, 0.15); transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); overflow: hidden; }
+  .hm-fly-btn::after { content: ''; position: absolute; top: 0; left: -100%; width: 60%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent); animation: hmFlyShine 3.5s ease-in-out infinite; }
+  @keyframes hmFlyShine { 0% { left: -60%; } 60%, 100% { left: 100%; } }
+  .hm-fly-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(0, 229, 204, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.4); }
+  .hm-fly-btn:active { transform: translateY(0) scale(0.98); }
+  .hm-fly-rocket { font-size: 18px; filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3)); }
+  .hm-fly-text { line-height: 1; }
+  .hm-fly-arrow { font-size: 18px; opacity: 0.6; line-height: 1; margin-left: 4px; }
+
+  /* QUICK ACTIONS — 2-column grid, color-coded tiles */
+  .hm-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .hm-tile { position: relative; display: flex; align-items: center; gap: 12px; padding: 14px 14px; border-radius: 16px; cursor: pointer; font-family: inherit; border: 1px solid rgba(124, 92, 252, 0.18); background: linear-gradient(180deg, rgba(20, 16, 46, 0.9) 0%, rgba(10, 8, 32, 0.95) 100%); transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); overflow: hidden; text-align: left; }
+  .hm-tile:hover { transform: translateY(-2px); border-color: rgba(124, 92, 252, 0.4); box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4); }
+  .hm-tile:active { transform: translateY(0) scale(0.98); }
+  .hm-tile-glow { position: absolute; top: 0; left: 0; bottom: 0; width: 4px; opacity: 0.9; transition: width 0.3s ease; }
+  .hm-tile:hover .hm-tile-glow { width: 6px; }
+  .hm-tile-icon { width: 38px; height: 38px; border-radius: 11px; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 900; flex-shrink: 0; position: relative; z-index: 1; }
+  .hm-tile-body { flex: 1; min-width: 0; position: relative; z-index: 1; }
+  .hm-tile-name { font-size: 13px; font-weight: 900; color: #F0EBFF; letter-spacing: 0.02em; line-height: 1.2; }
+  .hm-tile-sub { font-size: 10px; color: #6B7B9F; font-weight: 700; margin-top: 2px; line-height: 1.3; }
+  .hm-tile-badge { position: absolute; top: 8px; right: 10px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px; font-size: 10px; font-weight: 900; display: none; align-items: center; justify-content: center; z-index: 2; }
+  .hm-tile-badge.show { display: flex; }
+  .hm-tile-badge.cyan { background: var(--neon-cyan); color: #060B1A; box-shadow: 0 0 8px rgba(0, 229, 204, 0.5); }
+
+  /* Color variants — accent strip + icon bg */
+  .hm-tile-cyan .hm-tile-glow { background: linear-gradient(180deg, var(--neon-cyan), #00B8D4); box-shadow: 0 0 12px rgba(0, 229, 204, 0.5); }
+  .hm-tile-cyan .hm-tile-icon { background: rgba(0, 229, 204, 0.15); border: 1px solid rgba(0, 229, 204, 0.35); color: var(--neon-cyan); }
+  .hm-tile-purple .hm-tile-glow { background: linear-gradient(180deg, var(--neon), #5B3FBC); box-shadow: 0 0 12px rgba(124, 92, 252, 0.5); }
+  .hm-tile-purple .hm-tile-icon { background: rgba(124, 92, 252, 0.15); border: 1px solid rgba(124, 92, 252, 0.35); color: var(--neon); }
+  .hm-tile-gold .hm-tile-glow { background: linear-gradient(180deg, var(--gold), #F59E0B); box-shadow: 0 0 12px rgba(255, 179, 71, 0.5); }
+  .hm-tile-gold .hm-tile-icon { background: rgba(255, 179, 71, 0.15); border: 1px solid rgba(255, 179, 71, 0.35); color: var(--gold); }
+  .hm-tile-pink .hm-tile-glow { background: linear-gradient(180deg, var(--neon-pink), #E63B7A); box-shadow: 0 0 12px rgba(255, 77, 141, 0.5); }
+  .hm-tile-pink .hm-tile-icon { background: rgba(255, 77, 141, 0.15); border: 1px solid rgba(255, 77, 141, 0.35); color: var(--neon-pink); }
+  .hm-tile-cyan-soft .hm-tile-glow { background: linear-gradient(180deg, #5EEAD4, #2DD4BF); box-shadow: 0 0 12px rgba(94, 234, 212, 0.4); }
+  .hm-tile-cyan-soft .hm-tile-icon { background: rgba(94, 234, 212, 0.12); border: 1px solid rgba(94, 234, 212, 0.3); color: #5EEAD4; }
+  .hm-tile-gray .hm-tile-glow { background: linear-gradient(180deg, #6B7B9F, #4A5578); }
+  .hm-tile-gray .hm-tile-icon { background: rgba(107, 123, 159, 0.15); border: 1px solid rgba(107, 123, 159, 0.3); color: #8A9AC0; }
+
+  /* MISSION OF THE DAY — compact card */
+  .hm-mission-card { display: flex; align-items: center; gap: 12px; background: linear-gradient(135deg, rgba(0, 229, 204, 0.06), rgba(10, 8, 32, 0.85)); border: 1px solid rgba(0, 229, 204, 0.2); border-radius: 16px; padding: 12px 14px; }
+  .hm-mission-icon { width: 36px; height: 36px; border-radius: 11px; background: rgba(0, 229, 204, 0.12); border: 1px solid rgba(0, 229, 204, 0.3); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .hm-mission-body { flex: 1; min-width: 0; }
+  .hm-mission-label { font-size: 9px; color: var(--neon-cyan); font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 3px; }
+  .hm-mission-title { font-size: 12px; font-weight: 800; color: #F0EBFF; line-height: 1.3; margin-bottom: 6px; }
+  .hm-mission-row { display: flex; align-items: center; gap: 8px; }
+  .hm-mission-bar { flex: 1; height: 5px; background: rgba(0, 229, 204, 0.1); border-radius: 999px; overflow: hidden; }
+  .hm-mission-fill { height: 100%; background: linear-gradient(90deg, var(--neon), var(--neon-cyan)); border-radius: 999px; box-shadow: 0 0 6px rgba(0, 229, 204, 0.6); transition: width 0.5s ease; }
+  .hm-mission-progress { font-size: 11px; color: var(--neon-cyan); font-weight: 900; font-variant-numeric: tabular-nums; flex-shrink: 0; }
+
+  /* Tight screens — keep grid 2-col but trim padding */
+  @media (max-width: 360px) {
+    .hm-wrap { padding: 0 10px 16px; gap: 10px; }
+    .hm-hero-card { padding: 16px 14px 14px; border-radius: 20px; }
+    .hm-hero-amount { font-size: 32px; }
+    .hm-tile { padding: 12px 12px; gap: 10px; }
+    .hm-tile-icon { width: 34px; height: 34px; font-size: 16px; }
+    .hm-tile-name { font-size: 12px; }
+    .hm-tile-sub { display: none; }
+  }
 
   /* LAUNCH ANIMATION */
   #launch-overlay { position: fixed; inset: 0; background: #060B1A; z-index: 150; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
@@ -364,17 +480,17 @@
   @keyframes lootResultPop { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 
   /* Plasma balance banner on Home */
-  .plasma-banner { width: 100%; max-width: 540px; padding: 0 14px; margin-bottom: 12px; }
-  .plasma-banner-card { background: linear-gradient(135deg, rgba(0,229,204,0.12) 0%, rgba(124,92,252,0.06) 50%, rgba(10,8,32,0.9) 100%); border: 1px solid rgba(0, 229, 204, 0.3); border-radius: 20px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 8px 24px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05); position: relative; overflow: hidden; }
-  .plasma-banner-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--neon-cyan), var(--neon), transparent); }
-  .plasma-banner-left { display: flex; align-items: center; gap: 12px; }
-  .plasma-banner-icon { width: 44px; height: 44px; border-radius: 14px; background: linear-gradient(135deg, rgba(0,229,204,0.2), rgba(0,229,204,0.05)); border: 1px solid rgba(0,229,204,0.3); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
-  .plasma-banner-info { display: flex; flex-direction: column; gap: 2px; }
-  .plasma-banner-label { font-size: 9px; color: #6B7B9F; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; }
-  .plasma-banner-value { font-size: 24px; font-weight: 900; color: var(--neon-cyan); line-height: 1; text-shadow: 0 0 12px rgba(0,229,204,0.3); }
-  .plasma-banner-right { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
-  .plasma-banner-rate { font-size: 11px; color: var(--neon); font-weight: 800; }
-  .plasma-banner-rate-label { font-size: 8px; color: #6B7B9F; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+  .plasmoid-banner { width: 100%; max-width: 540px; padding: 0 14px; margin-bottom: 12px; }
+  .plasmoid-banner-card { background: linear-gradient(135deg, rgba(0,229,204,0.12) 0%, rgba(124,92,252,0.06) 50%, rgba(10,8,32,0.9) 100%); border: 1px solid rgba(0, 229, 204, 0.3); border-radius: 20px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 8px 24px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05); position: relative; overflow: hidden; }
+  .plasmoid-banner-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--neon-cyan), var(--neon), transparent); }
+  .plasmoid-banner-left { display: flex; align-items: center; gap: 12px; }
+  .plasmoid-banner-icon { width: 44px; height: 44px; border-radius: 14px; background: linear-gradient(135deg, rgba(0,229,204,0.2), rgba(0,229,204,0.05)); border: 1px solid rgba(0,229,204,0.3); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+  .plasmoid-banner-info { display: flex; flex-direction: column; gap: 2px; }
+  .plasmoid-banner-label { font-size: 9px; color: #6B7B9F; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; }
+  .plasmoid-banner-value { font-size: 24px; font-weight: 900; color: var(--neon-cyan); line-height: 1; text-shadow: 0 0 12px rgba(0,229,204,0.3); }
+  .plasmoid-banner-right { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+  .plasmoid-banner-rate { font-size: 11px; color: var(--neon); font-weight: 800; }
+  .plasmoid-banner-rate-label { font-size: 8px; color: #6B7B9F; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
 
   /* MINING SCREEN */
   .mn-card { background: linear-gradient(180deg, rgba(20, 16, 46, 0.9) 0%, rgba(10, 8, 32, 0.95) 100%); border: 1px solid rgba(124, 92, 252, 0.15); border-radius: 18px; padding: 16px; margin-bottom: 10px; display: flex; align-items: center; gap: 14px; box-shadow: 0 6px 20px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05); transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); position: relative; overflow: hidden; }
@@ -411,10 +527,7 @@
   .mn-collect-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(0,229,204,0.4); }
   .mn-collect-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
 
-  /* ENERGY BAR */
-  .energy-bar { display: flex; align-items: center; gap: 6px; background: rgba(0,229,204,0.08); padding: 6px 12px; border-radius: 999px; border: 1px solid rgba(0,229,204,0.2); }
-  .energy-icon { font-size: 14px; }
-  .energy-text { font-size: 11px; font-weight: 800; color: var(--neon-cyan); }
+  /* ENERGY — now uses .topbar-pill-energy (unified pill style, see topbar section) */
   .energy-dots { display: flex; gap: 2px; }
   .energy-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(0,229,204,0.15); }
   .energy-dot.filled { background: var(--neon-cyan); box-shadow: 0 0 4px rgba(0,229,204,0.5); }
@@ -703,6 +816,204 @@
   .toast.danger { color: var(--danger); border-color: rgba(255,77,109,0.4); }
   .toast.cyan { color: var(--neon-cyan); border-color: rgba(0,229,204,0.4); }
   .toast.success { color: var(--success); border-color: rgba(52,211,153,0.4); }
+
+  /* ============ TOPBAR SETTINGS BUTTON ============ */
+  .topbar-settings { width: 36px; height: 36px; border-radius: 50%; cursor: pointer; border: 2px solid rgba(124, 92, 252, 0.3); background: rgba(124, 92, 252, 0.08); display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; flex-shrink: 0; position: relative; }
+  .topbar-settings:hover { border-color: var(--neon); box-shadow: 0 0 12px rgba(124, 92, 252, 0.5); transform: rotate(45deg) scale(1.05); }
+  .topbar-settings svg { width: 16px; height: 16px; transition: transform 0.4s ease; }
+  .topbar-settings:hover svg { animation: gearSpin 1.5s linear infinite; }
+  @keyframes gearSpin { from { transform: rotate(0); } to { transform: rotate(360deg); } }
+
+  /* ============ SETTINGS — version & developer cards ============ */
+  .se-info-card { background: linear-gradient(135deg, rgba(124, 92, 252, 0.08), rgba(10, 8, 32, 0.8)); border: 1px solid rgba(124, 92, 252, 0.2); border-radius: 16px; padding: 16px; display: flex; align-items: center; gap: 14px; }
+  .se-info-card.dev { background: linear-gradient(135deg, rgba(0, 229, 204, 0.08), rgba(10, 8, 32, 0.8)); border-color: rgba(0, 229, 204, 0.25); }
+  .se-info-icon { width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, rgba(124, 92, 252, 0.25), rgba(124, 92, 252, 0.05)); border: 1px solid rgba(124, 92, 252, 0.3); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+  .se-info-card.dev .se-info-icon { background: linear-gradient(135deg, rgba(0, 229, 204, 0.25), rgba(0, 229, 204, 0.05)); border-color: rgba(0, 229, 204, 0.3); }
+  .se-info-body { flex: 1; }
+  .se-info-label { font-size: 9px; color: #6B7B9F; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 4px; }
+  .se-info-value { font-size: 15px; font-weight: 900; color: #F0EBFF; letter-spacing: 0.02em; }
+  .se-info-value .accent { color: var(--neon-cyan); }
+  .se-info-value .gold { color: var(--gold); }
+  .se-info-sub { font-size: 10px; color: #6B7B9F; font-weight: 700; margin-top: 2px; letter-spacing: 0.04em; }
+  .se-divider { display: flex; align-items: center; gap: 10px; margin: 4px 0; }
+  .se-divider::before, .se-divider::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, rgba(124, 92, 252, 0.3), transparent); }
+  .se-divider span { font-size: 9px; color: #6B7B9F; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; }
+
+  /* ============ SHIPYARD — real-time purchase feedback ============ */
+  .sy-card { position: relative; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  .sy-card.purchased { animation: syPurchasedFlash 0.8s ease-out; }
+  @keyframes syPurchasedFlash {
+    0% { transform: scale(1); box-shadow: 0 6px 20px rgba(0,0,0,0.3), 0 0 0 0 rgba(124, 92, 252, 0.6); }
+    20% { transform: scale(1.04); box-shadow: 0 12px 32px rgba(0,0,0,0.4), 0 0 0 8px rgba(124, 92, 252, 0), 0 0 40px rgba(124, 92, 252, 0.6); border-color: var(--neon-cyan); }
+    100% { transform: scale(1); box-shadow: 0 6px 20px rgba(0,0,0,0.3), 0 0 0 0 rgba(124, 92, 252, 0); }
+  }
+  .sy-card.purchased .sy-icon { animation: syIconBurst 0.8s ease-out; }
+  @keyframes syIconBurst {
+    0% { transform: scale(1) rotate(0); }
+    40% { transform: scale(1.3) rotate(-10deg); box-shadow: 0 0 24px rgba(0, 229, 204, 0.8); }
+    100% { transform: scale(1) rotate(0); }
+  }
+  .sy-level-row { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+  .sy-level-text { font-size: 10px; font-weight: 900; color: var(--neon-cyan); letter-spacing: 0.1em; padding: 3px 8px; background: rgba(0, 229, 204, 0.08); border: 1px solid rgba(0, 229, 204, 0.2); border-radius: 999px; font-variant-numeric: tabular-nums; }
+  .sy-level-text .current { font-size: 13px; }
+  .sy-level-text .sep { color: #6B7B9F; margin: 0 2px; }
+  .sy-level-text .max { color: #6B7B9F; }
+  .sy-level-text.maxed { color: var(--success); background: rgba(45, 212, 191, 0.08); border-color: rgba(45, 212, 191, 0.3); }
+  .sy-dot { width: 18px; height: 6px; border-radius: 999px; background: rgba(124, 92, 252, 0.12); transition: all 0.3s ease; position: relative; }
+  .sy-dot.filled { background: linear-gradient(90deg, var(--neon), var(--neon-cyan)); box-shadow: 0 0 8px rgba(0, 229, 204, 0.6); }
+  .sy-dot.just-filled { animation: dotPop 0.6s ease-out; }
+  @keyframes dotPop {
+    0% { transform: scaleY(1); }
+    40% { transform: scaleY(2.2); box-shadow: 0 0 16px rgba(0, 229, 204, 1); }
+    100% { transform: scaleY(1); }
+  }
+  .sy-float-lvl { position: absolute; pointer-events: none; right: 16px; top: 12px; font-size: 16px; font-weight: 900; color: var(--neon-cyan); text-shadow: 0 0 12px rgba(0, 229, 204, 0.8); animation: syFloatLvl 1.4s ease-out forwards; z-index: 5; }
+  @keyframes syFloatLvl {
+    0% { opacity: 0; transform: translateY(0) scale(0.7); }
+    20% { opacity: 1; transform: translateY(-8px) scale(1.2); }
+    100% { opacity: 0; transform: translateY(-44px) scale(1); }
+  }
+  .sy-buy.success { background: linear-gradient(135deg, var(--success), #20BFA6) !important; color: #060B1A !important; animation: syBuySuccess 0.6s ease-out; }
+  @keyframes syBuySuccess { 0% { transform: scale(1); } 40% { transform: scale(1.15); } 100% { transform: scale(1); } }
+
+  /* ============ MINING — redesigned live counter ============ */
+  .mn-hero { position: relative; max-width: 540px; margin: 0 auto 20px; padding: 0 16px; }
+  .mn-hero-card {
+    position: relative;
+    background:
+      radial-gradient(ellipse at 30% 0%, rgba(0, 229, 204, 0.18), transparent 60%),
+      radial-gradient(ellipse at 70% 100%, rgba(124, 92, 252, 0.18), transparent 60%),
+      linear-gradient(135deg, rgba(10, 16, 32, 0.95) 0%, rgba(6, 11, 26, 0.95) 100%);
+    border: 1px solid rgba(0, 229, 204, 0.3);
+    border-radius: 28px;
+    padding: 22px 20px 20px;
+    overflow: hidden;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 229, 204, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  }
+  /* Sweeping shine */
+  .mn-hero-card::before {
+    content: '';
+    position: absolute;
+    top: -50%; left: -60%;
+    width: 60%; height: 200%;
+    background: linear-gradient(90deg, transparent, rgba(0, 229, 204, 0.08), rgba(255, 255, 255, 0.04), transparent);
+    transform: skewX(-18deg);
+    animation: mnHeroSweep 5.5s ease-in-out infinite;
+    pointer-events: none;
+  }
+  @keyframes mnHeroSweep {
+    0% { left: -60%; }
+    55% { left: 160%; }
+    100% { left: 160%; }
+  }
+  /* Top accent bar */
+  .mn-hero-card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--neon-cyan), var(--neon), var(--neon-cyan), transparent);
+    background-size: 200% 100%;
+    animation: mnHeroBar 3s linear infinite;
+  }
+  @keyframes mnHeroBar {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 200% 50%; }
+  }
+
+  .mn-hero-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; position: relative; z-index: 2; }
+  .mn-hero-label { font-size: 9px; color: #6B7B9F; font-weight: 800; letter-spacing: 0.25em; text-transform: uppercase; }
+  .mn-hero-rate-pill { display: flex; align-items: center; gap: 6px; background: rgba(124, 92, 252, 0.12); border: 1px solid rgba(124, 92, 252, 0.3); padding: 5px 12px; border-radius: 999px; font-size: 11px; font-weight: 900; color: var(--neon); }
+  .mn-hero-rate-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--neon); box-shadow: 0 0 8px var(--neon); animation: mnPillPulse 1.2s ease-in-out infinite; }
+  @keyframes mnPillPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  .mn-hero-center { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 6px 0 14px; z-index: 2; }
+  .mn-ring-wrap { position: relative; width: 200px; height: 200px; display: flex; align-items: center; justify-content: center; }
+  .mn-ring { position: absolute; inset: 0; transform: rotate(-90deg); }
+  .mn-ring-bg { fill: none; stroke: rgba(124, 92, 252, 0.12); stroke-width: 6; }
+  .mn-ring-fg { fill: none; stroke: url(#mnRingGrad); stroke-width: 6; stroke-linecap: round; transition: stroke-dashoffset 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); filter: drop-shadow(0 0 6px rgba(0, 229, 204, 0.7)); }
+  .mn-ring-tick { stroke: rgba(0, 229, 204, 0.25); stroke-width: 1.5; }
+  .mn-ring-orbit { position: absolute; inset: -4px; border-radius: 50%; pointer-events: none; }
+  .mn-ring-orbit::before {
+    content: '';
+    position: absolute;
+    top: -3px; left: 50%;
+    width: 10px; height: 10px;
+    margin-left: -5px;
+    border-radius: 50%;
+    background: var(--neon-cyan);
+    box-shadow: 0 0 14px var(--neon-cyan), 0 0 28px rgba(0, 229, 204, 0.6);
+    animation: mnOrbit 4s linear infinite;
+    transform-origin: 50% 104px;
+  }
+  @keyframes mnOrbit { from { transform: rotate(0); } to { transform: rotate(360deg); } }
+
+  .mn-counter-stack { position: relative; display: flex; flex-direction: column; align-items: center; z-index: 2; }
+  .mn-counter-coin { font-size: 24px; color: var(--neon-cyan); text-shadow: 0 0 16px rgba(0, 229, 204, 0.8); margin-bottom: 2px; animation: mnCoinFloat 2.4s ease-in-out infinite; }
+  @keyframes mnCoinFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+  .mn-counter-num { font-size: 44px; font-weight: 900; color: #F0EBFF; line-height: 1; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; text-shadow: 0 0 24px rgba(0, 229, 204, 0.5); transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1); padding: 2px 8px; }
+  .mn-counter-num.bump { transform: scale(1.08); }
+  .mn-counter-unit { font-size: 11px; color: var(--neon-cyan); font-weight: 800; letter-spacing: 0.25em; text-transform: uppercase; margin-top: 4px; }
+  .mn-counter-trend { display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--success); font-weight: 800; margin-top: 6px; }
+  .mn-counter-trend .arrow { font-size: 12px; }
+
+  .mn-per-sec { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 12px; color: var(--neon); font-weight: 800; margin-top: 4px; z-index: 2; position: relative; }
+  .mn-per-sec .num { color: var(--neon-cyan); font-variant-numeric: tabular-nums; }
+  .mn-per-sec .lbl { color: #6B7B9F; font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; }
+
+  .mn-collect-row { position: relative; z-index: 2; margin-top: 16px; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .mn-collect-mega { position: relative; background: linear-gradient(135deg, var(--neon-cyan), #00BFA6, var(--neon-cyan)); background-size: 200% 200%; color: #060B1A; border: none; padding: 16px 38px; font-size: 14px; font-weight: 900; cursor: pointer; font-family: inherit; border-radius: 999px; letter-spacing: 0.15em; text-transform: uppercase; box-shadow: 0 8px 24px rgba(0, 229, 204, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.4); transition: all 0.25s ease; animation: mnCollectGlow 2.4s ease-in-out infinite; overflow: hidden; }
+  @keyframes mnCollectGlow { 0%, 100% { background-position: 0% 50%; box-shadow: 0 8px 24px rgba(0, 229, 204, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.4); } 50% { background-position: 100% 50%; box-shadow: 0 8px 32px rgba(0, 229, 204, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.4); } }
+  .mn-collect-mega:hover:not(:disabled) { transform: translateY(-2px) scale(1.02); }
+  .mn-collect-mega:active:not(:disabled) { transform: scale(0.97); }
+  .mn-collect-mega:disabled { background: rgba(0, 229, 204, 0.08); color: #6B7B9F; cursor: not-allowed; box-shadow: none; animation: none; }
+  .mn-collect-mega .lbl { display: inline-flex; align-items: center; gap: 8px; }
+  .mn-collect-mega .coin { font-size: 16px; }
+  .mn-collect-mega::after { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent); animation: mnCollectShine 3s ease-in-out infinite; }
+  @keyframes mnCollectShine { 0% { left: -100%; } 60%, 100% { left: 100%; } }
+  .mn-collect-ready-text { font-size: 10px; color: var(--success); font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; }
+  .mn-collect-ready-text.idle { color: #6B7B9F; }
+
+  /* Floating "+X" particles for mining counter — bigger, brighter */
+  .mn-float-num { position: absolute; pointer-events: none; font-size: 18px; font-weight: 900; color: var(--neon-cyan); text-shadow: 0 0 12px rgba(0, 229, 204, 0.9), 0 0 24px rgba(0, 229, 204, 0.5); animation: mnFloatUp 1.8s ease-out forwards; z-index: 10; font-variant-numeric: tabular-nums; }
+  @keyframes mnFloatUp { 0% { opacity: 0; transform: translateY(0) scale(0.6); } 15% { opacity: 1; transform: translateY(-6px) scale(1.15); } 100% { opacity: 0; transform: translateY(-70px) scale(0.9); } }
+
+  /* Background particles container — drifting plasmoid dust */
+  .mn-particles { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 1; }
+  .mn-particle { position: absolute; width: 3px; height: 3px; border-radius: 50%; background: var(--neon-cyan); box-shadow: 0 0 6px var(--neon-cyan); opacity: 0.5; animation: mnParticleDrift linear infinite; }
+  @keyframes mnParticleDrift {
+    0% { transform: translateY(110%) translateX(0); opacity: 0; }
+    10% { opacity: 0.6; }
+    90% { opacity: 0.4; }
+    100% { transform: translateY(-10%) translateX(var(--drift, 10px)); opacity: 0; }
+  }
+  /* Mining card purchase flash — mirrors shipyard behavior */
+  .mn-card.purchased { animation: syPurchasedFlash 0.8s ease-out; }
+  .mn-card.purchased .mn-icon { animation: syIconBurst 0.8s ease-out; }
+  .mn-buy.success { background: linear-gradient(135deg, var(--success), #20BFA6) !important; color: #060B1A !important; animation: syBuySuccess 0.6s ease-out; }
+  @keyframes settingsPulse {
+    0%, 100% { opacity: 0; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.15); }
+  }
+  @keyframes gearSpin { from { transform: rotate(0); } to { transform: rotate(360deg); } }
+
+  /* Tight screens — shrink topbar pills to fit */
+  @media (max-width: 400px) {
+    .topbar-pill { height: 28px; padding: 0 9px; font-size: 11px; gap: 4px; }
+    .topbar-pill-icon { font-size: 12px; }
+    .topbar-pill-value { font-size: 11px; }
+    .topbar-pill-settings { width: 28px; height: 28px; }
+    .topbar-pill-settings svg { width: 14px; height: 14px; }
+    .topbar-logo { font-size: 12px !important; }
+  }
+  @media (max-width: 340px) {
+    .topbar-pill { padding: 0 7px; }
+    .topbar-logo { display: none; }
+    .topbar-right { width: 100%; justify-content: space-between; }
+  }
+
+  /* Version debug widget — tiny, always visible, helps detect stale cache */
+  .ver-badge { position: fixed; bottom: 76px; right: 8px; z-index: 60; font-size: 8px; font-weight: 900; color: rgba(0, 229, 204, 0.5); background: rgba(6, 11, 26, 0.7); padding: 3px 7px; border-radius: 999px; border: 1px solid rgba(0, 229, 204, 0.15); letter-spacing: 0.1em; pointer-events: none; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); font-family: 'Space Grotesk', monospace; }
 </style>
 </head>
 <body>
@@ -737,23 +1048,25 @@
       </svg>
       <span class="logo-text"><span class="logo-letter">L</span><span class="logo-letter">E</span><span class="logo-letter">T</span><span class="logo-letter">U</span><span class="logo-letter">C</span><span class="logo-letter">H</span><span class="logo-letter">K</span><span class="logo-letter">A</span></span>
     </div>
-    <div class="topbar-level">
-      <span class="topbar-level-num" id="topLevel">1</span>
-      <span class="topbar-level-label">LVL</span>
-    </div>
     <div class="topbar-right">
-      <div class="topbar-currency topbar-currency-plasma">
-        <span class="topbar-currency-icon">◈</span>
-        <span id="topPlasma">0</span>
+      <div class="topbar-pill topbar-pill-plasmoid" id="topPlasmaPill">
+        <span class="topbar-pill-icon">◈</span>
+        <span class="topbar-pill-value mono" id="topPlasma">0</span>
       </div>
-      <div class="topbar-currency topbar-currency-stars">
-        <span class="topbar-currency-icon">★</span>
-        <span id="starsCount">50</span>
+      <div class="topbar-pill topbar-pill-stars">
+        <span class="topbar-pill-icon">★</span>
+        <span class="topbar-pill-value mono" id="starsCount">50</span>
       </div>
-      <div class="energy-bar" id="energyBar">
-        <span class="energy-icon">⚡</span>
-        <span class="energy-text" id="energyText">5/5</span>
+      <div class="topbar-pill topbar-pill-energy" id="energyBar">
+        <span class="topbar-pill-icon">⚡</span>
+        <span class="topbar-pill-value mono" id="energyText">5/5</span>
       </div>
+      <button class="topbar-pill topbar-pill-settings" onclick="switchScreen('settings')" aria-label="Настройки">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 15.5C13.933 15.5 15.5 13.933 15.5 12C15.5 10.067 13.933 8.5 12 8.5C10.067 8.5 8.5 10.067 8.5 12C8.5 13.933 10.067 15.5 12 15.5Z" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
       <div class="topbar-avatar" id="topbarAvatar" onclick="switchScreen('profile')">
         <div class="topbar-avatar-placeholder">?</div>
       </div>
@@ -763,52 +1076,112 @@
   <div class="screens-wrap">
     <!-- HOME -->
     <div id="home" class="screen active">
-      <div class="plasma-banner">
-        <div class="plasma-banner-card">
-          <div class="plasma-banner-left">
-            <div class="plasma-banner-icon">◈</div>
-            <div class="plasma-banner-info">
-              <div class="plasma-banner-label">$PLASMA</div>
-              <div class="plasma-banner-value" id="pbPlasma">0</div>
+      <div class="hm-wrap">
+
+        <!-- HERO: plasmoid balance + fly CTA in one tight block -->
+        <div class="hm-hero">
+          <div class="hm-hero-card">
+            <div class="hm-hero-bg"></div>
+            <div class="hm-hero-top">
+              <div class="hm-hero-label">$PLASMOID · <span data-i18n="pb_rate_label"></span></div>
+              <div class="hm-hero-rate"><span id="pbRate">+0/ч</span></div>
+            </div>
+            <div class="hm-hero-balance">
+              <div class="hm-hero-coin">◈</div>
+              <div class="hm-hero-amount mono" id="pbPlasma">0</div>
+            </div>
+            <button class="hm-fly-btn" onclick="startBattle()">
+              <span class="hm-fly-rocket">🚀</span>
+              <span class="hm-fly-text" data-i18n="launch"></span>
+              <span class="hm-fly-arrow">›</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- DAILY RUN compact banner -->
+        <div class="hm-section">
+          <div class="dr-card" onclick="switchScreen('dailyrun')">
+            <div class="dr-icon">⚔️</div>
+            <div class="dr-body">
+              <div class="dr-title" data-i18n="dr_title"></div>
+              <div class="dr-sub" data-i18n="dr_sub"></div>
+            </div>
+            <div class="dr-arrow">›</div>
+          </div>
+        </div>
+
+        <!-- QUICK ACTIONS grid 2x3 — every secondary screen reachable -->
+        <div class="hm-section">
+          <div class="hm-grid">
+            <button class="hm-tile hm-tile-cyan" onclick="switchScreen('quests')">
+              <div class="hm-tile-glow"></div>
+              <div class="hm-tile-icon">✦</div>
+              <div class="hm-tile-body">
+                <div class="hm-tile-name" data-i18n="nav_quests"></div>
+                <div class="hm-tile-sub" data-i18n="hm_qs_sub"></div>
+              </div>
+              <div class="hm-tile-badge cyan" id="qBadge">3</div>
+            </button>
+            <button class="hm-tile hm-tile-purple" onclick="switchScreen('comms')">
+              <div class="hm-tile-glow"></div>
+              <div class="hm-tile-icon">✉</div>
+              <div class="hm-tile-body">
+                <div class="hm-tile-name" data-i18n="nav_comms"></div>
+                <div class="hm-tile-sub" data-i18n="hm_cm_sub"></div>
+              </div>
+              <div class="hm-tile-badge cyan" id="cmBadge">!</div>
+            </button>
+            <button class="hm-tile hm-tile-gold" onclick="switchScreen('referrals')">
+              <div class="hm-tile-glow"></div>
+              <div class="hm-tile-icon">👥</div>
+              <div class="hm-tile-body">
+                <div class="hm-tile-name" data-i18n="rf_tile"></div>
+                <div class="hm-tile-sub" data-i18n="hm_rf_sub"></div>
+              </div>
+            </button>
+            <button class="hm-tile hm-tile-pink" onclick="switchScreen('faq')">
+              <div class="hm-tile-glow"></div>
+              <div class="hm-tile-icon">?</div>
+              <div class="hm-tile-body">
+                <div class="hm-tile-name" data-i18n="nav_faq"></div>
+                <div class="hm-tile-sub" data-i18n="hm_fq_sub"></div>
+              </div>
+            </button>
+            <button class="hm-tile hm-tile-cyan-soft" onclick="switchScreen('airdrop')">
+              <div class="hm-tile-glow"></div>
+              <div class="hm-tile-icon">◆</div>
+              <div class="hm-tile-body">
+                <div class="hm-tile-name" data-i18n="nav_airdrop"></div>
+                <div class="hm-tile-sub" data-i18n="hm_ad_sub"></div>
+              </div>
+              <div class="hm-tile-badge cyan" id="navAirdropBadgeHome">!</div>
+            </button>
+            <button class="hm-tile hm-tile-gray" onclick="switchScreen('settings')">
+              <div class="hm-tile-glow"></div>
+              <div class="hm-tile-icon">⚙</div>
+              <div class="hm-tile-body">
+                <div class="hm-tile-name" data-i18n="nav_settings"></div>
+                <div class="hm-tile-sub" data-i18n="hm_se_sub"></div>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- MISSION OF THE DAY -->
+        <div class="hm-section">
+          <div class="hm-mission-card">
+            <div class="hm-mission-icon">🎯</div>
+            <div class="hm-mission-body">
+              <div class="hm-mission-label" data-i18n="hm_mission_label"></div>
+              <div class="hm-mission-title" id="hmTitle">—</div>
+              <div class="hm-mission-row">
+                <div class="hm-mission-bar"><div class="hm-mission-fill" id="hmBar" style="width: 0%;"></div></div>
+                <div class="hm-mission-progress mono" id="hmProgress">—</div>
+              </div>
             </div>
           </div>
-          <div class="plasma-banner-right">
-            <div class="plasma-banner-rate" id="pbRate">+0/ч</div>
-            <div class="plasma-banner-rate-label" data-i18n="pb_rate_label"></div>
-          </div>
         </div>
-      </div>
-      <div class="home-launch">
-        <button class="launch-btn" onclick="startBattle()">
-          <span class="launch-btn-icon">🚀</span>
-          <span data-i18n="launch"></span>
-        </button>
-      </div>
-      <div class="dr-banner">
-        <div class="dr-card" onclick="switchScreen('dailyrun')">
-          <div class="dr-icon">⚔️</div>
-          <div class="dr-body">
-            <div class="dr-title" data-i18n="dr_title"></div>
-            <div class="dr-sub" data-i18n="dr_sub"></div>
-          </div>
-          <div class="dr-arrow">›</div>
-        </div>
-      </div>
-      <div class="home-quick">
-        <button class="hq-btn" onclick="switchScreen('shipyard')"><div class="hq-btn-icon">⚙</div><div class="hq-btn-label" data-i18n="nav_shipyard"></div></button>
-        <button class="hq-btn" onclick="switchScreen('quests')"><div class="hq-btn-icon">✦</div><div class="hq-btn-label" data-i18n="nav_quests"></div><div class="hq-badge cyan" id="qBadge">3</div></button>
-        <button class="hq-btn" onclick="switchScreen('comms')"><div class="hq-btn-icon">✉</div><div class="hq-btn-label" data-i18n="nav_comms"></div><div class="hq-badge cyan" id="cmBadge">!</div></button>
-        <button class="hq-btn" onclick="switchScreen('faq')"><div class="hq-btn-icon">?</div><div class="hq-btn-label" data-i18n="nav_faq"></div></button>
-      </div>
-      <div class="home-mission">
-        <div class="hm-card">
-          <div class="hm-icon">🎯</div>
-          <div class="hm-body">
-            <div class="hm-title" id="hmTitle">—</div>
-            <div class="hm-progress" id="hmProgress">—</div>
-            <div class="hm-bar"><div class="hm-bar-fill" id="hmBar" style="width: 0%;"></div></div>
-          </div>
-        </div>
+
       </div>
     </div>
 
@@ -817,7 +1190,7 @@
       <div class="battle-canvas-wrap"><canvas id="battleCanvas"></canvas></div>
       <div class="battle-hud">
         <div class="bh-left">
-          <div class="bh-card gold"><span>💎</span><span id="bhPlasma">0</span></div>
+          <div class="bh-card gold"><span>◈</span><span id="bhPlasma">0</span></div>
           <div class="bh-card"><span class="bh-hp" id="bhHp"></span></div>
         </div>
         <div class="bh-right">
@@ -841,7 +1214,7 @@
       <div class="go-title" data-i18n="go_title"></div>
       <div class="go-sub" data-i18n="go_sub"></div>
       <div class="go-rewards">
-        <div class="gr-card"><div class="gr-icon">💎</div><div class="gr-value" id="grPlasma">0</div><div class="gr-label" data-i18n="gr_plasma"></div></div>
+        <div class="gr-card"><div class="gr-icon">◈</div><div class="gr-value" id="grPlasma">0</div><div class="gr-label" data-i18n="gr_plasma"></div></div>
         <div class="gr-card"><div class="gr-icon">⭐</div><div class="gr-value gold" id="grGlory">0</div><div class="gr-label" data-i18n="gr_glory"></div></div>
       </div>
       <div class="go-stats">
@@ -949,15 +1322,59 @@
         <div class="qu-title" data-i18n="mn_title"></div>
         <div class="qu-sub mono" data-i18n="mn_sub"></div>
       </div>
-      <div class="mn-summary">
-        <div class="mn-summary-card" id="mnSummaryCard">
-          <div class="mn-summary-label mono" data-i18n="mn_passive_income"></div>
-          <div class="mn-summary-value mono" id="mnTotalIncome">0/ч</div>
-          <div style="height:1px;background:linear-gradient(90deg,transparent,rgba(0,229,204,0.2),transparent);margin:14px 0;"></div>
-          <div class="mn-live-label mono" data-i18n="mn_pending"></div>
-          <div class="mn-live-counter mono" id="mnLiveCounter">0</div>
-          <div class="mn-live-rate">+<span id="mnLiveRate">0.00</span> $PLASMA/сек</div>
-          <button class="mn-collect-btn" id="mnCollectBtn" onclick="collectMining()" data-i18n="mn_collect"></button>
+      <div class="mn-hero">
+        <div class="mn-hero-card" id="mnSummaryCard">
+          <!-- Background drifting particles -->
+          <div class="mn-particles" id="mnParticles"></div>
+
+          <!-- Top row: label + rate pill -->
+          <div class="mn-hero-top">
+            <div class="mn-hero-label" data-i18n="mn_pending"></div>
+            <div class="mn-hero-rate-pill"><span class="dot"></span><span data-i18n="mn_passive_income"></span> <span id="mnTotalIncome">0/ч</span></div>
+          </div>
+
+          <!-- Center: progress ring + counter -->
+          <div class="mn-hero-center">
+            <div class="mn-ring-wrap">
+              <svg class="mn-ring" viewBox="0 0 200 200" width="200" height="200">
+                <defs>
+                  <linearGradient id="mnRingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#00E5CC"/>
+                    <stop offset="60%" stop-color="#7C5CFC"/>
+                    <stop offset="100%" stop-color="#FF4D8D"/>
+                  </linearGradient>
+                </defs>
+                <!-- Tick marks around the ring -->
+                <g id="mnRingTicks"></g>
+                <circle class="mn-ring-bg" cx="100" cy="100" r="92"/>
+                <circle class="mn-ring-fg" id="mnRingFg" cx="100" cy="100" r="92"
+                        stroke-dasharray="578.05" stroke-dashoffset="578.05"/>
+              </svg>
+              <div class="mn-ring-orbit"></div>
+
+              <div class="mn-counter-stack">
+                <div class="mn-counter-coin">◈</div>
+                <div class="mn-counter-num mono" id="mnLiveCounter">0</div>
+                <div class="mn-counter-unit" data-i18n="mn_pending_unit"></div>
+                <div class="mn-counter-trend"><span class="arrow">▲</span><span id="mnTrendPerSec">+0.00</span>/сек</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Per-second line -->
+          <div class="mn-per-sec">
+            <span class="lbl" data-i18n="mn_per_sec"></span>
+            <span class="num mono" id="mnLiveRate">0.00</span>
+            <span>◈/сек</span>
+          </div>
+
+          <!-- Collect button + ready text -->
+          <div class="mn-collect-row">
+            <button class="mn-collect-mega" id="mnCollectBtn" onclick="collectMining()">
+              <span class="lbl"><span class="coin">◈</span><span data-i18n="mn_collect"></span></span>
+            </button>
+            <div class="mn-collect-ready-text idle" id="mnCollectHint" data-i18n="mn_collect_idle"></div>
+          </div>
         </div>
       </div>
       <div style="max-width:540px;margin:0 auto;padding:0 16px;">
@@ -1018,6 +1435,23 @@
         <div class="se-sub mono" data-i18n="se_sub"></div>
       </div>
       <div class="se-list">
+        <div class="se-info-card">
+          <div class="se-info-icon">⚙️</div>
+          <div class="se-info-body">
+            <div class="se-info-label" data-i18n="se_version_label"></div>
+            <div class="se-info-value">v<span class="accent" id="seVersionNum">1.5.1</span> · <span data-i18n="se_build"></span></div>
+            <div class="se-info-sub" data-i18n="se_version_sub"></div>
+          </div>
+        </div>
+        <div class="se-info-card dev">
+          <div class="se-info-icon">🛠</div>
+          <div class="se-info-body">
+            <div class="se-info-label" data-i18n="se_dev_label"></div>
+            <div class="se-info-value">made by <span class="accent">SKUFI4</span></div>
+            <div class="se-info-sub" data-i18n="se_dev_sub"></div>
+          </div>
+        </div>
+        <div class="se-divider"><span data-i18n="se_prefs"></span></div>
         <div class="se-card">
           <div class="se-info">
             <div class="se-name" data-i18n="se_lang"></div>
@@ -1131,19 +1565,22 @@
   const I18N = {
     ru: {
       ob_title: 'Прорыв<br><em>блокады.</em>',
-      ob_sub: 'Ты — капитан ЛЕТУЧКИ. Собирай плазму. Отстреливай дронов Наблюдателей. Прорывайся через блокаду. Чем дольше живёшь — тем больше награда.',
+      ob_sub: 'Ты — капитан ЛЕТУЧКИ. Собирай плазмоид. Отстреливай дронов Наблюдателей. Прорывайся через блокаду. Чем дольше живёшь — тем больше награда.',
       ob_begin: 'Взлёт',
-      hs_plasma: '$PLASMA', hs_glory: 'СЛАВА', hs_best: 'РЕКОРД',
+      hs_plasma: '$PLASMOID', hs_glory: 'СЛАВА', hs_best: 'РЕКОРД',
       pb_rate_label: 'ДОХОД/Ч',
       launch: 'ЛЕТЕТЬ',
+      hm_qs_sub: 'Награды каждый день', hm_cm_sub: 'Сигналы из гиперпространства', hm_rf_sub: 'Пригласи друзей · бонусы', hm_fq_sub: 'Механики · советы', hm_ad_sub: 'Листинг Q4 2026', hm_se_sub: 'Язык · звук · сброс',
+      hm_mission_label: 'МИССИЯ ДНЯ',
+      rf_tile: 'Рефералы',
       nav_home: 'Главная', nav_shipyard: 'Верфь', nav_quests: 'Задания', nav_comms: 'Связь', nav_faq: 'FAQ', nav_settings: 'Настройки',
       joy_hint: 'Веди палец в любом месте — корабль летит за ним',
-      go_title: 'РЕЙС ОКОНЧЕН', go_sub: 'Корабль уничтожен. Плазма спасена.',
-      gr_plasma: 'ПЛАЗМА', gr_glory: 'СЛАВА',
-      gs_kills: 'Дронов сбито', gs_time: 'Время в рейсе', gs_plasma_collected: 'Плазмы собрано',
+      go_title: 'РЕЙС ОКОНЧЕН', go_sub: 'Корабль уничтожен. Плазмоид спасён.',
+      gr_plasma: 'ПЛАЗМОИД', gr_glory: 'СЛАВА',
+      gs_kills: 'Дронов сбито', gs_time: 'Время в рейсе', gs_plasma_collected: 'Плазмоида собрано',
       go_again: 'ЛЕТЕТЬ СНОВА', go_shipyard: 'В ВЕРФЬ', go_home: 'НА ГЛАВНУЮ',
       sy_title: 'Космическая <em>верфь</em>', sy_sub: 'Апгрейды корабля · прокачка',
-      sy_balance: 'БАЛАНС ПЛАЗМЫ',
+      sy_balance: 'БАЛАНС ПЛАЗМОИДА',
       qu_title: 'Задания <em>капитана</em>', qu_sub: 'Выполняй · получай награды',
       qu_daily: 'Дневные', qu_weekly: 'Недельные', qu_story: 'Сюжет',
       cm_title: 'Гиперпространственные <em>сигналы</em>', cm_sub: 'Те, кто вышел на связь',
@@ -1153,7 +1590,13 @@
       se_sound: 'Звук', se_sound_desc: 'Звуковые эффекты',
       se_vibration: 'Вибрация', se_vibration_desc: 'Тактильная отдача',
       se_reset: 'СБРОСИТЬ ПРОГРЕСС',
-      not_enough: 'Недостаточно $PLASMA',
+      se_version_label: 'Версия приложения',
+      se_build: 'Сборка 2026.06 · $PLASMOID',
+      se_version_sub: 'LETUCHKA · Telegram Mini App',
+      se_dev_label: 'Разработчик',
+      se_dev_sub: 'Капитан корабля · код · арт · геймдизайн',
+      se_prefs: 'ПРЕДПОЧТЕНИЯ',
+      not_enough: 'Недостаточно $PLASMOID',
       purchased: 'Апгрейд куплен',
       maxed: 'Максимальный уровень',
       quest_done: 'Задание выполнено',
@@ -1167,7 +1610,7 @@
       revive_btn: 'ВОССТАНОВИТЬ',
       revive_decline: 'Сдаться',
       loot_title: 'Секретный <em>груз</em>',
-      loot_desc: 'Контейнер с Золотого Дрона. Внутри — плазма, звёзды или уникальный скин корабля.',
+      loot_desc: 'Контейнер с Золотого Дрона. Внутри — плазмоид, звёзды или уникальный скин корабля.',
       loot_instant: 'ОТКРЫТЬ СЕЙЧАС',
       loot_free: 'Открыть бесплатно (3ч)',
       loot_later: 'Позже',
@@ -1183,10 +1626,10 @@
       rf_lock_title: '🔒 Блокировка ТОП-апгрейдов',
       rf_lock_desc: '4-й и 5-й уровни апгрейдов в Верфи требуют минимум 3 приглашённых капитана. Делись ссылкой — открывай мощь.',
       rf_rewards_title: '🎁 Награды за рефералов',
-      rf_rewards_desc: '1 капитан → +5% к добыче. 3 капитана → разблокировка ТОП-апгрейдов. 10 капитанов → +5000 плазмы.',
+      rf_rewards_desc: '1 капитан → +5% к добыче. 3 капитана → разблокировка ТОП-апгрейдов. 10 капитанов → +5000 плазмоида.',
       nav_refs: 'Флот',
       dr_title: 'Дневной вызов',
-      dr_sub: 'Одинаковая карта для всех · кто соберёт больше плазмы?',
+      dr_sub: 'Одинаковая карта для всех · кто соберёт больше плазмоида?',
       dr_screen_title: 'Дневной <em>рейд</em>',
       dr_screen_sub: 'Сегодня все играют одну карту',
       dr_today: 'Карта дня',
@@ -1198,32 +1641,33 @@
       art_skip: 'Играть без модуля',
       hst_fire: 'СКОР.СТР', hst_dmg: 'УРОН', hst_rad: 'РАДИУС', hst_hp: 'ПРОЧН',
       nav_mining: 'Майнинг', nav_airdrop: 'Airdrop',
-      mn_title: 'Майнинг <em>ферма</em>', mn_sub: 'Пассивный доход $PLASMA в час',
+      mn_title: 'Майнинг <em>ферма</em>', mn_sub: 'Пассивный доход $PLASMOID в час',
       mn_passive_income: 'ДОХОД В ЧАС', mn_pending: 'готово к сбору', mn_collect: 'СОБРАТЬ',
+      mn_pending_unit: '$PLASMOID', mn_per_sec: 'в секунду', mn_collect_idle: 'Накопите плазмоид, чтобы собрать',
       mn_modules: 'МОДУЛИ ДОБЫЧИ',
-      ad_title: '$PLASMA <em>Airdrop</em>', ad_sub: 'Листинг Q4 2026 · выполни задания',
-      ad_badge: 'ЛИСТИНГ Q4 2026', ad_listing_title: 'Листинг $PLASMA на биржах',
+      ad_title: '$PLASMOID <em>Airdrop</em>', ad_sub: 'Листинг Q4 2026 · выполни задания',
+      ad_badge: 'ЛИСТИНГ Q4 2026', ad_listing_title: 'Листинг $PLASMOID на биржах',
       ad_tasks_done: 'заданий выполнено',
-      ad_wallet_title: 'Привяжите TON кошелёк', ad_wallet_desc: 'Укажите адрес TON-кошелька для получения $PLASMA при листинге',
+      ad_wallet_title: 'Привяжите TON кошелёк', ad_wallet_desc: 'Укажите адрес TON-кошелька для получения $PLASMOID при листинге',
       ad_wallet_btn: 'ПРИВЯЗАТЬ КОШЕЛЁК',
       ad_wallet_soon: 'Привязка TON-кошелька будет доступна ближе к листингу. Следите за новостями!',
       ad_wallet_soon_btn: 'СКОРО',
       nav_profile: 'Профиль',
       pf_tab_stats: 'Статистика', pf_tab_ach: 'Достижения', pf_tab_conv: 'Конвертер',
-      pf_conv_title: 'Конвертер $PLASMA → TON',
-      pf_conv_desc: 'Курс обмена фиксирован. После листинга вы сможете конвертировать $PLASMA в TON напрямую.',
+      pf_conv_title: 'Конвертер $PLASMOID → TON',
+      pf_conv_desc: 'Курс обмена фиксирован. После листинга вы сможете конвертировать $PLASMOID в TON напрямую.',
       titles: ['Искатель','Новичок','Штурман','Капитан','Командор','Адмирал','Звездоходец','Галактический Лорд','Бог Вселенной'],
       faq: {
         q1: 'Как управлять кораблём?',
         a1: 'Поставь палец в любое место экрана и веди его. Корабль плавно летит в ту же сторону. Нос корабля всегда направлен по движению — туда же летят и пули. Не нужен джойстик на экране, просто веди пальцем.',
-        q2: 'Как собирать плазму?',
-        a2: 'Плазма (бирюзовые кристаллы) автоматически собирается, когда твой корабль оказывается рядом. Чем выше уровень «Радиуса добычи» в Верфи — тем дальше собираешь. Покупай апгрейд радиуса первым!',
+        q2: 'Как собирать плазмоид?',
+        a2: 'Плазмоид (бирюзовые кристаллы) автоматически собирается, когда твой корабль оказывается рядом. Чем выше уровень «Радиуса добычи» в Верфи — тем дальше собираешь. Покупай апгрейд радиуса первым!',
         q3: 'Как стрелять?',
         a3: 'Корабль стреляет автоматически в направлении носа. Тебе нужно маневрировать так, чтобы нос был направлен на дронов. Прокачивай «Скорострельность» и «Урон» в Верфи для большей огневой мощи.',
         q4: 'Что делать с красными дронами?',
-        a4: 'Красные дроны Наблюдателей летят прямо на тебя. Если врежется — потеряешь 1 HP и часть плазмы, а комбо сбросится. Уворачивайся и отстреливай их. Оранжевые элитные дроны (с бронёй) — прочнее, нужно больше выстрелов.',
+        a4: 'Красные дроны Наблюдателей летят прямо на тебя. Если врежется — потеряешь 1 HP и часть плазмоида, а комбо сбросится. Уворачивайся и отстреливай их. Оранжевые элитные дроны (с бронёй) — прочнее, нужно больше выстрелов.',
         q5: 'Что такое комбо и как его растить?',
-        a5: 'Комбо растёт за каждое убийство без перерыва (3 секунды). Чем выше комбо — тем больше плазмы с дронов. На ×10 счётчик становится бирюзовым, на ×20 — розовым. Получил урон = комбо обнуляется!',
+        a5: 'Комбо растёт за каждое убийство без перерыва (3 секунды). Чем выше комбо — тем больше плазмоида с дронов. На ×10 счётчик становится бирюзовым, на ×20 — розовым. Получил урон = комбо обнуляется!',
         q6: 'Что такое слава и титулы?',
         a6: 'Слава растёт от убийств дронов и времени в рейсе. От неё зависит твой титул: от Искателя до Бога Вселенной (9 титулов). Чем выше титул — тем престижнее. Слава также определяет твой уровень игрока.',
         q7: 'Зачем нужны кристаллы (★)?',
@@ -1231,46 +1675,49 @@
         q8: 'Что такое модули дрейфа (артефакты)?',
         a8: 'Перед каждым рейсом тебе предлагают 3 случайных модификатора. Каждый даёт бонус и штраф. Например: +100% урон, но -2 HP. Выбирай билд под свой стиль игры. Можно пропустить и играть без модуля.',
         q9: 'Как работают абилки?',
-        a9: 'В бою внизу экрана 3 кнопки:\n• ⚡ EMP — оглушает дронов рядом на 2 сек (кулдаун 25с)\n• 🔥 Форсаж — рывок вперёд, огненный след убивает дронов (кулдаун 20с)\n• 🧲 Магнит — 5 сек вся плазма летит к тебе (кулдаун 30с)\nАбилки бесплатны, просто жми когда готовы!',
+        a9: 'В бою внизу экрана 3 кнопки:\n• ⚡ EMP — оглушает дронов рядом на 2 сек (кулдаун 25с)\n• 🔥 Форсаж — рывок вперёд, огненный след убивает дронов (кулдаун 20с)\n• 🧲 Магнит — 5 сек весь плазмоид летит к тебе (кулдаун 30с)\nАбилки бесплатны, просто жми когда готовы!',
         q10: 'Что такое уровни угрозы?',
         a10: 'Каждые 2 минуты сложность скачкообразно растёт. Фон темнеет, появляется красный оттенок, спавнится больше дронов, появляются элитные. На 5 уровне угрозы — полный хаос. Индикатор вверху экрана показывает текущий уровень.',
         q11: 'Когда появляется БОСС?',
-        a11: 'Каждые 3 минуты рейса появляется БОСС — огромный шестигранный дредноут с 50 HP. Он стреляет веером из 3 пуль, наносит урон при касании. За убийство: +5000 плазмы, +10 к комбо и 3 лутбокса в Верфь!',
+        a11: 'Каждые 3 минуты рейса появляется БОСС — огромный шестигранный дредноут с 50 HP. Он стреляет веером из 3 пуль, наносит урон при касании. За убийство: +5000 плазмоида, +10 к комбо и 3 лутбокса в Верфь!',
         q12: 'Как получить лутбоксы?',
-        a12: 'Лутбоксы выпадают из золотых дронов (появляются каждые 45-75 сек) и из боссов (3 штуки). Открываешь в Верфи: бесплатно через 3 часа или мгновенно за 100★. Внутри: плазма, звёзды или скин корабля.',
+        a12: 'Лутбоксы выпадают из золотых дронов (появляются каждые 45-75 сек) и из боссов (3 штуки). Открываешь в Верфи: бесплатно через 3 часа или мгновенно за 100★. Внутри: плазмоид, звёзды или скин корабля.',
         q13: 'Зачем приглашать друзей?',
         a13: '3 приглашённых капитана разблокируют 4-й и 5-й уровни апгрейдов в Верфи. Без рефералов ты не сможешь прокачать корабль до максимума. Делись ссылкой в разделе «Флот».',
         q14: 'Какие валюты в игре и за что они отвечают?',
-        a14: 'В игре 2 валюты:\n\n◈ $PLASMA — игровая валюта. Добывается: в бою (сбор кристаллов), пассивно (майнинг-ферма). Тратится: апгрейды корабля в Верфи, модули майнинга. После листинга Q4 2026 — конвертируется в TON.\n\n★ Кристаллы — премиум-валюта. Получаешь: за достижения, кейсы, рефералов, airdrop-задания. Тратится: воскрешение после смерти (50★), мгновенное открытие лутбокса (100★).\n\nОбе валюты всегда видны в шапке сверху.',
+        a14: 'В игре 2 валюты:\n\n◈ $PLASMOID — игровая валюта. Добывается: в бою (сбор плазмоида), пассивно (майнинг-ферма). Тратится: апгрейды корабля в Верфи, модули майнинга. После листинга Q4 2026 — конвертируется в TON.\n\n★ Кристаллы — премиум-валюта. Получаешь: за достижения, кейсы, рефералов, airdrop-задания. Тратится: воскрешение после смерти (50★), мгновенное открытие лутбокса (100★).\n\nОбе валюты всегда видны в шапке сверху.',
         q15: 'Что такое Майнинг-ферма?',
-        a15: 'Вкладка «Майнинг» — это пассивный доход. Ты покупаешь модули (спутник, шахта, завод, чёрная дыра, квазар) за $PLASMA. Каждый модуль генерирует $PLASMA каждый час, даже когда ты не в игре. Накопленное нужно собирать кнопкой «СОБРАТЬ». Чем больше модулей — тем больше пассивный доход.',
+        a15: 'Вкладка «Майнинг» — это пассивный доход. Ты покупаешь модули (спутник, шахта, завод, чёрная дыра, квазар) за $PLASMOID. Каждый модуль генерирует $PLASMOID каждый час, даже когда ты не в игре. Накопленное нужно собирать кнопкой «СОБРАТЬ». Чем больше модулей — тем больше пассивный доход.',
         q16: 'Что такое энергия?',
         a16: 'Энергия нужна для рейдов (боёв). У тебя 5 энергии максимум. Каждый рейд тратит 1 энергию. 1 энергия восстанавливается каждые 10 минут. Нет энергии — нельзя летать. Энергия накапливается даже когда ты не в игре.',
-        q17: 'Когда листинг $PLASMA?',
-        a17: 'Листинг $PLASMA на биржах запланирован на Q4 2026. Точная дата будет объявлена в канале. До листинга $PLASMA — внутриигровая валюта. После листинга — торгуемый токен, который можно будет обменять на TON.',
-        q18: 'Какой курс обмена $PLASMA на TON?',
-        a18: 'Фиксированный курс: 100,000 $PLASMA = 1 TON. Калькулятор доступен в Профиле → вкладка «Конвертер». Там видно сколько TON стоит твой текущий баланс. Конвертация будет доступна после листинга.',
+        q17: 'Когда листинг $PLASMOID?',
+        a17: 'Листинг $PLASMOID на биржах запланирован на Q4 2026. Точная дата будет объявлена в канале. До листинга $PLASMOID — внутриигровая валюта. После листинга — торгуемый токен, который можно будет обменять на TON.',
+        q18: 'Какой курс обмена $PLASMOID на TON?',
+        a18: 'Фиксированный курс: 100,000 $PLASMOID = 1 TON. Калькулятор доступен в Профиле → вкладка «Конвертер». Там видно сколько TON стоит твой текущий баланс. Конвертация будет доступна после листинга.',
         q19: 'Что такое Airdrop?',
-        a19: 'Airdrop — раздача $PLASMA держателям перед листингом. Чтобы участвовать: выполни 5 заданий во вкладке «Airdrop» (подписка на канал, приглашение друзей, рейды, апгрейды, убийство босса) и привяжи TON-кошелёк (привязка будет доступна позже).',
+        a19: 'Airdrop — раздача $PLASMOID держателям перед листингом. Чтобы участвовать: выполни 5 заданий во вкладке «Airdrop» (подписка на канал, приглашение друзей, рейды, апгрейды, убийство босса) и привяжи TON-кошелёк (привязка будет доступна позже).',
         q20: 'Где что тратить — шпаргалка',
-        a20: '◈ $PLASMA (игровая):\n• Апгрейды корабля в Верфи (радиус, скорострельность, урон, скорость, HP, щит)\n• Модули майнинг-фермы (спутник, шахта, завод и т.д.)\n\n★ Кристаллы (премиум):\n• Воскрешение после смерти (50★)\n• Мгновенное открытие лутбокса (100★)\n\n⚡ Энергия:\n• 1 рейд = 1 энергия, 5 максимум, 1/10мин\n\nКристаллы НЕ покупаются за $PLASMA и наоборот. Это две независимые валюты.'
+        a20: '◈ $PLASMOID (игровая):\n• Апгрейды корабля в Верфи (радиус, скорострельность, урон, скорость, HP, щит)\n• Модули майнинг-фермы (спутник, шахта, завод и т.д.)\n\n★ Кристаллы (премиум):\n• Воскрешение после смерти (50★)\n• Мгновенное открытие лутбокса (100★)\n\n⚡ Энергия:\n• 1 рейд = 1 энергия, 5 максимум, 1/10мин\n\nКристаллы НЕ покупаются за $PLASMOID и наоборот. Это две независимые валюты.'
       }
     },
     en: {
       ob_title: 'Break the<br><em>blockade.</em>',
-      ob_sub: 'You are a LETUCHKA captain. Collect plasma. Shoot Watcher drones. Break through the blockade. The longer you survive — the bigger the reward.',
+      ob_sub: 'You are a LETUCHKA captain. Collect plasmoid. Shoot Watcher drones. Break through the blockade. The longer you survive — the bigger the reward.',
       ob_begin: 'Launch',
-      hs_plasma: '$PLASMA', hs_glory: 'GLORY', hs_best: 'BEST',
+      hs_plasma: '$PLASMOID', hs_glory: 'GLORY', hs_best: 'BEST',
       pb_rate_label: 'INCOME/H',
       launch: 'LAUNCH',
+      hm_qs_sub: 'Daily rewards', hm_cm_sub: 'Hyperspace signals', hm_rf_sub: 'Invite friends · bonuses', hm_fq_sub: 'Mechanics · tips', hm_ad_sub: 'Listing Q4 2026', hm_se_sub: 'Language · sound · reset',
+      hm_mission_label: 'MISSION OF THE DAY',
+      rf_tile: 'Referrals',
       nav_home: 'Home', nav_shipyard: 'Shipyard', nav_quests: 'Quests', nav_comms: 'Comms', nav_faq: 'FAQ', nav_settings: 'Settings',
       joy_hint: 'Drag finger anywhere — ship follows',
-      go_title: 'MISSION ENDED', go_sub: 'Ship destroyed. Plasma saved.',
-      gr_plasma: 'PLASMA', gr_glory: 'GLORY',
-      gs_kills: 'Drones killed', gs_time: 'Time in battle', gs_plasma_collected: 'Plasma collected',
+      go_title: 'MISSION ENDED', go_sub: 'Ship destroyed. Plasmoid saved.',
+      gr_plasma: 'PLASMOID', gr_glory: 'GLORY',
+      gs_kills: 'Drones killed', gs_time: 'Time in battle', gs_plasma_collected: 'Plasmoid collected',
       go_again: 'LAUNCH AGAIN', go_shipyard: 'TO SHIPYARD', go_home: 'GO HOME',
       sy_title: 'Cosmic <em>shipyard</em>', sy_sub: 'Ship upgrades · progression',
-      sy_balance: 'PLASMA BALANCE',
+      sy_balance: 'PLASMOID BALANCE',
       qu_title: 'Captain\'s <em>quests</em>', qu_sub: 'Complete · earn rewards',
       qu_daily: 'Daily', qu_weekly: 'Weekly', qu_story: 'Story',
       cm_title: 'Hyperspace <em>signals</em>', cm_sub: 'Those who reached out',
@@ -1280,7 +1727,13 @@
       se_sound: 'Sound', se_sound_desc: 'Sound effects',
       se_vibration: 'Vibration', se_vibration_desc: 'Haptic feedback',
       se_reset: 'RESET PROGRESS',
-      not_enough: 'Not enough $PLASMA',
+      se_version_label: 'App Version',
+      se_build: 'Build 2026.06 · $PLASMOID',
+      se_version_sub: 'LETUCHKA · Telegram Mini App',
+      se_dev_label: 'Developer',
+      se_dev_sub: 'Ship captain · code · art · game design',
+      se_prefs: 'PREFERENCES',
+      not_enough: 'Not enough $PLASMOID',
       purchased: 'Upgrade purchased',
       maxed: 'Max level',
       quest_done: 'Quest completed',
@@ -1294,7 +1747,7 @@
       revive_btn: 'RESTORE',
       revive_decline: 'Give up',
       loot_title: 'Secret <em>cargo</em>',
-      loot_desc: 'Container from Golden Drone. Inside — plasma, stars, or unique ship skin.',
+      loot_desc: 'Container from Golden Drone. Inside — plasmoid, stars, or unique ship skin.',
       loot_instant: 'OPEN NOW',
       loot_free: 'Open free (3h)',
       loot_later: 'Later',
@@ -1310,10 +1763,10 @@
       rf_lock_title: '🔒 TOP upgrade lock',
       rf_lock_desc: 'Level 4 and 5 upgrades in Shipyard require at least 3 invited captains. Share your link — unlock the power.',
       rf_rewards_title: '🎁 Referral rewards',
-      rf_rewards_desc: '1 captain → +5% yield. 3 captains → unlock TOP upgrades. 10 captains → +5000 plasma.',
+      rf_rewards_desc: '1 captain → +5% yield. 3 captains → unlock TOP upgrades. 10 captains → +5000 plasmoid.',
       nav_refs: 'Fleet',
       dr_title: 'Daily Challenge',
-      dr_sub: 'Same map for everyone · who collects more plasma?',
+      dr_sub: 'Same map for everyone · who collects more plasmoid?',
       dr_screen_title: 'Daily <em>raid</em>',
       dr_screen_sub: 'Today everyone plays the same map',
       dr_today: 'Map of the day',
@@ -1325,32 +1778,33 @@
       art_skip: 'Play without module',
       hst_fire: 'FIRE', hst_dmg: 'DMG', hst_rad: 'RADIUS', hst_hp: 'HULL',
       nav_mining: 'Mining', nav_airdrop: 'Airdrop',
-      mn_title: 'Mining <em>farm</em>', mn_sub: 'Passive $PLASMA income per hour',
+      mn_title: 'Mining <em>farm</em>', mn_sub: 'Passive $PLASMOID income per hour',
       mn_passive_income: 'HOURLY INCOME', mn_pending: 'ready to collect', mn_collect: 'COLLECT',
+      mn_pending_unit: '$PLASMOID', mn_per_sec: 'per second', mn_collect_idle: 'Accumulate plasmoid to collect',
       mn_modules: 'MINING MODULES',
-      ad_title: '$PLASMA <em>Airdrop</em>', ad_sub: 'Listing Q4 2026 · complete tasks',
-      ad_badge: 'LISTING Q4 2026', ad_listing_title: '$PLASMA listing on exchanges',
+      ad_title: '$PLASMOID <em>Airdrop</em>', ad_sub: 'Listing Q4 2026 · complete tasks',
+      ad_badge: 'LISTING Q4 2026', ad_listing_title: '$PLASMOID listing on exchanges',
       ad_tasks_done: 'tasks completed',
-      ad_wallet_title: 'Link your TON wallet', ad_wallet_desc: 'Enter your TON wallet address to receive $PLASMA at listing',
+      ad_wallet_title: 'Link your TON wallet', ad_wallet_desc: 'Enter your TON wallet address to receive $PLASMOID at listing',
       ad_wallet_btn: 'LINK WALLET',
       ad_wallet_soon: 'TON wallet linking will be available closer to listing. Stay tuned!',
       ad_wallet_soon_btn: 'COMING SOON',
       nav_profile: 'Profile',
       pf_tab_stats: 'Stats', pf_tab_ach: 'Achievements', pf_tab_conv: 'Converter',
-      pf_conv_title: '$PLASMA → TON Converter',
-      pf_conv_desc: 'Exchange rate is fixed. After listing, you will be able to convert $PLASMA to TON directly.',
+      pf_conv_title: '$PLASMOID → TON Converter',
+      pf_conv_desc: 'Exchange rate is fixed. After listing, you will be able to convert $PLASMOID to TON directly.',
       titles: ['Seeker','Novice','Navigator','Captain','Commander','Admiral','Starwalker','Galactic Lord','God of Universe'],
       faq: {
         q1: 'How to control the ship?',
         a1: 'Put your finger anywhere on screen and drag. The ship smoothly follows your finger. The nose always points in the direction of movement — bullets fire from the nose. No on-screen joystick needed, just drag.',
-        q2: 'How to collect plasma?',
-        a2: 'Plasma (teal crystals) is collected automatically when your ship is nearby. Higher "Collect Radius" level in Shipyard = larger pickup range. Buy radius upgrade first!',
+        q2: 'How to collect plasmoid?',
+        a2: 'Plasmoid (teal crystals) is collected automatically when your ship is nearby. Higher "Collect Radius" level in Shipyard = larger pickup range. Buy radius upgrade first!',
         q3: 'How to shoot?',
         a3: 'Ship fires automatically in the direction its nose is pointing. Maneuver so the nose faces the drones. Upgrade "Fire Rate" and "Damage" in Shipyard for more firepower.',
         q4: 'What about red drones?',
-        a4: 'Red Watcher drones fly straight at you. If they hit — you lose 1 HP, some plasma, and your combo resets. Dodge and shoot them. Orange elite drones (with armor) are tougher, need more hits.',
+        a4: 'Red Watcher drones fly straight at you. If they hit — you lose 1 HP, some plasmoid, and your combo resets. Dodge and shoot them. Orange elite drones (with armor) are tougher, need more hits.',
         q5: 'What is combo and how to build it?',
-        a5: 'Combo grows with each kill without a break (3 seconds). Higher combo = more plasma per drone. At ×10 the counter turns teal, at ×20 — pink. Take damage = combo resets to zero!',
+        a5: 'Combo grows with each kill without a break (3 seconds). Higher combo = more plasmoid per drone. At ×10 the counter turns teal, at ×20 — pink. Take damage = combo resets to zero!',
         q6: 'What are glory and titles?',
         a6: 'Glory grows from drone kills and survival time. It determines your title: from Seeker to God of Universe (9 titles). Higher title = more prestige. Glory also determines your player level.',
         q7: 'What are crystals (★) for?',
@@ -1358,29 +1812,29 @@
         q8: 'What are drift modules (artifacts)?',
         a8: 'Before each run you choose 1 of 3 random modifiers. Each gives a bonus and a penalty. For example: +100% damage, but -2 HP. Pick a build that suits your playstyle. You can skip and play without a module.',
         q9: 'How do abilities work?',
-        a9: 'In battle, 3 buttons at the bottom:\n• ⚡ EMP — stuns nearby drones for 2 sec (cooldown 25s)\n• 🔥 Boost — dash forward, fire trail kills drones (cooldown 20s)\n• 🧲 Magnet — 5 sec all plasma flies to you (cooldown 30s)\nAbilities are free, just tap when ready!',
+        a9: 'In battle, 3 buttons at the bottom:\n• ⚡ EMP — stuns nearby drones for 2 sec (cooldown 25s)\n• 🔥 Boost — dash forward, fire trail kills drones (cooldown 20s)\n• 🧲 Magnet — 5 sec all plasmoid flies to you (cooldown 30s)\nAbilities are free, just tap when ready!',
         q10: 'What are threat levels?',
         a10: 'Every 2 minutes difficulty spikes. Background darkens with red tint, more drones spawn, elites appear. At threat level 5 — total chaos. Indicator at top shows current level.',
         q11: 'When does the BOSS appear?',
-        a11: 'Every 3 minutes a BOSS appears — a massive hexagonal dreadnought with 50 HP. It shoots 3-way spread, damages on contact. Kill reward: +5000 plasma, +10 combo, and 3 lootboxes to Shipyard!',
+        a11: 'Every 3 minutes a BOSS appears — a massive hexagonal dreadnought with 50 HP. It shoots 3-way spread, damages on contact. Kill reward: +5000 plasmoid, +10 combo, and 3 lootboxes to Shipyard!',
         q12: 'How to get lootboxes?',
-        a12: 'Lootboxes drop from golden drones (appear every 45-75 sec) and from bosses (3 each). Open in Shipyard: free after 3 hours or instantly for 100★. Inside: plasma, stars, or ship skin.',
+        a12: 'Lootboxes drop from golden drones (appear every 45-75 sec) and from bosses (3 each). Open in Shipyard: free after 3 hours or instantly for 100★. Inside: plasmoid, stars, or ship skin.',
         q13: 'Why invite friends?',
         a13: '3 invited captains unlock upgrade levels 4 and 5 in the Shipyard. Without referrals you cannot max out your ship. Share your link in the "Fleet" section.',
         q14: 'What currencies exist and what are they for?',
-        a14: 'There are 2 currencies:\n\n◈ $PLASMA — in-game currency. Earned: in battle (collect crystals), passively (mining farm). Spent on: ship upgrades in Shipyard, mining modules. After Q4 2026 listing — convertible to TON.\n\n★ Crystals — premium currency. Earned: from achievements, cases, referrals, airdrop tasks. Spent on: revive after death (50★), instant lootbox opening (100★).\n\nBoth currencies are always visible in the top bar.',
+        a14: 'There are 2 currencies:\n\n◈ $PLASMOID — in-game currency. Earned: in battle (collect crystals), passively (mining farm). Spent on: ship upgrades in Shipyard, mining modules. After Q4 2026 listing — convertible to TON.\n\n★ Crystals — premium currency. Earned: from achievements, cases, referrals, airdrop tasks. Spent on: revive after death (50★), instant lootbox opening (100★).\n\nBoth currencies are always visible in the top bar.',
         q15: 'What is the Mining farm?',
-        a15: 'The "Mining" tab is passive income. You buy modules (satellite, mine, plant, black hole, quasar) with $PLASMA. Each module generates $PLASMA every hour, even when you are not playing. Accumulated plasma must be collected with the "COLLECT" button. More modules = more passive income.',
+        a15: 'The "Mining" tab is passive income. You buy modules (satellite, mine, plant, black hole, quasar) with $PLASMOID. Each module generates $PLASMOID every hour, even when you are not playing. Accumulated plasmoid must be collected with the "COLLECT" button. More modules = more passive income.',
         q16: 'What is energy?',
         a16: 'Energy is needed for raids (battles). You have 5 energy max. Each raid costs 1 energy. 1 energy regenerates every 10 minutes. No energy = no flying. Energy accumulates even when you are offline.',
-        q17: 'When is the $PLASMA listing?',
-        a17: '$PLASMA listing on exchanges is planned for Q4 2026. The exact date will be announced in the channel. Before listing, $PLASMA is an in-game currency. After listing — a tradeable token that can be exchanged for TON.',
-        q18: 'What is the $PLASMA to TON exchange rate?',
-        a18: 'Fixed rate: 100,000 $PLASMA = 1 TON. Calculator available in Profile → "Converter" tab. There you can see how much TON your current balance is worth. Conversion will be available after listing.',
+        q17: 'When is the $PLASMOID listing?',
+        a17: '$PLASMOID listing on exchanges is planned for Q4 2026. The exact date will be announced in the channel. Before listing, $PLASMOID is an in-game currency. After listing — a tradeable token that can be exchanged for TON.',
+        q18: 'What is the $PLASMOID to TON exchange rate?',
+        a18: 'Fixed rate: 100,000 $PLASMOID = 1 TON. Calculator available in Profile → "Converter" tab. There you can see how much TON your current balance is worth. Conversion will be available after listing.',
         q19: 'What is the Airdrop?',
-        a19: 'Airdrop is a $PLASMA distribution to holders before listing. To participate: complete 5 tasks in the "Airdrop" tab (subscribe to channel, invite friends, raids, upgrades, kill a boss) and link your TON wallet (linking will be available later).',
+        a19: 'Airdrop is a $PLASMOID distribution to holders before listing. To participate: complete 5 tasks in the "Airdrop" tab (subscribe to channel, invite friends, raids, upgrades, kill a boss) and link your TON wallet (linking will be available later).',
         q20: 'Spending cheat sheet',
-        a20: '◈ $PLASMA (in-game):\n• Ship upgrades in Shipyard (radius, fire rate, damage, speed, HP, shield)\n• Mining farm modules (satellite, mine, plant, etc.)\n\n★ Crystals (premium):\n• Revive after death (50★)\n• Instant lootbox opening (100★)\n\n⚡ Energy:\n• 1 raid = 1 energy, 5 max, 1/10min\n\nCrystals CANNOT be bought with $PLASMA and vice versa. These are two independent currencies.'
+        a20: '◈ $PLASMOID (in-game):\n• Ship upgrades in Shipyard (radius, fire rate, damage, speed, HP, shield)\n• Mining farm modules (satellite, mine, plant, etc.)\n\n★ Crystals (premium):\n• Revive after death (50★)\n• Instant lootbox opening (100★)\n\n⚡ Energy:\n• 1 raid = 1 energy, 5 max, 1/10min\n\nCrystals CANNOT be bought with $PLASMOID and vice versa. These are two independent currencies.'
       }
     }
   };
@@ -1426,7 +1880,7 @@
 
   // ============ DATA ============
   const UPGRADES = [
-    { id: 'radius', icon: '🎯', name: { ru: 'Радиус добычи', en: 'Collect Radius' }, desc: { ru: 'Дальность сбора плазмы', en: 'Plasma pickup range' }, maxLevel: 5, baseCost: 200, costMult: 1.8 },
+    { id: 'radius', icon: '🎯', name: { ru: 'Радиус добычи', en: 'Collect Radius' }, desc: { ru: 'Дальность сбора плазмоида', en: 'Plasmoid pickup range' }, maxLevel: 5, baseCost: 200, costMult: 1.8 },
     { id: 'fireRate', icon: '⚡', name: { ru: 'Скорострельность', en: 'Fire Rate' }, desc: { ru: 'Частота выстрелов', en: 'Shoot frequency' }, maxLevel: 5, baseCost: 300, costMult: 1.9 },
     { id: 'damage', icon: '💥', name: { ru: 'Урон лазера', en: 'Laser Damage' }, desc: { ru: 'Урон по дронам', en: 'Damage per shot' }, maxLevel: 5, baseCost: 400, costMult: 2.0 },
     { id: 'speed', icon: '🚀', name: { ru: 'Скорость корабля', en: 'Ship Speed' }, desc: { ru: 'Скорость движения', en: 'Movement speed' }, maxLevel: 5, baseCost: 250, costMult: 1.8 },
@@ -1435,26 +1889,26 @@
   ];
 
   const DAILY_QUESTS = [
-    { id: 'd1', icon: '💎', text: { ru: 'Собери 500 плазмы', en: 'Collect 500 plasma' }, target: 500, type: 'plasma', reward: { type: 'plasma', amount: 200 } },
-    { id: 'd2', icon: '💀', text: { ru: 'Убей 20 дронов', en: 'Kill 20 drones' }, target: 20, type: 'kills', reward: { type: 'plasma', amount: 300 } },
+    { id: 'd1', icon: '◈', text: { ru: 'Собери 500 плазмоида', en: 'Collect 500 plasmoid' }, target: 500, type: 'plasmoid', reward: { type: 'plasmoid', amount: 200 } },
+    { id: 'd2', icon: '💀', text: { ru: 'Убей 20 дронов', en: 'Kill 20 drones' }, target: 20, type: 'kills', reward: { type: 'plasmoid', amount: 300 } },
     { id: 'd3', icon: '⏱', text: { ru: 'Проживи 60 секунд в рейсе', en: 'Survive 60 seconds' }, target: 60, type: 'time', reward: { type: 'stars', amount: 5 } }
   ];
   const WEEKLY_QUESTS = [
-    { id: 'w1', icon: '🚀', text: { ru: '10 рейсов за неделю', en: '10 runs this week' }, target: 10, type: 'runs', reward: { type: 'plasma', amount: 3000 } },
+    { id: 'w1', icon: '🚀', text: { ru: '10 рейсов за неделю', en: '10 runs this week' }, target: 10, type: 'runs', reward: { type: 'plasmoid', amount: 3000 } },
     { id: 'w2', icon: '💀', text: { ru: '500 убийств дронов', en: '500 drone kills' }, target: 500, type: 'kills', reward: { type: 'stars', amount: 30 } },
-    { id: 'w3', icon: '💎', text: { ru: '5000 плазмы', en: '5000 plasma' }, target: 5000, type: 'plasma', reward: { type: 'stars', amount: 50 } }
+    { id: 'w3', icon: '◈', text: { ru: '5000 плазмоида', en: '5000 plasmoid' }, target: 5000, type: 'plasmoid', reward: { type: 'stars', amount: 50 } }
   ];
   const STORY_QUESTS = [
-    { id: 's1', icon: '🚀', text: { ru: 'Соверши первый вылет', en: 'First launch' }, target: 1, type: 'runs', reward: { type: 'plasma', amount: 100 } },
-    { id: 's2', icon: '💀', text: { ru: 'Убей первого дрона', en: 'Kill first drone' }, target: 1, type: 'kills', reward: { type: 'plasma', amount: 100 } },
-    { id: 's3', icon: '🛠', text: { ru: 'Купи первый апгрейд', en: 'Buy first upgrade' }, target: 1, type: 'upgrades', reward: { type: 'plasma', amount: 200 } },
-    { id: 's4', icon: '⏱', text: { ru: 'Проживи 90 секунд', en: 'Survive 90 seconds' }, target: 90, type: 'time', reward: { type: 'plasma', amount: 500 } },
+    { id: 's1', icon: '🚀', text: { ru: 'Соверши первый вылет', en: 'First launch' }, target: 1, type: 'runs', reward: { type: 'plasmoid', amount: 100 } },
+    { id: 's2', icon: '💀', text: { ru: 'Убей первого дрона', en: 'Kill first drone' }, target: 1, type: 'kills', reward: { type: 'plasmoid', amount: 100 } },
+    { id: 's3', icon: '🛠', text: { ru: 'Купи первый апгрейд', en: 'Buy first upgrade' }, target: 1, type: 'upgrades', reward: { type: 'plasmoid', amount: 200 } },
+    { id: 's4', icon: '⏱', text: { ru: 'Проживи 90 секунд', en: 'Survive 90 seconds' }, target: 90, type: 'time', reward: { type: 'plasmoid', amount: 500 } },
     { id: 's5', icon: '⭐', text: { ru: 'Достигни 5000 славы', en: 'Reach 5000 glory' }, target: 5000, type: 'glory', reward: { type: 'stars', amount: 100 } }
   ];
 
   const CHAPTERS = [
     { num: 1, name: { ru: 'ПЕРВЫЙ ВЫЛЕТ', en: 'FIRST LAUNCH' }, tagline: { ru: 'Тишина. Бесконечная темнота. И ты.', en: 'Silence. Endless dark. And you.' }, trigger: () => true, messages: [
-      { from: 'system', text: { ru: 'Корабль активирован. Перед тобой — открытый космос. Вокруг разбросана плазма. Собирай. Наблюдатели уже заметили тебя.', en: 'Ship activated. Before you — open space. Plasma scattered around. Collect. Watchers already noticed you.' } }
+      { from: 'system', text: { ru: 'Корабль активирован. Перед тобой — открытый космос. Вокруг разбросан плазмоид. Собирай. Наблюдатели уже заметили тебя.', en: 'Ship activated. Before you — open space. Plasmoid scattered around. Collect. Watchers already noticed you.' } }
     ]},
     { num: 2, name: { ru: 'ГОЛОС В ТИШИНЕ', en: 'VOICE IN THE VOID' }, tagline: { ru: 'Кто-то слушает твой канал.', en: 'Someone is listening.' }, trigger: (s) => s.totalRuns >= 5, messages: [
       { from: 'kira', text: { ru: 'Капитан. Не отвечай. Просто слушай. Я — Кира. Бывший штурман флота Наблюдателей. Дезертировала. Я знаю, что ты там. И знаю, что они идут за тобой.', en: 'Captain. Don\'t reply. Just listen. I am Kira. Former Watcher navigator. Deserted. I know you\'re there. And I know they\'re coming for you.' } }
@@ -1476,16 +1930,16 @@
   const ARTIFACTS = [
     { id: 'speed', icon: '🚀', name: { ru: 'Гипердвигатель', en: 'Hyperdrive' }, pro: { ru: '+30% скорость', en: '+30% speed' }, con: { ru: '-1 HP', en: '-1 HP' }, rarity: 'common', effect: { speedMult: 1.3, hpAdd: -1 } },
     { id: 'fan', icon: '🌐', name: { ru: 'Веерная стрельба', en: 'Fan Shot' }, pro: { ru: 'Стреляет веером ×3', en: 'Shoots 3-way fan' }, con: { ru: '-40% урон', en: '-40% damage' }, rarity: 'rare', effect: { fanShot: true, dmgMult: 0.6 } },
-    { id: 'vampire', icon: '🩸', name: { ru: 'Вампир', en: 'Vampire' }, pro: { ru: 'Восстанавливает HP за киллы', en: 'Heal on kill' }, con: { ru: '-50% плазмы', en: '-50% plasma' }, rarity: 'rare', effect: { vampire: true, plasmaMult: 0.5 } },
+    { id: 'vampire', icon: '🩸', name: { ru: 'Вампир', en: 'Vampire' }, pro: { ru: 'Восстанавливает HP за киллы', en: 'Heal on kill' }, con: { ru: '-50% плазмоида', en: '-50% plasmoid' }, rarity: 'rare', effect: { vampire: true, plasmaMult: 0.5 } },
     { id: 'berserk', icon: '⚔️', name: { ru: 'Берсерк', en: 'Berserker' }, pro: { ru: '+100% урон', en: '+100% damage' }, con: { ru: '-2 HP', en: '-2 HP' }, rarity: 'rare', effect: { dmgMult: 2.0, hpAdd: -2 } },
     { id: 'magnet', icon: '🧲', name: { ru: 'Постоянный магнит', en: 'Permanent Magnet' }, pro: { ru: '+200% радиус сбора', en: '+200% collect radius' }, con: { ru: '+30% скорость дронов', en: '+30% drone speed' }, rarity: 'rare', effect: { radiusMult: 3.0, droneSpeedMult: 1.3 } },
     { id: 'glass', icon: '🔮', name: { ru: 'Стеклянная пушка', en: 'Glass Cannon' }, pro: { ru: '+150% урон, +50% скорострел', en: '+150% dmg, +50% fire rate' }, con: { ru: '1 HP всего', en: 'Only 1 HP' }, rarity: 'epic', effect: { dmgMult: 2.5, fireRateMult: 1.5, hpSet: 1 } },
     { id: 'tank', icon: '🛡️', name: { ru: 'Танк', en: 'Tank' }, pro: { ru: '+3 HP', en: '+3 HP' }, con: { ru: '-30% скорость', en: '-30% speed' }, rarity: 'rare', effect: { hpAdd: 3, speedMult: 0.7 } },
     { id: 'rapid', icon: '⚡', name: { ru: 'Скорострел', en: 'Rapid Fire' }, pro: { ru: '+100% скорострельность', en: '+100% fire rate' }, con: { ru: '-30% урон', en: '-30% damage' }, rarity: 'common', effect: { fireRateMult: 2.0, dmgMult: 0.7 } },
-    { id: 'plasma', icon: '💎', name: { ru: 'Плазменный жрец', en: 'Plasma Priest' }, pro: { ru: '+200% плазмы', en: '+200% plasma' }, con: { ru: '-1 HP', en: '-1 HP' }, rarity: 'rare', effect: { plasmaMult: 3.0, hpAdd: -1 } },
+    { id: 'plasmoid', icon: '◈', name: { ru: 'Жрец плазмоида', en: 'Plasmoid Priest' }, pro: { ru: '+200% плазмоида', en: '+200% plasmoid' }, con: { ru: '-1 HP', en: '-1 HP' }, rarity: 'rare', effect: { plasmaMult: 3.0, hpAdd: -1 } },
     { id: 'lucky', icon: '🍀', name: { ru: 'Удачливый', en: 'Lucky' }, pro: { ru: '+100% шанс золотого дрона', en: '+100% golden drone chance' }, con: { ru: '-20% урон', en: '-20% damage' }, rarity: 'rare', effect: { goldenMult: 2.0, dmgMult: 0.8 } },
     { id: 'godmode', icon: '👑', name: { ru: 'Бог войны', en: 'God of War' }, pro: { ru: '+50% всё', en: '+50% everything' }, con: { ru: 'Нет щита', en: 'No shield' }, rarity: 'epic', effect: { dmgMult: 1.5, fireRateMult: 1.5, speedMult: 1.5, plasmaMult: 1.5, noShield: true } },
-    { id: 'pacifist', icon: '🕊️', name: { ru: 'Пацифист', en: 'Pacifist' }, pro: { ru: '+300% плазмы, +2 HP', en: '+300% plasma, +2 HP' }, con: { ru: 'Нет стрельбы', en: 'No shooting' }, rarity: 'epic', effect: { plasmaMult: 4.0, hpAdd: 2, noShoot: true } }
+    { id: 'pacifist', icon: '🕊️', name: { ru: 'Пацифист', en: 'Pacifist' }, pro: { ru: '+300% плазмоида, +2 HP', en: '+300% plasmoid, +2 HP' }, con: { ru: 'Нет стрельбы', en: 'No shooting' }, rarity: 'epic', effect: { plasmaMult: 4.0, hpAdd: 2, noShoot: true } }
   ];
 
   let pendingBattleCallback = null;
@@ -1494,7 +1948,7 @@
   // ============ STATE ============
   function getState() {
     return {
-      plasma: parseFloat(localStorage.getItem('vd_plasma') || '0'),
+      plasmoid: parseFloat(localStorage.getItem('vd_plasma') || '0'),
       stars: parseInt(localStorage.getItem('vd_stars') || '50'),
       glory: parseInt(localStorage.getItem('vd_glory') || '0'),
       bestRun: parseInt(localStorage.getItem('vd_best') || '0'),
@@ -1528,7 +1982,7 @@
     };
   }
   function saveState(s) {
-    const keys = { plasma: 'vd_plasma', stars: 'vd_stars', glory: 'vd_glory', bestRun: 'vd_best', totalRuns: 'vd_runs', totalKills: 'vd_kills', totalPlasma: 'vd_total_plasma', invited: 'vd_invited', dailyRunScore: 'vd_daily_score' };
+    const keys = { plasmoid: 'vd_plasma', stars: 'vd_stars', glory: 'vd_glory', bestRun: 'vd_best', totalRuns: 'vd_runs', totalKills: 'vd_kills', totalPlasma: 'vd_total_plasma', invited: 'vd_invited', dailyRunScore: 'vd_daily_score' };
     Object.keys(keys).forEach(k => { if (s[k] !== undefined) localStorage.setItem(keys[k], s[k].toString()); });
     if (s.upgrades !== undefined) localStorage.setItem('vd_upgrades', JSON.stringify(s.upgrades));
     if (s.lootboxes !== undefined) localStorage.setItem('vd_lootboxes', JSON.stringify(s.lootboxes));
@@ -1642,10 +2096,10 @@
 
   function renderHome() {
     const s = getState();
-    document.getElementById('pbPlasma').textContent = Math.floor(s.plasma).toLocaleString();
+    document.getElementById('pbPlasma').textContent = Math.floor(s.plasmoid).toLocaleString();
     document.getElementById('pbRate').textContent = '+' + getMiningTotalProfit().toLocaleString() + '/ч';
-    document.getElementById('topPlasma').textContent = Math.floor(s.plasma).toLocaleString();
-    document.getElementById('topLevel').textContent = getLevel(s).level;
+    document.getElementById('topPlasma').textContent = Math.floor(s.plasmoid).toLocaleString();
+    const _topLevelEl = document.getElementById('topLevel'); if (_topLevelEl) _topLevelEl.textContent = getLevel(s).level;
     document.getElementById('starsCount').textContent = s.stars;
     // Show first unclaimed daily quest as mission
     const unclaimed = DAILY_QUESTS.find(q => !s.dailyClaimed.includes(q.id));
@@ -1829,7 +2283,15 @@
       let baseHp = 3 + (s.upgrades.maxHp || 0) + hpAdd;
       if (hpSet !== null) baseHp = hpSet;
       this.ship = { x: this.W / 2, y: this.H / 2, vx: 0, vy: 0, angle: -Math.PI / 2, hp: baseHp, maxHp: baseHp, shield: (eff.noShield ? false : (s.upgrades.shield ? true : false)), size: 16, shootCooldown: 0 };
-      this.plasma = []; this.drones = []; this.bullets = []; this.particles = [];
+      this.plasmoid = []; this.drones = []; this.bullets = []; this.particles = [];
+      // HARD CAPS to prevent freeze on long runs
+      this.MAX_DRONES = 60;
+      this.MAX_BULLETS = 120;
+      this.MAX_PARTICLES = 80;
+      this.MAX_PLASMOID = 15;
+      // Cache state once per run — getState() does localStorage+JSON.parse every call, kills FPS
+      this._cachedState = s;
+      this._stateCacheTime = Date.now();
       this.kills = 0; this.plasmaCollected = 0;
       this.revivedThisRun = false;
       this.ended = false;
@@ -1850,7 +2312,7 @@
       this.joystick = { active: false, startX: 0, startY: 0, dx: 0, dy: 0 };
       this.bgStars = [];
       for (let i = 0; i < 80; i++) this.bgStars.push({ x: Math.random() * this.W, y: Math.random() * this.H, size: Math.random() * 1.5 + 0.3, phase: Math.random() * Math.PI * 2 });
-      // Initial plasma
+      // Initial plasmoid
       for (let i = 0; i < 8; i++) this.spawnPlasma();
       document.getElementById('joyHint').classList.remove('hide');
     }
@@ -1890,7 +2352,7 @@
       const marginX = 40;
       const marginTop = 100; // top HUD
       const marginBottom = 180; // nav + abilities + safe area
-      this.plasma.push({ x: marginX + Math.random() * (this.W - marginX * 2), y: marginTop + Math.random() * (this.H - marginTop - marginBottom), size: 5, phase: Math.random() * Math.PI * 2, value: 10 });
+      this.plasmoid.push({ x: marginX + Math.random() * (this.W - marginX * 2), y: marginTop + Math.random() * (this.H - marginTop - marginBottom), size: 5, phase: Math.random() * Math.PI * 2, value: 10 });
     }
     spawnDrone() {
       const side = Math.floor(Math.random() * 4);
@@ -1912,8 +2374,9 @@
       SOUNDS.danger();
       vibrate([100, 50, 100]);
       showToast(currentLang === 'ru' ? `⚠️ УРОВЕНЬ УГРОЗЫ ${this.threatLevel + 1}!` : `⚠️ THREAT LEVEL ${this.threatLevel + 1}!`, 'danger');
-      // Spawn burst of drones
-      for (let i = 0; i < 3 + this.threatLevel; i++) this.spawnDrone();
+      // Spawn burst of drones — CAPPED to prevent freeze on long runs
+      const burst = Math.min(3 + this.threatLevel, 8);
+      for (let i = 0; i < burst && this.drones.length < this.MAX_DRONES; i++) this.spawnDrone();
     }
     spawnGoldenDrone() {
       const side = Math.floor(Math.random() * 4);
@@ -1994,7 +2457,7 @@
         saveState(s2);
         SOUNDS.gameover(); // dramatic sound
         vibrate([100, 50, 100, 50, 100, 50, 300]);
-        showToast(currentLang === 'ru' ? '🐋 БОСС ПОВЕРЖЕН! +5000 💎 + 3 контейнера!' : '🐋 BOSS DEFEATED! +5000 💎 + 3 containers!', 'gold');
+        showToast(currentLang === 'ru' ? '🐋 БОСС ПОВЕРЖЕН! +5000 ◈ + 3 контейнера!' : '🐋 BOSS DEFEATED! +5000 ◈ + 3 containers!', 'gold');
         this.boss = null;
       }
       // Boss collision with ship
@@ -2031,8 +2494,12 @@
     loop(now) {
       if (!this.running) return;
       if (this.paused) return;
-      const dt = Math.min(50, now - this.lastTime);
+      // FIX: clamp dt harder and detect tab-throttle / freeze. If dt > 100ms, skip update to avoid spiral of death.
+      const rawDt = now - this.lastTime;
       this.lastTime = now;
+      // If browser throttled (tab switch / lag spike), skip this frame entirely
+      if (rawDt > 250) { requestAnimationFrame(this.loop); return; }
+      const dt = Math.min(50, rawDt);
       this.t += dt;
       this.elapsedTime = (now - this.startTime) / 1000;
       this.difficulty = Math.floor(this.elapsedTime / 20);
@@ -2048,7 +2515,13 @@
       requestAnimationFrame(this.loop);
     }
     update(dt) {
-      const s = getState();
+      // FIX: use cached state instead of getState() every frame (localStorage+JSON.parse kills FPS)
+      // Refresh cache every 2 seconds to pick up upgrade changes
+      if (Date.now() - this._stateCacheTime > 2000) {
+        this._cachedState = getState();
+        this._stateCacheTime = Date.now();
+      }
+      const s = this._cachedState;
       const speedUpgrade = s.upgrades.speed || 0;
       const eff = this.artifact ? this.artifact.effect : {};
       const speedMult = eff.speedMult || 1;
@@ -2094,7 +2567,7 @@
       if (nearest && minDist < 500) {
         shootAngle = Math.atan2(nearest.y - this.ship.y, nearest.x - this.ship.x);
       }
-      if (!noShoot && this.ship.shootCooldown <= 0) {
+      if (!noShoot && this.ship.shootCooldown <= 0 && this.bullets.length < this.MAX_BULLETS) {
         const damageUpgrade = s.upgrades.damage || 0;
         const dmgMult = eff.dmgMult || 1;
         const damage = (1 + damageUpgrade) * dmgMult;
@@ -2109,16 +2582,16 @@
         SOUNDS.shoot();
       }
 
-      // Spawn plasma
+      // Spawn plasmoid
       this.nextPlasmaSpawn -= dt;
-      if (this.nextPlasmaSpawn <= 0 && this.plasma.length < 12) { this.spawnPlasma(); this.nextPlasmaSpawn = 1500 + Math.random() * 1500; }
+      if (this.nextPlasmaSpawn <= 0 && this.plasmoid.length < this.MAX_PLASMOID) { this.spawnPlasma(); this.nextPlasmaSpawn = 1500 + Math.random() * 1500; }
 
-      // Spawn drones
+      // Spawn drones — HARD CAP to prevent freeze on long runs
       this.nextDroneSpawn -= dt;
-      if (this.nextDroneSpawn <= 0) {
-        // FIX: fewer drones at start, gradual scaling
-        const count = 1 + Math.floor(this.difficulty / 3);
-        for (let i = 0; i < count; i++) this.spawnDrone();
+      if (this.nextDroneSpawn <= 0 && this.drones.length < this.MAX_DRONES) {
+        // FIX: fewer drones at start, gradual scaling, capped count
+        const count = Math.min(1 + Math.floor(this.difficulty / 3), 4);
+        for (let i = 0; i < count && this.drones.length < this.MAX_DRONES; i++) this.spawnDrone();
         this.nextDroneSpawn = Math.max(1500, 5000 - this.difficulty * 250);
       }
 
@@ -2199,9 +2672,9 @@
               else vibrate(15);
               this.spawnExplosion(d.x, d.y, d.golden ? '#FFB347' : (d.elite ? '#FB923C' : '#FF4D6D'));
               SOUNDS.hit();
-              // Drop plasma with combo bonus
-              const comboMult = 1 + Math.floor(this.combo / 5) * 0.2;
-              if (Math.random() < 0.4) this.plasma.push({ x: d.x, y: d.y, size: 5, phase: Math.random() * Math.PI * 2, value: Math.floor(15 * comboMult) });
+              // Drop plasmoid with combo bonus — cap combo multiplier to prevent runaway values
+              const comboMult = Math.min(5, 1 + Math.floor(this.combo / 5) * 0.2);
+              if (Math.random() < 0.4) this.plasmoid.push({ x: d.x, y: d.y, size: 5, phase: Math.random() * Math.PI * 2, value: Math.floor(15 * comboMult) });
               // Vampire effect: heal on kill
               if (eff.vampire && this.ship.hp < this.ship.maxHp && Math.random() < 0.15) {
                 this.ship.hp++;
@@ -2225,7 +2698,7 @@
 
       // Plasma collection
       const plasmaMult = eff.plasmaMult || 1;
-      this.plasma = this.plasma.filter(p => {
+      this.plasmoid = this.plasmoid.filter(p => {
         const dx = p.x - this.ship.x, dy = p.y - this.ship.y;
         const dist = Math.sqrt(dx*dx + dy*dy);
         if (dist < collectRadius) {
@@ -2238,9 +2711,13 @@
         return true;
       });
 
-      // Update particles — limit max count to prevent GC freezes
-      if (this.particles.length > 80) this.particles = this.particles.slice(-80);
-      this.particles = this.particles.filter(p => { p.x += p.vx; p.y += p.vy; p.life -= 0.03; p.vx *= 0.95; p.vy *= 0.95; return p.life > 0; });
+      // Update particles — trim in-place to avoid GC pressure on long runs
+      if (this.particles.length > this.MAX_PARTICLES) this.particles.splice(0, this.particles.length - this.MAX_PARTICLES);
+      for (let i = this.particles.length - 1; i >= 0; i--) {
+        const p = this.particles[i];
+        p.x += p.vx; p.y += p.vy; p.life -= 0.03; p.vx *= 0.95; p.vy *= 0.95;
+        if (p.life <= 0) this.particles.splice(i, 1);
+      }
 
       // COMBO: countdown timer
       if (this.comboTimer > 0) { this.comboTimer -= dt; if (this.comboTimer <= 0) this.combo = 0; }
@@ -2262,7 +2739,7 @@
       if (this.magnetActive > 0) {
         this.magnetActive -= dt;
         const magnetRange = 400;
-        this.plasma.forEach(p => {
+        this.plasmoid.forEach(p => {
           const dx = this.ship.x - p.x, dy = this.ship.y - p.y;
           const dist = Math.sqrt(dx*dx + dy*dy);
           if (dist < magnetRange && dist > 0) { p.x += (dx / dist) * 8; p.y += (dy / dist) * 8; }
@@ -2372,7 +2849,7 @@
     finalizeBattle() {
       const s = getState();
       const glory = this.kills * 5 + Math.floor(this.elapsedTime);
-      s.plasma += this.plasmaCollected;
+      s.plasmoid += this.plasmaCollected;
       s.glory += glory;
       s.totalRuns++;
       s.totalKills += this.kills;
@@ -2388,7 +2865,7 @@
       // FIX: save state FIRST, before updateQuestProgress (which reads/writes localStorage internally)
       saveState(s);
       // Now update quest progress (reads saved state, adds progress, saves again)
-      updateQuestProgress('plasma', this.plasmaCollected);
+      updateQuestProgress('plasmoid', this.plasmaCollected);
       updateQuestProgress('kills', this.kills);
       updateQuestProgress('time', Math.floor(this.elapsedTime));
       updateQuestProgress('runs', 1);
@@ -2401,7 +2878,7 @@
       document.getElementById('gsPlasmaCollected').textContent = this.plasmaCollected;
       document.getElementById('gsMaxCombo').textContent = '×' + this.maxCombo;
       // Update topbar
-      document.getElementById('topPlasma').textContent = Math.floor(s.plasma).toLocaleString();
+      document.getElementById('topPlasma').textContent = Math.floor(s.plasmoid).toLocaleString();
       document.getElementById('starsCount').textContent = s.stars;
       // Switch to game over screen
       switchScreen('gameover');
@@ -2451,7 +2928,7 @@
       // Nebula
       const ng = ctx.createRadialGradient(this.W * 0.3, this.H * 0.4, 0, this.W * 0.3, this.H * 0.4, this.W * 0.6); ng.addColorStop(0, 'rgba(124,92,252,0.06)'); ng.addColorStop(1, 'rgba(124,92,252,0)'); ctx.fillStyle = ng; ctx.fillRect(0, 0, this.W, this.H);
       // Plasma
-      this.plasma.forEach(p => {
+      this.plasmoid.forEach(p => {
         const pulse = 1 + Math.sin(this.t * 0.005 + p.phase) * 0.2;
         const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size * 3); grad.addColorStop(0, 'rgba(0,229,204,0.6)'); grad.addColorStop(1, 'rgba(0,229,204,0)'); ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(p.x, p.y, p.size * 3, 0, Math.PI * 2); ctx.fill();
         ctx.fillStyle = '#00E5CC'; ctx.shadowColor = '#00E5CC'; ctx.shadowBlur = 10;
@@ -2730,7 +3207,7 @@
   function getUpgradeCost(up, currentLevel) { return Math.floor(up.baseCost * Math.pow(up.costMult, currentLevel)); }
   function renderShipyard() {
     const s = getState();
-    document.getElementById('syBalance').textContent = Math.floor(s.plasma).toLocaleString() + ' $P';
+    document.getElementById('syBalance').textContent = Math.floor(s.plasmoid).toLocaleString() + ' $P';
     // Update hangar stats
     const dmgUp = s.upgrades.damage || 0;
     const fireUp = s.upgrades.fireRate || 0;
@@ -2780,24 +3257,33 @@
       const cost = maxed ? 0 : getUpgradeCost(up, level);
       // Referral lock for levels 4-5 (except shield which is level 1 max)
       const needsRefs = !maxed && level >= 3 && up.maxLevel >= 4 && s.invited < 3;
-      const canBuy = !maxed && !needsRefs && s.plasma >= cost;
+      const canBuy = !maxed && !needsRefs && s.plasmoid >= cost;
+      // Mark dots as "just-filled" only for the freshly-purchased level (used by the per-card animation trigger)
       let dots = '';
-      for (let i = 0; i < up.maxLevel; i++) dots += `<div class="sy-dot ${i < level ? 'filled' : ''}"></div>`;
+      for (let i = 0; i < up.maxLevel; i++) {
+        const filled = i < level;
+        const justFilled = (window._syJustBought && window._syJustBought[up.id] && i === level - 1);
+        dots += `<div class="sy-dot ${filled ? 'filled' : ''} ${justFilled ? 'just-filled' : ''}"></div>`;
+      }
+      const levelBadge = `<span class="sy-level-text ${maxed ? 'maxed' : ''}"><span class="current">${level}</span><span class="sep">/</span><span class="max">${up.maxLevel}</span></span>`;
       let actionHtml = '';
       if (maxed) actionHtml = '<div class="sy-cost" style="color:#34D399">MAX</div><button class="sy-buy maxed">✓</button>';
       else if (needsRefs) actionHtml = `<div class="sy-cost">${cost.toLocaleString()} $P</div><div class="sy-lock-badge">🔒 ${s.invited}/3</div><button class="sy-buy" disabled onclick="showToast(t('need_referrals'),'danger')">${currentLang === 'ru' ? 'ЗАБЛОКИРОВАНО' : 'LOCKED'}</button>`;
-      else actionHtml = `<div class="sy-cost">${cost.toLocaleString()} $P</div><button class="sy-buy" ${canBuy ? '' : 'disabled'} onclick="buyUpgrade('${up.id}')">${currentLang === 'ru' ? 'КУПИТЬ' : 'BUY'}</button>`;
-      return `<div class="sy-card">
+      else actionHtml = `<div class="sy-cost">${cost.toLocaleString()} $P</div><button class="sy-buy" ${canBuy ? '' : 'disabled'} data-upgrade-id="${up.id}" onclick="buyUpgrade('${up.id}')">${currentLang === 'ru' ? 'КУПИТЬ' : 'BUY'}</button>`;
+      const purchasedCls = (window._syJustBought && window._syJustBought[up.id]) ? ' purchased' : '';
+      return `<div class="sy-card${purchasedCls}" data-upgrade-card="${up.id}">
         <div class="sy-icon">${up.icon}</div>
         <div class="sy-body">
           <div class="sy-name">${up.name[currentLang]}</div>
           <div class="sy-desc">${up.desc[currentLang]}</div>
-          <div class="sy-level">${dots}</div>
+          <div class="sy-level-row"><div class="sy-level">${dots}</div>${levelBadge}</div>
         </div>
         <div class="sy-action">${actionHtml}</div>
       </div>`;
     }).join('');
     list.innerHTML = lootHtml + upHtml;
+    // Clear "just bought" markers after render so they don't replay on next re-render
+    window._syJustBought = null;
   }
   function formatLootTime(ms) {
     const h = Math.floor(ms / 3600000); const m = Math.floor((ms % 3600000) / 60000); const s = Math.floor((ms % 60000) / 1000);
@@ -2810,18 +3296,54 @@
     const level = s.upgrades[id] || 0;
     if (level >= up.maxLevel) return;
     const cost = getUpgradeCost(up, level);
-    if (s.plasma < cost) { showToast(t('not_enough'), 'danger'); return; }
-    s.plasma -= cost;
+    if (s.plasmoid < cost) { showToast(t('not_enough'), 'danger'); return; }
+    // Apply purchase to state
+    s.plasmoid -= cost;
     s.upgrades[id] = level + 1;
     saveState(s); // Save FIRST
     SOUNDS.buy();
-    updateQuestProgress('upgrades', 1); // This reads/writes state separately
+    vibrate(60);
+    // Mark this upgrade as "just bought" so renderShipyard can flash the card & pop the dot
+    window._syJustBought = (window._syJustBought || {});
+    window._syJustBought[id] = true;
+    // Brief success state on the buy button before re-rendering
+    const buyBtn = document.querySelector(`.sy-buy[data-upgrade-id="${id}"]`);
+    if (buyBtn) {
+      buyBtn.classList.add('success');
+      buyBtn.textContent = '✓';
+    }
+    // Update quest progress (reads/writes state separately)
+    updateQuestProgress('upgrades', 1);
     showToast(t('purchased'), 'success');
     // Re-render AFTER state is saved — reads fresh state
     const freshS = getState();
-    document.getElementById('topPlasma').textContent = Math.floor(freshS.plasma).toLocaleString();
+    // Update every visible counter in real-time, no page refresh needed
+    document.getElementById('topPlasma').textContent = Math.floor(freshS.plasmoid).toLocaleString();
+    document.getElementById('starsCount').textContent = freshS.stars;
+    document.getElementById('syBalance').textContent = Math.floor(freshS.plasmoid).toLocaleString() + ' $P';
+    // Update hangar stat values immediately so the player sees the buff
+    const dmgUp = freshS.upgrades.damage || 0;
+    const fireUp = freshS.upgrades.fireRate || 0;
+    const radUp = freshS.upgrades.radius || 0;
+    const hpUp = freshS.upgrades.maxHp || 0;
+    document.getElementById('hstFire').textContent = (1 + fireUp);
+    document.getElementById('hstDmg').textContent = (1 + dmgUp);
+    document.getElementById('hstRad').textContent = (30 + radUp * 12);
+    document.getElementById('hstHp').textContent = (3 + hpUp);
+    // Re-render list with flash + dot pop animation
     renderShipyard();
     renderHome();
+    // Spawn floating "+1 LVL" on the upgraded card after the new HTML is in the DOM
+    requestAnimationFrame(() => {
+      const card = document.querySelector(`.sy-card[data-upgrade-card="${id}"]`);
+      if (card) {
+        const float = document.createElement('div');
+        float.className = 'sy-float-lvl';
+        float.textContent = '+1 LVL';
+        card.appendChild(float);
+        setTimeout(() => float.remove(), 1500);
+      }
+    });
     checkStoryProgress();
   }
 
@@ -2855,7 +3377,7 @@
       const done = prog >= q.target;
       const canClaim = done && !isClaimed;
       const pct = Math.min(100, (prog / q.target) * 100);
-      const rewardText = q.reward.type === 'plasma' ? `+${q.reward.amount} 💎` : `+${q.reward.amount} ★`;
+      const rewardText = q.reward.type === 'plasmoid' ? `+${q.reward.amount} ◈` : `+${q.reward.amount} ★`;
       return `<div class="qu-card ${isClaimed ? 'done' : ''}">
         <div class="qu-top">
           <div class="qu-icon">${q.icon}</div>
@@ -2878,13 +3400,13 @@
     else { quests = STORY_QUESTS; claimedArr = s.storyClaimed; key = 'storyClaimed'; }
     const q = quests.find(x => x.id === qid);
     if (!q || claimedArr.includes(qid)) return;
-    if (q.reward.type === 'plasma') s.plasma += q.reward.amount;
+    if (q.reward.type === 'plasmoid') s.plasmoid += q.reward.amount;
     else if (q.reward.type === 'stars') s.stars += q.reward.amount;
     s[key] = [...claimedArr, qid];
     saveState(s);
     SOUNDS.quest();
-    showToast(t('quest_done') + ' +' + q.reward.amount + (q.reward.type === 'plasma' ? ' $P' : ' ★'), 'success');
-    document.getElementById('topPlasma').textContent = Math.floor(s.plasma).toLocaleString();
+    showToast(t('quest_done') + ' +' + q.reward.amount + (q.reward.type === 'plasmoid' ? ' ◈' : ' ★'), 'success');
+    document.getElementById('topPlasma').textContent = Math.floor(s.plasmoid).toLocaleString();
     document.getElementById('starsCount').textContent = s.stars;
     renderQuests(); renderHome(); updateBadges();
   }
@@ -2925,14 +3447,17 @@
     checkClaimable(DAILY_QUESTS, s.dailyClaimed, s.dailyProgress);
     checkClaimable(WEEKLY_QUESTS, s.weeklyClaimed, s.weeklyProgress);
     checkClaimable(STORY_QUESTS, s.storyClaimed, null);
-    const qb1 = document.getElementById('qBadge'); const qb2 = document.getElementById('navQuestBadge');
-    if (claimable > 0) { qb1.classList.add('show'); qb1.textContent = claimable; qb2.classList.add('show'); qb2.textContent = claimable; }
-    else { qb1.classList.remove('show'); qb2.classList.remove('show'); }
+    const qb1 = document.getElementById('qBadge');
+    const qb2 = document.getElementById('navQuestBadge');
+    if (qb1) { if (claimable > 0) { qb1.classList.add('show'); qb1.textContent = claimable; } else { qb1.classList.remove('show'); } }
+    if (qb2) { if (claimable > 0) { qb2.classList.add('show'); qb2.textContent = claimable; } else { qb2.classList.remove('show'); } }
     // Comms badge
     let unread = 0;
     CHAPTERS.forEach(ch => { if (s.unlockedChapters.includes(ch.num)) ch.messages.forEach((m, i) => { if (!s.readMessages.includes(`${ch.num}-${i}`)) unread++; }); });
-    const cb1 = document.getElementById('cmBadge'); const cb2 = document.getElementById('navCommsBadge');
-    if (unread > 0) { cb1.classList.add('show'); cb2.classList.add('show'); } else { cb1.classList.remove('show'); cb2.classList.remove('show'); }
+    const cb1 = document.getElementById('cmBadge');
+    const cb2 = document.getElementById('navCommsBadge');
+    if (cb1) { if (unread > 0) { cb1.classList.add('show'); } else { cb1.classList.remove('show'); } }
+    if (cb2) { if (unread > 0) { cb2.classList.add('show'); } else { cb2.classList.remove('show'); } }
   }
 
   // ============ STORY ============
@@ -3155,16 +3680,16 @@
     s.lootboxes.splice(index, 1);
     // Generate reward
     const rewards = [
-      { type: 'plasma', amount: 500, label: '+500 💎', icon: '💎' },
-      { type: 'plasma', amount: 2000, label: '+2000 💎', icon: '💎' },
-      { type: 'plasma', amount: 5000, label: '+5000 💎', icon: '💎' },
+      { type: 'plasmoid', amount: 500, label: '+500 ◈', icon: '◈' },
+      { type: 'plasmoid', amount: 2000, label: '+2000 ◈', icon: '◈' },
+      { type: 'plasmoid', amount: 5000, label: '+5000 ◈', icon: '◈' },
       { type: 'stars', amount: 20, label: '+20 ★', icon: '⭐' },
       { type: 'stars', amount: 50, label: '+50 ★', icon: '⭐' },
       { type: 'stars', amount: 100, label: '+100 ★', icon: '⭐' },
       { type: 'skin', amount: 0, label: currentLang === 'ru' ? 'СКИН КОРАБЛЯ!' : 'SHIP SKIN!', icon: '🎨' }
     ];
     const reward = rewards[Math.floor(Math.random() * rewards.length)];
-    if (reward.type === 'plasma') s.plasma += reward.amount;
+    if (reward.type === 'plasmoid') s.plasmoid += reward.amount;
     else if (reward.type === 'stars') s.stars += reward.amount;
     saveState(s);
     SOUNDS.buy();
@@ -3239,7 +3764,7 @@
       return `<div class="nw-reward ${p.isMe ? 'unlocked' : ''}" ${rankCls}>
         <div class="nw-reward-icon" style="font-size:18px;color:${rankColor};font-weight:900;width:24px;text-align:center;">${i+1}</div>
         <div class="nw-reward-body"><div class="nw-reward-name" style="color:${p.isMe ? 'var(--neon)' : '#F0EBFF'}">${p.name}${p.isMe ? ' (' + (currentLang === 'ru' ? 'ты' : 'you') + ')' : ''}</div></div>
-        <div class="nw-reward-count" style="color:${p.isMe ? 'var(--neon)' : 'var(--gold)'};min-width:auto;">${p.score.toLocaleString()} 💎</div>
+        <div class="nw-reward-count" style="color:${p.isMe ? 'var(--neon)' : 'var(--gold)'};min-width:auto;">${p.score.toLocaleString()} ◈</div>
       </div>`;
     }).join('');
   }
@@ -3259,16 +3784,16 @@
   const MINING_MODULES = [
     { id: 'm1', icon: '🛰', name: { ru: 'Спутник-ретранслятор', en: 'Relay Satellite' }, desc: { ru: 'Базовый спутник на орбите', en: 'Basic orbiting satellite' }, profit: 50, cost: 500, maxLevel: 10, costMult: 1.6 },
     { id: 'm2', icon: '⛏', name: { ru: 'Шахта на астероиде', en: 'Asteroid Mine' }, desc: { ru: 'Добыча на астероидах', en: 'Mining on asteroids' }, profit: 200, cost: 2500, maxLevel: 10, costMult: 1.7 },
-    { id: 'm3', icon: '🏭', name: { ru: 'Плазма-завод', en: 'Plasma Plant' }, desc: { ru: 'Промышленная переработка', en: 'Industrial processing' }, profit: 800, cost: 12000, maxLevel: 10, costMult: 1.8 },
+    { id: 'm3', icon: '🏭', name: { ru: 'Завод плазмоида', en: 'Plasmoid Plant' }, desc: { ru: 'Промышленная переработка', en: 'Industrial processing' }, profit: 800, cost: 12000, maxLevel: 10, costMult: 1.8 },
     { id: 'm4', icon: '🔆', name: { ru: 'Солнечный сборщик', en: 'Solar Harvester' }, desc: { ru: 'Энергия из звёзд', en: 'Energy from stars' }, profit: 3000, cost: 60000, maxLevel: 10, costMult: 1.9 },
     { id: 'm5', icon: '🕳', name: { ru: 'Чёрная дыра', en: 'Black Hole Tap' }, desc: { ru: 'Энергия из сингулярности', en: 'Energy from singularity' }, profit: 12000, cost: 300000, maxLevel: 10, costMult: 2.0 },
     { id: 'm6', icon: '🌌', name: { ru: 'Квазар-ядро', en: 'Quasar Core' }, desc: { ru: 'Древняя энергия галактики', en: 'Ancient galaxy energy' }, profit: 50000, cost: 1500000, maxLevel: 10, costMult: 2.1 }
   ];
 
   const AIRDROP_TASKS = [
-    { id: 't1', icon: '📢', name: { ru: 'Подписаться на канал', en: 'Subscribe to channel' }, url: 'https://t.me/letuchka_news', reward: { ru: '+500 $PLASMA', en: '+500 $PLASMA' }, plasmaReward: 500 },
-    { id: 't2', icon: '👥', name: { ru: 'Пригласить 3 друзей', en: 'Invite 3 friends' }, url: '', reward: { ru: '+1000 $PLASMA', en: '+1000 $PLASMA' }, plasmaReward: 1000 },
-    { id: 't3', icon: '🎮', name: { ru: 'Сыграть 10 рейдов', en: 'Play 10 raids' }, url: '', reward: { ru: '+2000 $PLASMA', en: '+2000 $PLASMA' }, plasmaReward: 2000 },
+    { id: 't1', icon: '📢', name: { ru: 'Подписаться на канал', en: 'Subscribe to channel' }, url: 'https://t.me/letuchka_news', reward: { ru: '+500 $PLASMOID', en: '+500 $PLASMOID' }, plasmaReward: 500 },
+    { id: 't2', icon: '👥', name: { ru: 'Пригласить 3 друзей', en: 'Invite 3 friends' }, url: '', reward: { ru: '+1000 $PLASMOID', en: '+1000 $PLASMOID' }, plasmaReward: 1000 },
+    { id: 't3', icon: '🎮', name: { ru: 'Сыграть 10 рейдов', en: 'Play 10 raids' }, url: '', reward: { ru: '+2000 $PLASMOID', en: '+2000 $PLASMOID' }, plasmaReward: 2000 },
     { id: 't4', icon: '⚡', name: { ru: 'Купить любой апгрейд', en: 'Buy any upgrade' }, url: '', reward: { ru: '+10 ★', en: '+10 ★' }, starsReward: 10 },
     { id: 't5', icon: '🐋', name: { ru: 'Убить БОССА', en: 'Kill a BOSS' }, url: '', reward: { ru: '+50 ★', en: '+50 ★' }, starsReward: 50 }
   ];
@@ -3296,6 +3821,9 @@
 
   let miningLiveInterval = null;
   let miningLastFloatTime = 0;
+  let miningParticlesSpawned = false;
+  const MN_RING_CIRC = 2 * Math.PI * 92; // ≈ 578.05
+  const MN_RING_CAP_HOURS = 4; // ring fills up over 4h of uncollected plasmoid
   function renderMining() {
     const s = getState();
     const totalProfit = getMiningTotalProfit();
@@ -3304,7 +3832,49 @@
     document.getElementById('mnLiveCounter').textContent = pending.toLocaleString();
     const perSec = totalProfit / 3600;
     document.getElementById('mnLiveRate').textContent = perSec.toFixed(2);
+    document.getElementById('mnTrendPerSec').textContent = '+' + perSec.toFixed(2);
     document.getElementById('mnCollectBtn').disabled = pending <= 0;
+    // Update collect hint
+    const hintEl = document.getElementById('mnCollectHint');
+    if (hintEl) {
+      if (pending > 0) {
+        hintEl.classList.remove('idle');
+        hintEl.textContent = currentLang === 'ru' ? `Доступно: ${pending.toLocaleString()} ◈` : `Available: ${pending.toLocaleString()} ◈`;
+      } else {
+        hintEl.classList.add('idle');
+        // restore i18n default
+        hintEl.textContent = currentLang === 'ru' ? 'Накопите плазмоид, чтобы собрать' : 'Accumulate plasmoid to collect';
+      }
+    }
+    // Render tick marks once (they're static)
+    const tickGroup = document.getElementById('mnRingTicks');
+    if (tickGroup && !tickGroup.hasChildNodes()) {
+      let ticks = '';
+      const N = 60;
+      for (let i = 0; i < N; i++) {
+        const a = (i / N) * 2 * Math.PI - Math.PI / 2;
+        const x1 = 100 + Math.cos(a) * 80;
+        const y1 = 100 + Math.sin(a) * 80;
+        const x2 = 100 + Math.cos(a) * (i % 5 === 0 ? 74 : 78);
+        const y2 = 100 + Math.sin(a) * (i % 5 === 0 ? 74 : 78);
+        ticks += `<line class="mn-ring-tick" x1="${x1.toFixed(2)}" y1="${y1.toFixed(2)}" x2="${x2.toFixed(2)}" y2="${y2.toFixed(2)}"/>`;
+      }
+      tickGroup.innerHTML = ticks;
+    }
+    // Update progress ring: fill proportional to uncollected time, capped at MN_RING_CAP_HOURS
+    const elapsedH = (Date.now() - s.miningLastCollect) / 3600000;
+    const fillPct = Math.min(1, elapsedH / MN_RING_CAP_HOURS);
+    const offset = MN_RING_CIRC * (1 - fillPct);
+    const ringEl = document.getElementById('mnRingFg');
+    if (ringEl) {
+      ringEl.setAttribute('stroke-dasharray', MN_RING_CIRC.toFixed(2));
+      ringEl.setAttribute('stroke-dashoffset', offset.toFixed(2));
+    }
+    // Spawn drifting background particles once
+    if (!miningParticlesSpawned) {
+      spawnMiningParticles();
+      miningParticlesSpawned = true;
+    }
     // Render module list
     const list = document.getElementById('mnList');
     list.innerHTML = MINING_MODULES.map(mod => {
@@ -3312,20 +3882,23 @@
       const level = owned ? owned.level : 0;
       const maxed = level >= mod.maxLevel;
       const cost = maxed ? 0 : getMiningCost(mod, level);
-      const canBuy = !maxed && s.plasma >= cost;
+      const canBuy = !maxed && s.plasmoid >= cost;
       const profit = mod.profit * level;
-      return `<div class="mn-card ${level > 0 ? 'owned' : ''}">
+      const justBought = !!(window._mnJustBought && window._mnJustBought[mod.id]);
+      const purchasedCls = justBought ? ' purchased' : '';
+      return `<div class="mn-card ${level > 0 ? 'owned' : ''}${purchasedCls}" data-mine-card="${mod.id}">
         <div class="mn-icon">${mod.icon}</div>
         <div class="mn-body">
-          <div class="mn-name">${mod.name[currentLang]} ${level > 0 ? '<span style="color:var(--neon-cyan);font-size:11px;">Lv.' + level + '</span>' : ''}</div>
+          <div class="mn-name">${mod.name[currentLang]} ${level > 0 ? '<span style="color:var(--neon-cyan);font-size:11px;">Lv.' + level + '/' + mod.maxLevel + '</span>' : ''}</div>
           <div class="mn-profit">+${(mod.profit * (level + (maxed ? 0 : 1))).toLocaleString()}/ч ${level > 0 ? '(тек: +' + profit.toLocaleString() + '/ч)' : ''}</div>
           <div class="mn-desc">${mod.desc[currentLang]}</div>
         </div>
         <div class="mn-action">
-          ${maxed ? '<div class="mn-cost" style="color:var(--success)">MAX</div><button class="mn-buy maxed">✓</button>' : `<div class="mn-cost">${cost.toLocaleString()} $P</div><button class="mn-buy" ${canBuy ? '' : 'disabled'} onclick="buyMining('${mod.id}')">${currentLang === 'ru' ? 'КУПИТЬ' : 'BUY'}</button>`}
+          ${maxed ? '<div class="mn-cost" style="color:var(--success)">MAX</div><button class="mn-buy maxed">✓</button>' : `<div class="mn-cost">${cost.toLocaleString()} $P</div><button class="mn-buy" data-mine-id="${mod.id}" ${canBuy ? '' : 'disabled'} onclick="buyMining('${mod.id}')">${currentLang === 'ru' ? 'КУПИТЬ' : 'BUY'}</button>`}
         </div>
       </div>`;
     }).join('');
+    window._mnJustBought = null;
     // Start live counter interval
     if (miningLiveInterval) clearInterval(miningLiveInterval);
     miningLiveInterval = setInterval(() => {
@@ -3339,15 +3912,38 @@
       const livePerSec = liveProfit / 3600;
       const counterEl = document.getElementById('mnLiveCounter');
       if (counterEl) {
+        const prev = parseInt(counterEl.textContent.replace(/\s/g, '').replace(/\D/g, '')) || 0;
         counterEl.textContent = livePending.toLocaleString();
         // Pulse effect on number change
-        counterEl.style.transform = 'scale(1.03)';
-        setTimeout(() => { if (counterEl) counterEl.style.transform = 'scale(1)'; }, 150);
+        if (livePending !== prev) {
+          counterEl.classList.add('bump');
+          setTimeout(() => { if (counterEl) counterEl.classList.remove('bump'); }, 180);
+        }
       }
       const rateEl = document.getElementById('mnLiveRate');
       if (rateEl) rateEl.textContent = livePerSec.toFixed(2);
+      const trendEl = document.getElementById('mnTrendPerSec');
+      if (trendEl) trendEl.textContent = '+' + livePerSec.toFixed(2);
       const collectBtn = document.getElementById('mnCollectBtn');
       if (collectBtn) collectBtn.disabled = livePending <= 0;
+      // Update collect hint
+      const hint = document.getElementById('mnCollectHint');
+      if (hint) {
+        if (livePending > 0) {
+          hint.classList.remove('idle');
+          hint.textContent = currentLang === 'ru' ? `Доступно: ${livePending.toLocaleString()} ◈` : `Available: ${livePending.toLocaleString()} ◈`;
+        } else {
+          hint.classList.add('idle');
+          hint.textContent = currentLang === 'ru' ? 'Накопите плазмоид, чтобы собрать' : 'Accumulate plasmoid to collect';
+        }
+      }
+      // Update ring progress (smoothly tracks elapsed time)
+      const st = getState();
+      const elapsedH2 = (Date.now() - st.miningLastCollect) / 3600000;
+      const fillPct2 = Math.min(1, elapsedH2 / MN_RING_CAP_HOURS);
+      const offset2 = MN_RING_CIRC * (1 - fillPct2);
+      const ringEl2 = document.getElementById('mnRingFg');
+      if (ringEl2) ringEl2.setAttribute('stroke-dashoffset', offset2.toFixed(2));
       // Floating "+X" numbers every 3 seconds
       if (Date.now() - miningLastFloatTime > 3000 && liveProfit > 0) {
         miningLastFloatTime = Date.now();
@@ -3356,16 +3952,43 @@
     }, 1000);
   }
 
+  function spawnMiningParticles() {
+    const container = document.getElementById('mnParticles');
+    if (!container) return;
+    container.innerHTML = '';
+    const N = 18;
+    for (let i = 0; i < N; i++) {
+      const p = document.createElement('div');
+      p.className = 'mn-particle';
+      p.style.left = (Math.random() * 100) + '%';
+      const dur = 6 + Math.random() * 8;
+      p.style.animationDuration = dur + 's';
+      p.style.animationDelay = (-Math.random() * dur) + 's';
+      p.style.setProperty('--drift', (Math.random() * 60 - 30) + 'px');
+      const size = 2 + Math.random() * 3;
+      p.style.width = size + 'px';
+      p.style.height = size + 'px';
+      if (Math.random() < 0.3) {
+        p.style.background = 'var(--neon)';
+        p.style.boxShadow = '0 0 6px var(--neon)';
+      } else if (Math.random() < 0.15) {
+        p.style.background = 'var(--neon-pink)';
+        p.style.boxShadow = '0 0 6px var(--neon-pink)';
+      }
+      container.appendChild(p);
+    }
+  }
+
   function spawnMiningFloat(amount) {
     const card = document.getElementById('mnSummaryCard');
     if (!card) return;
     const float = document.createElement('div');
     float.className = 'mn-float-num';
     float.textContent = '+' + Math.floor(amount).toLocaleString();
-    float.style.left = (30 + Math.random() * 40) + '%';
-    float.style.top = '40%';
+    float.style.left = (38 + Math.random() * 24) + '%';
+    float.style.top = '46%';
     card.appendChild(float);
-    setTimeout(() => float.remove(), 2000);
+    setTimeout(() => float.remove(), 1900);
   }
 
   function buyMining(id) {
@@ -3376,29 +3999,80 @@
     const level = owned ? owned.level : 0;
     if (level >= mod.maxLevel) return;
     const cost = getMiningCost(mod, level);
-    if (s.plasma < cost) { showToast(t('not_enough'), 'danger'); return; }
-    s.plasma -= cost;
+    if (s.plasmoid < cost) { showToast(t('not_enough'), 'danger'); return; }
+    s.plasmoid -= cost;
     if (owned) { owned.level++; }
     else { s.miningModules = [...s.miningModules, { id, level: 1 }]; }
     saveState(s);
     SOUNDS.buy();
+    vibrate(60);
     showToast(t('purchased'), 'success');
+    // Mark this module as just bought for the card flash
+    window._mnJustBought = (window._mnJustBought || {});
+    window._mnJustBought[id] = true;
     const freshS = getState();
-    document.getElementById('topPlasma').textContent = Math.floor(freshS.plasma).toLocaleString();
+    // Real-time counter updates — no page refresh needed
+    document.getElementById('topPlasma').textContent = Math.floor(freshS.plasmoid).toLocaleString();
+    // Brief success animation on the button before re-render
+    const buyBtn = document.querySelector(`.mn-buy[data-mine-id="${id}"]`);
+    if (buyBtn) {
+      buyBtn.classList.add('success');
+      buyBtn.textContent = '✓';
+    }
     renderMining();
     renderHome();
+    // Spawn floating "+1 LVL" on the bought module card
+    requestAnimationFrame(() => {
+      const card = document.querySelector(`.mn-card[data-mine-card="${id}"]`);
+      if (card) {
+        const float = document.createElement('div');
+        float.className = 'sy-float-lvl';
+        float.style.right = '60px';
+        float.textContent = '+1 LVL';
+        card.appendChild(float);
+        setTimeout(() => float.remove(), 1500);
+      }
+    });
   }
 
   function collectMining() {
     const s = getState();
     const pending = getPendingPlasma();
     if (pending <= 0) return;
-    s.plasma += pending;
+    s.plasmoid += pending;
     s.miningLastCollect = Date.now();
     saveState(s);
     SOUNDS.collect();
-    showToast(`+${pending.toLocaleString()} $PLASMA`, 'cyan');
-    document.getElementById('topPlasma').textContent = Math.floor(s.plasma).toLocaleString();
+    vibrate([40, 30, 60]);
+    showToast(`+${pending.toLocaleString()} ◈ $PLASMOID`, 'cyan');
+    // Real-time topbar update
+    document.getElementById('topPlasma').textContent = Math.floor(s.plasmoid).toLocaleString();
+    // Burst of floating "+X" particles on the hero card
+    const card = document.getElementById('mnSummaryCard');
+    if (card) {
+      for (let i = 0; i < 6; i++) {
+        setTimeout(() => spawnMiningFloat(pending / 6), i * 70);
+      }
+      // Brief golden flash overlay
+      const flash = document.createElement('div');
+      flash.style.cssText = 'position:absolute;inset:0;background:radial-gradient(circle at 50% 45%, rgba(0,229,204,0.35), transparent 60%);pointer-events:none;z-index:5;animation:mnCollectFlash 0.8s ease-out forwards;';
+      card.appendChild(flash);
+      setTimeout(() => flash.remove(), 900);
+    }
+    // Reset ring + counter immediately so the player sees the harvest
+    const ringEl = document.getElementById('mnRingFg');
+    if (ringEl) ringEl.setAttribute('stroke-dashoffset', MN_RING_CIRC.toFixed(2));
+    const counterEl = document.getElementById('mnLiveCounter');
+    if (counterEl) {
+      counterEl.textContent = '0';
+      counterEl.classList.add('bump');
+      setTimeout(() => counterEl && counterEl.classList.remove('bump'), 200);
+    }
+    const hint = document.getElementById('mnCollectHint');
+    if (hint) {
+      hint.classList.add('idle');
+      hint.textContent = currentLang === 'ru' ? 'Накопите плазмоид, чтобы собрать' : 'Accumulate plasmoid to collect';
+    }
     renderMining();
     renderHome();
   }
@@ -3458,10 +4132,12 @@
         ${done ? '<button class="ad-task-btn done-btn">✓</button>' : `<button class="ad-task-btn" onclick="doAirdropTask('${task.id}')">${currentLang === 'ru' ? 'ВЫПОЛНИТЬ' : 'DO'}</button>`}
       </div>`;
     }).join('');
-    // Hide badge if all done
-    const badge = document.getElementById('navAirdropBadge');
-    if (tasksDone >= AIRDROP_TASKS.length && s.airdropWallet) badge.classList.remove('show');
-    else badge.classList.add('show');
+    // Hide badge if all done — keep both nav badge and home tile badge in sync
+    const showBadge = !(tasksDone >= AIRDROP_TASKS.length && s.airdropWallet);
+    const navBadge = document.getElementById('navAirdropBadge');
+    if (navBadge) { if (showBadge) navBadge.classList.add('show'); else navBadge.classList.remove('show'); }
+    const homeBadge = document.getElementById('navAirdropBadgeHome');
+    if (homeBadge) { if (showBadge) homeBadge.classList.add('show'); else homeBadge.classList.remove('show'); }
   }
 
   function doAirdropTask(id) {
@@ -3477,7 +4153,7 @@
     // Mark as done (in demo, instant; in prod, would verify)
     setTimeout(() => {
       s.airdropTasks = [...s.airdropTasks, id];
-      if (task.plasmaReward) s.plasma += task.plasmaReward;
+      if (task.plasmaReward) s.plasmoid += task.plasmaReward;
       if (task.starsReward) s.stars += task.starsReward;
       saveState(s);
       SOUNDS.quest();
@@ -3500,15 +4176,15 @@
   }
 
   // ============ PROFILE + LEVEL + CONVERTER ============
-  const PLASMA_TO_TON_RATE = 100000; // 100,000 $PLASMA = 1 TON
+  const PLASMOID_TO_TON_RATE = 100000; // 100,000 $PLASMOID = 1 TON
   const ACHIEVEMENTS = [
     { id: 'first_blood', icon: '🩸', name: { ru: 'Первая кровь', en: 'First Blood' }, cond: s => s.totalKills >= 1 },
     { id: 'kills_100', icon: '💀', name: { ru: '100 дронов', en: '100 Kills' }, cond: s => s.totalKills >= 100 },
     { id: 'kills_500', icon: '⚔', name: { ru: '500 дронов', en: '500 Kills' }, cond: s => s.totalKills >= 500 },
     { id: 'runs_10', icon: '🎮', name: { ru: '10 рейдов', en: '10 Raids' }, cond: s => s.totalRuns >= 10 },
     { id: 'runs_50', icon: '🎯', name: { ru: '50 рейдов', en: '50 Raids' }, cond: s => s.totalRuns >= 50 },
-    { id: 'plasma_10k', icon: '💎', name: { ru: '10K плазмы', en: '10K Plasma' }, cond: s => s.totalPlasma >= 10000 },
-    { id: 'plasma_100k', icon: '💰', name: { ru: '100K плазмы', en: '100K Plasma' }, cond: s => s.totalPlasma >= 100000 },
+    { id: 'plasma_10k', icon: '◈', name: { ru: '10K плазмоида', en: '10K Plasmoid' }, cond: s => s.totalPlasma >= 10000 },
+    { id: 'plasma_100k', icon: '💰', name: { ru: '100K плазмоида', en: '100K Plasmoid' }, cond: s => s.totalPlasma >= 100000 },
     { id: 'mining_1', icon: '⛏', name: { ru: 'Майнер', en: 'Miner' }, cond: s => s.miningModules.length > 0 },
     { id: 'boss_1', icon: '🐋', name: { ru: 'Убийца боссов', en: 'Boss Slayer' }, cond: s => s.totalKills >= 60 }, // proxy
     { id: 'lvl_5', icon: '⭐', name: { ru: '5 уровень', en: 'Level 5' }, cond: s => getLevel(s).level >= 5 },
@@ -3527,7 +4203,7 @@
   function updateTopbarAvatar() {
     const s = getState();
     const lvl = getLevel(s);
-    document.getElementById('topLevel').textContent = lvl.level;
+    const _lvlEl = document.getElementById('topLevel'); if (_lvlEl) _lvlEl.textContent = lvl.level;
     const avatarEl = document.getElementById('topbarAvatar');
     if (!avatarEl) return;
     if (tgUser && tgUser.photo_url) {
@@ -3569,14 +4245,14 @@
     // Stats tab
     const miningProfit = getMiningTotalProfit();
     const statsHtml = `
-      <div class="pf-stat-card"><div class="pf-stat-icon">◈</div><div class="pf-stat-val">${Math.floor(s.plasma).toLocaleString()}</div><div class="pf-stat-lbl">$PLASMA</div></div>
+      <div class="pf-stat-card"><div class="pf-stat-icon">◈</div><div class="pf-stat-val">${Math.floor(s.plasmoid).toLocaleString()}</div><div class="pf-stat-lbl">$PLASMOID</div></div>
       <div class="pf-stat-card"><div class="pf-stat-icon">★</div><div class="pf-stat-val">${s.glory.toLocaleString()}</div><div class="pf-stat-lbl">${currentLang === 'ru' ? 'СЛАВА' : 'GLORY'}</div></div>
       <div class="pf-stat-card"><div class="pf-stat-icon">🎮</div><div class="pf-stat-val">${s.totalRuns}</div><div class="pf-stat-lbl">${currentLang === 'ru' ? 'РЕЙДОВ' : 'RAIDS'}</div></div>
       <div class="pf-stat-card"><div class="pf-stat-icon">💀</div><div class="pf-stat-val">${s.totalKills}</div><div class="pf-stat-lbl">${currentLang === 'ru' ? 'КИЛЛОВ' : 'KILLS'}</div></div>
       <div class="pf-stat-card"><div class="pf-stat-icon">⛏</div><div class="pf-stat-val">${miningProfit.toLocaleString()}/ч</div><div class="pf-stat-lbl">${currentLang === 'ru' ? 'ДОХОД/Ч' : 'INCOME/H'}</div></div>
       <div class="pf-stat-card"><div class="pf-stat-icon">♛</div><div class="pf-stat-val">${s.bestRun}</div><div class="pf-stat-lbl">${currentLang === 'ru' ? 'РЕКОРД' : 'BEST'}</div></div>
       <div class="pf-stat-card"><div class="pf-stat-icon">👥</div><div class="pf-stat-val">${s.invited}</div><div class="pf-stat-lbl">${currentLang === 'ru' ? 'ДРУЗЕЙ' : 'FRIENDS'}</div></div>
-      <div class="pf-stat-card"><div class="pf-stat-icon">💎</div><div class="pf-stat-val">${s.totalPlasma.toLocaleString()}</div><div class="pf-stat-lbl">${currentLang === 'ru' ? 'ВСЕГО $P' : 'TOTAL $P'}</div></div>
+      <div class="pf-stat-card"><div class="pf-stat-icon">◈</div><div class="pf-stat-val">${s.totalPlasma.toLocaleString()}</div><div class="pf-stat-lbl">${currentLang === 'ru' ? 'ВСЕГО ◈' : 'TOTAL ◈'}</div></div>
     `;
     document.getElementById('pfStatsContent').innerHTML = statsHtml;
     // Achievements tab
@@ -3589,8 +4265,8 @@
     }).join('');
     document.getElementById('pfAchContent').innerHTML = achHtml;
     // Converter tab
-    const tonValue = (s.plasma / PLASMA_TO_TON_RATE).toFixed(4);
-    const pendingTon = (getPendingPlasma() / PLASMA_TO_TON_RATE).toFixed(4);
+    const tonValue = (s.plasmoid / PLASMOID_TO_TON_RATE).toFixed(4);
+    const pendingTon = (getPendingPlasma() / PLASMOID_TO_TON_RATE).toFixed(4);
     const convHtml = `
       <div class="pf-conv-card">
         <div class="pf-conv-title" data-i18n="pf_conv_title"></div>
@@ -3598,7 +4274,7 @@
         <div class="pf-conv-rate">
           <div class="pf-conv-from">
             <div class="pf-conv-from-val">100,000</div>
-            <div class="pf-conv-from-lbl">$PLASMA</div>
+            <div class="pf-conv-from-lbl">$PLASMOID</div>
           </div>
           <div class="pf-conv-arrow">→</div>
           <div class="pf-conv-to">
@@ -3606,9 +4282,9 @@
             <div class="pf-conv-to-lbl">TON</div>
           </div>
         </div>
-        <div class="pf-conv-balance">${currentLang === 'ru' ? 'Твой баланс' : 'Your balance'}: <span>${Math.floor(s.plasma).toLocaleString()} $PLASMA</span></div>
+        <div class="pf-conv-balance">${currentLang === 'ru' ? 'Твой баланс' : 'Your balance'}: <span>${Math.floor(s.plasmoid).toLocaleString()} $PLASMOID</span></div>
         <div class="pf-conv-balance">≈ <span>${tonValue} TON</span></div>
-        ${miningProfit > 0 ? `<div class="pf-conv-balance">${currentLang === 'ru' ? 'Накоплено майнингом' : 'Mining pending'}: <span>${getPendingPlasma().toLocaleString()} $P</span> (≈ ${pendingTon} TON)</div>` : ''}
+        ${miningProfit > 0 ? `<div class="pf-conv-balance">${currentLang === 'ru' ? 'Накоплено майнингом' : 'Mining pending'}: <span>${getPendingPlasma().toLocaleString()} ◈</span> (≈ ${pendingTon} TON)</div>` : ''}
         <div class="pf-conv-note">${currentLang === 'ru' ? 'Конвертация доступна после листинга в Q4 2026' : 'Conversion available after listing in Q4 2026'}</div>
       </div>
     `;
@@ -3629,6 +4305,9 @@
   if (sessionStorage.getItem('vd_entered')) { document.getElementById('onboarding').style.display = 'none'; document.getElementById('app').classList.add('show'); checkDailyReset(); renderAll(); checkStoryProgress(); checkEnergyRegen(); setInterval(checkEnergyRegen, 30000); }
   else { sessionStorage.setItem('vd_entered', '1'); }
 </script>
+
+<!-- Version badge: helps detect stale Telegram cache. If you don't see "v1.5.1" here, you're viewing a cached old version. -->
+<div class="ver-badge" id="verBadge">v1.5.1</div>
 
 </body>
 </html>
