@@ -48,6 +48,72 @@
   .topbar-logo { font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 700; background: linear-gradient(135deg, #7C5CFC 0%, #00E5CC 50%, #FF4D8D 100%); background-size: 200% 200%; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 0.15em; animation: logoGradient 6s ease-in-out infinite; display: flex; align-items: center; gap: 6px; }
   @keyframes logoGradient { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
   .topbar-logo-ship { width: 20px; height: 20px; animation: logoShipFloat 3s ease-in-out infinite; }
+
+  /* Logo letters shimmer */
+  .logo-text { display: flex; gap: 1px; }
+  .logo-letter { display: inline-block; background: linear-gradient(135deg, #7C5CFC, #00E5CC, #FF4D8D, #7C5CFC); background-size: 300% 300%; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; animation: letterShimmer 4s ease-in-out infinite; }
+  @keyframes letterShimmer { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+
+  /* Topbar avatar */
+  .topbar-avatar { width: 36px; height: 36px; border-radius: 50%; cursor: pointer; overflow: hidden; border: 2px solid rgba(0, 229, 204, 0.3); transition: all 0.3s ease; flex-shrink: 0; }
+  .topbar-avatar:hover { border-color: var(--neon-cyan); box-shadow: 0 0 12px rgba(0, 229, 204, 0.4); transform: scale(1.05); }
+  .topbar-avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .topbar-avatar-placeholder { width: 100%; height: 100%; background: linear-gradient(135deg, var(--neon), var(--neon-cyan)); display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 900; color: #060B1A; }
+  .topbar-level { display: flex; flex-direction: column; align-items: center; gap: 1px; }
+  .topbar-level-num { font-size: 14px; font-weight: 900; color: var(--neon-cyan); line-height: 1; }
+  .topbar-level-label { font-size: 7px; font-weight: 800; color: #6B7B9F; letter-spacing: 0.1em; text-transform: uppercase; }
+
+  /* PROFILE SCREEN */
+  .pf-header { text-align: center; margin-bottom: 20px; padding: 0 16px; }
+  .pf-title { font-size: 26px; font-weight: 900; color: #F0EBFF; margin-bottom: 4px; }
+  .pf-title em { background: linear-gradient(135deg, var(--neon), var(--neon-cyan)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; font-style: normal; }
+  .pf-sub { font-size: 11px; color: #6B7B9F; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; }
+  .pf-avatar-wrap { width: 80px; height: 80px; margin: 0 auto 12px; border-radius: 50%; overflow: hidden; border: 3px solid var(--neon); box-shadow: 0 0 20px rgba(124,92,252,0.3); }
+  .pf-avatar-wrap img { width: 100%; height: 100%; object-fit: cover; }
+  .pf-avatar-placeholder { width: 100%; height: 100%; background: linear-gradient(135deg, var(--neon), var(--neon-cyan)); display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 900; color: #060B1A; }
+  .pf-name { font-size: 20px; font-weight: 900; color: #F0EBFF; margin-bottom: 2px; }
+  .pf-title-badge { font-size: 12px; color: var(--neon-cyan); font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px; }
+  .pf-level-bar { max-width: 300px; margin: 0 auto; }
+  .pf-level-info { display: flex; justify-content: space-between; font-size: 11px; color: #6B7B9F; margin-bottom: 4px; }
+  .pf-level-info span { color: var(--neon-cyan); font-weight: 800; }
+  .pf-level-progress { height: 8px; background: rgba(124,92,252,0.1); border-radius: 999px; overflow: hidden; }
+  .pf-level-fill { height: 100%; background: linear-gradient(90deg, var(--neon), var(--neon-cyan)); border-radius: 999px; transition: width 0.5s ease; }
+
+  .pf-tabs { max-width: 540px; margin: 0 auto 16px; padding: 0 16px; display: flex; gap: 6px; background: rgba(10, 8, 32, 0.6); padding: 4px; border-radius: 999px; border: 1px solid rgba(124, 92, 252, 0.1); }
+  .pf-tab { flex: 1; background: transparent; border: none; color: #6B7B9F; padding: 10px; font-size: 12px; font-weight: 800; cursor: pointer; border-radius: 999px; transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); font-family: inherit; }
+  .pf-tab.active { background: linear-gradient(135deg, var(--neon), var(--neon-cyan)); color: #060B1A; box-shadow: 0 4px 14px rgba(124,92,252,0.3); }
+
+  .pf-stats { max-width: 540px; margin: 0 auto; padding: 0 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .pf-stat-card { background: linear-gradient(180deg, rgba(20, 16, 46, 0.9) 0%, rgba(10, 8, 32, 0.95) 100%); border: 1px solid rgba(124, 92, 252, 0.15); border-radius: 16px; padding: 14px; text-align: center; }
+  .pf-stat-icon { font-size: 20px; margin-bottom: 4px; }
+  .pf-stat-val { font-size: 20px; font-weight: 900; color: var(--neon-cyan); }
+  .pf-stat-lbl { font-size: 9px; color: #6B7B9F; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; margin-top: 4px; }
+
+  /* Achievements */
+  .pf-ach { max-width: 540px; margin: 0 auto; padding: 0 16px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .pf-ach-card { background: linear-gradient(180deg, rgba(20, 16, 46, 0.9) 0%, rgba(10, 8, 32, 0.95) 100%); border: 1px solid rgba(124, 92, 252, 0.12); border-radius: 14px; padding: 10px 4px; text-align: center; }
+  .pf-ach-card.earned { border-color: rgba(0, 229, 204, 0.3); background: linear-gradient(135deg, rgba(0,229,204,0.06), rgba(10,8,32,0.95)); }
+  .pf-ach-card.locked { opacity: 0.4; }
+  .pf-ach-icon { font-size: 22px; margin-bottom: 4px; }
+  .pf-ach-name { font-size: 8px; color: #6B7B9F; font-weight: 800; letter-spacing: 0.04em; }
+  .pf-ach-card.earned .pf-ach-name { color: var(--neon-cyan); }
+
+  /* Converter */
+  .pf-conv { max-width: 540px; margin: 0 auto; padding: 0 16px; }
+  .pf-conv-card { background: linear-gradient(135deg, rgba(0,229,204,0.08), rgba(10,8,32,0.9)); border: 1px solid rgba(0,229,204,0.25); border-radius: 20px; padding: 20px; text-align: center; }
+  .pf-conv-title { font-size: 16px; font-weight: 900; color: #F0EBFF; margin-bottom: 6px; }
+  .pf-conv-desc { font-size: 12px; color: #6B7B9F; margin-bottom: 16px; line-height: 1.5; }
+  .pf-conv-rate { display: flex; justify-content: center; align-items: center; gap: 8px; margin-bottom: 16px; }
+  .pf-conv-from { background: rgba(124,92,252,0.1); border: 1px solid rgba(124,92,252,0.2); border-radius: 12px; padding: 12px 16px; }
+  .pf-conv-from-val { font-size: 18px; font-weight: 900; color: var(--neon); }
+  .pf-conv-from-lbl { font-size: 9px; color: #6B7B9F; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
+  .pf-conv-arrow { font-size: 20px; color: var(--neon-cyan); }
+  .pf-conv-to { background: rgba(0,229,204,0.1); border: 1px solid rgba(0,229,204,0.2); border-radius: 12px; padding: 12px 16px; }
+  .pf-conv-to-val { font-size: 18px; font-weight: 900; color: var(--neon-cyan); }
+  .pf-conv-to-lbl { font-size: 9px; color: #6B7B9F; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
+  .pf-conv-balance { font-size: 13px; color: #6B7B9F; margin-top: 12px; }
+  .pf-conv-balance span { color: var(--neon-cyan); font-weight: 800; }
+  .pf-conv-note { font-size: 10px; color: #6B7B9F; margin-top: 8px; font-style: italic; }
   @keyframes logoShipFloat { 0%, 100% { transform: translateY(0) rotate(-5deg); } 50% { transform: translateY(-2px) rotate(5deg); } }
   .topbar-title-badge { background: rgba(0, 229, 204, 0.08); padding: 5px 10px; border-radius: 999px; border: 1px solid rgba(0, 229, 204, 0.2); font-size: 9px; font-weight: 800; color: var(--neon-cyan); letter-spacing: 0.08em; max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .topbar-right { display: flex; align-items: center; gap: 6px; }
@@ -639,21 +705,27 @@
 <!-- APP -->
 <div id="app">
   <div class="topbar">
-    <div class="topbar-logo mono">
+    <div class="topbar-logo mono" onclick="switchScreen('profile')">
       <svg class="topbar-logo-ship" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M10 1L17 14L13 17L7 17L3 14L10 1Z" fill="url(#shipGrad)" stroke="#00E5CC" stroke-width="0.5"/>
         <circle cx="10" cy="9" r="2" fill="#00E5CC"/>
         <defs><linearGradient id="shipGrad" x1="10" y1="1" x2="10" y2="17"><stop stop-color="#7C5CFC"/><stop offset="1" stop-color="#5B3FBC"/></linearGradient></defs>
       </svg>
-      LETUCHKA
+      <span class="logo-text"><span class="logo-letter">L</span><span class="logo-letter">E</span><span class="logo-letter">T</span><span class="logo-letter">U</span><span class="logo-letter">C</span><span class="logo-letter">H</span><span class="logo-letter">K</span><span class="logo-letter">A</span></span>
     </div>
-    <div class="topbar-title-badge mono" id="topTitle">ИСКАТЕЛЬ</div>
+    <div class="topbar-level">
+      <span class="topbar-level-num" id="topLevel">1</span>
+      <span class="topbar-level-label">LVL</span>
+    </div>
     <div class="topbar-right">
       <div class="energy-bar" id="energyBar">
         <span class="energy-icon">⚡</span>
         <span class="energy-text" id="energyText">5/5</span>
       </div>
       <div class="topbar-pill"><span>★</span><span id="starsCount">50</span></div>
+      <div class="topbar-avatar" id="topbarAvatar" onclick="switchScreen('profile')">
+        <div class="topbar-avatar-placeholder" id="topbarAvatarPlaceholder">?</div>
+      </div>
     </div>
   </div>
 
@@ -868,12 +940,32 @@
         <div class="ad-wallet" id="adWalletSection">
           <div class="ad-wallet-icon">👛</div>
           <div class="ad-wallet-title" data-i18n="ad_wallet_title"></div>
-          <div class="ad-wallet-desc" data-i18n="ad_wallet_desc"></div>
-          <input class="ad-wallet-input" id="adWalletInput" placeholder="UQ... / EQ..." autocomplete="off">
-          <button class="ad-wallet-btn" onclick="saveWallet()" data-i18n="ad_wallet_btn"></button>
+          <div class="ad-wallet-desc" data-i18n="ad_wallet_soon"></div>
+          <button class="ad-wallet-btn" disabled style="opacity:0.5;cursor:not-allowed;" data-i18n="ad_wallet_soon_btn"></button>
         </div>
         <div id="adTasks"></div>
       </div>
+    </div>
+
+    <!-- PROFILE -->
+    <div id="profile" class="screen">
+      <div class="pf-header">
+        <div class="pf-avatar-wrap" id="pfAvatarWrap"><div class="pf-avatar-placeholder" id="pfAvatarPlaceholder">?</div></div>
+        <div class="pf-name" id="pfName">Капитан</div>
+        <div class="pf-title-badge" id="pfTitleBadge">Искатель</div>
+        <div class="pf-level-bar">
+          <div class="pf-level-info"><span>Lvl <span id="pfLevel">1</span></span><span><span id="pfLevelExp">0</span>/<span id="pfLevelNext">100</span> XP</span></div>
+          <div class="pf-level-progress"><div class="pf-level-fill" id="pfLevelFill" style="width:0%;"></div></div>
+        </div>
+      </div>
+      <div class="pf-tabs">
+        <button class="pf-tab active" data-ptab="stats" onclick="switchProfileTab('stats')" data-i18n="pf_tab_stats"></button>
+        <button class="pf-tab" data-ptab="ach" onclick="switchProfileTab('ach')" data-i18n="pf_tab_ach"></button>
+        <button class="pf-tab" data-ptab="conv" onclick="switchProfileTab('conv')" data-i18n="pf_tab_conv"></button>
+      </div>
+      <div id="pfStatsContent" class="pf-stats"></div>
+      <div id="pfAchContent" class="pf-ach" style="display:none;"></div>
+      <div id="pfConvContent" class="pf-conv" style="display:none;"></div>
     </div>
 
     <!-- SETTINGS -->
@@ -940,7 +1032,7 @@
     <button class="nav-btn" data-screen="mining" onclick="switchScreen('mining')"><div class="nav-btn-icon-wrap"><div class="nav-btn-icon">⛏</div></div><span data-i18n="nav_mining"></span></button>
     <button class="nav-btn" data-screen="shipyard" onclick="switchScreen('shipyard')"><div class="nav-btn-icon-wrap"><div class="nav-btn-icon">⚙</div></div><span data-i18n="nav_shipyard"></span></button>
     <button class="nav-btn" data-screen="airdrop" onclick="switchScreen('airdrop')"><div class="nav-btn-icon-wrap"><div class="nav-btn-icon">◆</div></div><span data-i18n="nav_airdrop"></span><div class="nav-badge cyan" id="navAirdropBadge">!</div></button>
-    <button class="nav-btn" data-screen="settings" onclick="switchScreen('settings')"><div class="nav-btn-icon-wrap"><div class="nav-btn-icon">☰</div></div><span data-i18n="nav_settings"></span></button>
+    <button class="nav-btn" data-screen="profile" onclick="switchScreen('profile')"><div class="nav-btn-icon-wrap"><div class="nav-btn-icon">☻</div></div><span data-i18n="nav_profile"></span></button>
   </div>
 </div>
 
@@ -1070,6 +1162,12 @@
       ad_tasks_done: 'заданий выполнено',
       ad_wallet_title: 'Привяжите TON кошелёк', ad_wallet_desc: 'Укажите адрес TON-кошелька для получения $PLASMA при листинге',
       ad_wallet_btn: 'ПРИВЯЗАТЬ КОШЕЛЁК',
+      ad_wallet_soon: 'Привязка TON-кошелька будет доступна ближе к листингу. Следите за новостями!',
+      ad_wallet_soon_btn: 'СКОРО',
+      nav_profile: 'Профиль',
+      pf_tab_stats: 'Статистика', pf_tab_ach: 'Достижения', pf_tab_conv: 'Конвертер',
+      pf_conv_title: 'Конвертер $PLASMA → TON',
+      pf_conv_desc: 'Курс обмена фиксирован. После листинга вы сможете конвертировать $PLASMA в TON напрямую.',
       titles: ['Искатель','Новичок','Штурман','Капитан','Командор','Адмирал','Звездоходец','Галактический Лорд','Бог Вселенной'],
       faq: {
         q1: 'Как управлять кораблём?',
@@ -1178,6 +1276,12 @@
       ad_tasks_done: 'tasks completed',
       ad_wallet_title: 'Link your TON wallet', ad_wallet_desc: 'Enter your TON wallet address to receive $PLASMA at listing',
       ad_wallet_btn: 'LINK WALLET',
+      ad_wallet_soon: 'TON wallet linking will be available closer to listing. Stay tuned!',
+      ad_wallet_soon_btn: 'COMING SOON',
+      nav_profile: 'Profile',
+      pf_tab_stats: 'Stats', pf_tab_ach: 'Achievements', pf_tab_conv: 'Converter',
+      pf_conv_title: '$PLASMA → TON Converter',
+      pf_conv_desc: 'Exchange rate is fixed. After listing, you will be able to convert $PLASMA to TON directly.',
       titles: ['Seeker','Novice','Navigator','Captain','Commander','Admiral','Starwalker','Galactic Lord','God of Universe'],
       faq: {
         q1: 'How to control the ship?',
@@ -1455,6 +1559,7 @@
     if (name === 'shipyard') renderShipyard();
     if (name === 'mining') renderMining();
     if (name === 'airdrop') renderAirdrop();
+    if (name === 'profile') renderProfile();
     if (name === 'quests') renderQuests();
     if (name === 'comms') { renderComms(); markMessagesRead(); }
     if (name === 'faq') renderFAQ();
@@ -1463,7 +1568,7 @@
     if (name === 'battle') {} else { if (battle) battle.stop(); }
   }
 
-  function renderAll() { renderHome(); renderShipyard(); renderMining(); renderAirdrop(); renderQuests(); renderComms(); renderFAQ(); renderReferrals(); renderDailyRun(); updateBadges(); updateEnergyUI(); }
+  function renderAll() { renderHome(); renderShipyard(); renderMining(); renderAirdrop(); renderProfile(); renderQuests(); renderComms(); renderFAQ(); renderReferrals(); renderDailyRun(); updateBadges(); updateEnergyUI(); updateTopbarAvatar(); }
 
   function renderHome() {
     const s = getState();
@@ -3257,6 +3362,123 @@
     SOUNDS.buy();
     showToast(currentLang === 'ru' ? 'Кошелёк привязан!' : 'Wallet linked!', 'success');
     renderAirdrop();
+  }
+
+  // ============ PROFILE + LEVEL + CONVERTER ============
+  const PLASMA_TO_TON_RATE = 100000; // 100,000 $PLASMA = 1 TON
+  const ACHIEVEMENTS = [
+    { id: 'first_blood', icon: '🩸', name: { ru: 'Первая кровь', en: 'First Blood' }, cond: s => s.totalKills >= 1 },
+    { id: 'kills_100', icon: '💀', name: { ru: '100 дронов', en: '100 Kills' }, cond: s => s.totalKills >= 100 },
+    { id: 'kills_500', icon: '⚔', name: { ru: '500 дронов', en: '500 Kills' }, cond: s => s.totalKills >= 500 },
+    { id: 'runs_10', icon: '🎮', name: { ru: '10 рейдов', en: '10 Raids' }, cond: s => s.totalRuns >= 10 },
+    { id: 'runs_50', icon: '🎯', name: { ru: '50 рейдов', en: '50 Raids' }, cond: s => s.totalRuns >= 50 },
+    { id: 'plasma_10k', icon: '💎', name: { ru: '10K плазмы', en: '10K Plasma' }, cond: s => s.totalPlasma >= 10000 },
+    { id: 'plasma_100k', icon: '💰', name: { ru: '100K плазмы', en: '100K Plasma' }, cond: s => s.totalPlasma >= 100000 },
+    { id: 'mining_1', icon: '⛏', name: { ru: 'Майнер', en: 'Miner' }, cond: s => s.miningModules.length > 0 },
+    { id: 'boss_1', icon: '🐋', name: { ru: 'Убийца боссов', en: 'Boss Slayer' }, cond: s => s.totalKills >= 60 }, // proxy
+    { id: 'lvl_5', icon: '⭐', name: { ru: '5 уровень', en: 'Level 5' }, cond: s => getLevel(s).level >= 5 },
+    { id: 'refs_3', icon: '👥', name: { ru: '3 друга', en: '3 Friends' }, cond: s => s.invited >= 3 },
+    { id: 'glory_5k', icon: '👑', name: { ru: 'Слава 5K', en: 'Glory 5K' }, cond: s => s.glory >= 5000 }
+  ];
+
+  function getLevel(s) {
+    // Level from glory: each level needs level*100 glory
+    let level = 1, needed = 100, totalNeeded = 0;
+    while (s.glory >= totalNeeded + needed) { totalNeeded += needed; level++; needed = level * 100; }
+    const exp = s.glory - totalNeeded;
+    return { level, exp, next: needed, pct: (exp / needed) * 100 };
+  }
+
+  function updateTopbarAvatar() {
+    const s = getState();
+    const lvl = getLevel(s);
+    document.getElementById('topLevel').textContent = lvl.level;
+    const avatarEl = document.getElementById('topbarAvatar');
+    const placeholder = document.getElementById('topbarAvatarPlaceholder');
+    if (s.tgId && tgUser && tgUser.photo_url) {
+      avatarEl.innerHTML = `<img src="${tgUser.photo_url}" alt="">`;
+    } else if (s.tgName) {
+      placeholder.textContent = s.tgName.charAt(0).toUpperCase();
+    } else {
+      placeholder.textContent = '?';
+    }
+  }
+
+  let profileTab = 'stats';
+  function switchProfileTab(tab) {
+    profileTab = tab;
+    document.querySelectorAll('.pf-tab').forEach(b => b.classList.toggle('active', b.dataset.ptab === tab));
+    document.getElementById('pfStatsContent').style.display = tab === 'stats' ? 'grid' : 'none';
+    document.getElementById('pfAchContent').style.display = tab === 'ach' ? 'grid' : 'none';
+    document.getElementById('pfConvContent').style.display = tab === 'conv' ? 'block' : 'none';
+  }
+
+  function renderProfile() {
+    const s = getState();
+    const lvl = getLevel(s);
+    // Avatar
+    const avatarWrap = document.getElementById('pfAvatarWrap');
+    if (s.tgId && tgUser && tgUser.photo_url) {
+      avatarWrap.innerHTML = `<img src="${tgUser.photo_url}" alt="">`;
+    } else {
+      const initial = s.tgName ? s.tgName.charAt(0).toUpperCase() : '?';
+      avatarWrap.innerHTML = `<div class="pf-avatar-placeholder">${initial}</div>`;
+    }
+    // Name + title
+    document.getElementById('pfName').textContent = s.tgName || (currentLang === 'ru' ? 'Капитан' : 'Captain');
+    document.getElementById('pfTitleBadge').textContent = getTitle();
+    document.getElementById('pfLevel').textContent = lvl.level;
+    document.getElementById('pfLevelExp').textContent = lvl.exp;
+    document.getElementById('pfLevelNext').textContent = lvl.next;
+    document.getElementById('pfLevelFill').style.width = lvl.pct + '%';
+    // Stats tab
+    const miningProfit = getMiningTotalProfit();
+    const statsHtml = `
+      <div class="pf-stat-card"><div class="pf-stat-icon">◈</div><div class="pf-stat-val">${Math.floor(s.plasma).toLocaleString()}</div><div class="pf-stat-lbl">$PLASMA</div></div>
+      <div class="pf-stat-card"><div class="pf-stat-icon">★</div><div class="pf-stat-val">${s.glory.toLocaleString()}</div><div class="pf-stat-lbl">${currentLang === 'ru' ? 'СЛАВА' : 'GLORY'}</div></div>
+      <div class="pf-stat-card"><div class="pf-stat-icon">🎮</div><div class="pf-stat-val">${s.totalRuns}</div><div class="pf-stat-lbl">${currentLang === 'ru' ? 'РЕЙДОВ' : 'RAIDS'}</div></div>
+      <div class="pf-stat-card"><div class="pf-stat-icon">💀</div><div class="pf-stat-val">${s.totalKills}</div><div class="pf-stat-lbl">${currentLang === 'ru' ? 'КИЛЛОВ' : 'KILLS'}</div></div>
+      <div class="pf-stat-card"><div class="pf-stat-icon">⛏</div><div class="pf-stat-val">${miningProfit.toLocaleString()}/ч</div><div class="pf-stat-lbl">${currentLang === 'ru' ? 'ДОХОД/Ч' : 'INCOME/H'}</div></div>
+      <div class="pf-stat-card"><div class="pf-stat-icon">♛</div><div class="pf-stat-val">${s.bestRun}</div><div class="pf-stat-lbl">${currentLang === 'ru' ? 'РЕКОРД' : 'BEST'}</div></div>
+      <div class="pf-stat-card"><div class="pf-stat-icon">👥</div><div class="pf-stat-val">${s.invited}</div><div class="pf-stat-lbl">${currentLang === 'ru' ? 'ДРУЗЕЙ' : 'FRIENDS'}</div></div>
+      <div class="pf-stat-card"><div class="pf-stat-icon">💎</div><div class="pf-stat-val">${s.totalPlasma.toLocaleString()}</div><div class="pf-stat-lbl">${currentLang === 'ru' ? 'ВСЕГО $P' : 'TOTAL $P'}</div></div>
+    `;
+    document.getElementById('pfStatsContent').innerHTML = statsHtml;
+    // Achievements tab
+    const achHtml = ACHIEVEMENTS.map(a => {
+      const earned = a.cond(s);
+      return `<div class="pf-ach-card ${earned ? 'earned' : 'locked'}">
+        <div class="pf-ach-icon">${a.icon}</div>
+        <div class="pf-ach-name">${a.name[currentLang]}</div>
+      </div>`;
+    }).join('');
+    document.getElementById('pfAchContent').innerHTML = achHtml;
+    // Converter tab
+    const tonValue = (s.plasma / PLASMA_TO_TON_RATE).toFixed(4);
+    const pendingTon = (getPendingPlasma() / PLASMA_TO_TON_RATE).toFixed(4);
+    const convHtml = `
+      <div class="pf-conv-card">
+        <div class="pf-conv-title" data-i18n="pf_conv_title"></div>
+        <div class="pf-conv-desc" data-i18n="pf_conv_desc"></div>
+        <div class="pf-conv-rate">
+          <div class="pf-conv-from">
+            <div class="pf-conv-from-val">100,000</div>
+            <div class="pf-conv-from-lbl">$PLASMA</div>
+          </div>
+          <div class="pf-conv-arrow">→</div>
+          <div class="pf-conv-to">
+            <div class="pf-conv-to-val">1 TON</div>
+            <div class="pf-conv-to-lbl">TON</div>
+          </div>
+        </div>
+        <div class="pf-conv-balance">${currentLang === 'ru' ? 'Твой баланс' : 'Your balance'}: <span>${Math.floor(s.plasma).toLocaleString()} $PLASMA</span></div>
+        <div class="pf-conv-balance">≈ <span>${tonValue} TON</span></div>
+        ${miningProfit > 0 ? `<div class="pf-conv-balance">${currentLang === 'ru' ? 'Накоплено майнингом' : 'Mining pending'}: <span>${getPendingPlasma().toLocaleString()} $P</span> (≈ ${pendingTon} TON)</div>` : ''}
+        <div class="pf-conv-note">${currentLang === 'ru' ? 'Конвертация доступна после листинга в Q4 2026' : 'Conversion available after listing in Q4 2026'}</div>
+      </div>
+    `;
+    document.getElementById('pfConvContent').innerHTML = convHtml;
+    applyI18n();
   }
 
   // ============ INIT ============
