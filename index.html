@@ -397,9 +397,16 @@
   .mn-summary-card { background: linear-gradient(135deg, rgba(0,229,204,0.08), rgba(10,8,32,0.9)); border: 1px solid rgba(0,229,204,0.25); border-radius: 20px; padding: 18px; text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,0.3); position: relative; overflow: hidden; }
   .mn-summary-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--neon-cyan), var(--neon), transparent); }
   .mn-summary-label { font-size: 10px; color: #6B7B9F; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 6px; }
-  .mn-summary-value { font-size: 32px; color: var(--neon-cyan); font-weight: 900; line-height: 1; text-shadow: 0 0 20px rgba(0,229,204,0.4); }
+  .mn-summary-value { font-size: 32px; color: var(--neon-cyan); font-weight: 900; line-height: 1; text-shadow: 0 0 20px rgba(0,229,204,0.4); font-variant-numeric: tabular-nums; }
   .mn-summary-sub { font-size: 11px; color: #6B7B9F; margin-top: 6px; }
   .mn-summary-sub span { color: var(--neon-cyan); }
+  .mn-live-counter { font-size: 28px; font-weight: 900; color: var(--neon-cyan); font-variant-numeric: tabular-nums; text-shadow: 0 0 16px rgba(0,229,204,0.5); margin: 8px 0; animation: mnLivePulse 2s ease-in-out infinite; transition: transform 0.15s ease; }
+  @keyframes mnLivePulse { 0%, 100% { text-shadow: 0 0 16px rgba(0,229,204,0.5); } 50% { text-shadow: 0 0 28px rgba(0,229,204,0.8); } }
+  .mn-live-label { font-size: 10px; color: #6B7B9F; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 4px; }
+  .mn-live-rate { font-size: 12px; color: var(--neon); font-weight: 800; }
+  .mn-live-rate span { color: var(--neon-cyan); }
+  .mn-float-num { position: absolute; pointer-events: none; font-size: 14px; font-weight: 900; color: var(--neon-cyan); text-shadow: 0 0 8px rgba(0,229,204,0.6); animation: mnFloatUp 2s ease-out forwards; }
+  @keyframes mnFloatUp { 0% { opacity: 0; transform: translateY(0); } 10% { opacity: 1; } 100% { opacity: 0; transform: translateY(-40px); } }
   .mn-collect-btn { display: block; margin: 14px auto 0; background: linear-gradient(135deg, var(--neon-cyan), #00BFA6); color: #060B1A; border: none; padding: 14px 32px; font-size: 13px; font-weight: 900; cursor: pointer; font-family: inherit; border-radius: 999px; letter-spacing: 0.05em; text-transform: uppercase; box-shadow: 0 6px 18px rgba(0,229,204,0.3); transition: all 0.25s ease; }
   .mn-collect-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(0,229,204,0.4); }
   .mn-collect-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
@@ -943,10 +950,13 @@
         <div class="qu-sub mono" data-i18n="mn_sub"></div>
       </div>
       <div class="mn-summary">
-        <div class="mn-summary-card">
+        <div class="mn-summary-card" id="mnSummaryCard">
           <div class="mn-summary-label mono" data-i18n="mn_passive_income"></div>
           <div class="mn-summary-value mono" id="mnTotalIncome">0/ч</div>
-          <div class="mn-summary-sub"><span id="mnPending">0</span> $PLASMA <span data-i18n="mn_pending"></span></div>
+          <div style="height:1px;background:linear-gradient(90deg,transparent,rgba(0,229,204,0.2),transparent);margin:14px 0;"></div>
+          <div class="mn-live-label mono" data-i18n="mn_pending"></div>
+          <div class="mn-live-counter mono" id="mnLiveCounter">0</div>
+          <div class="mn-live-rate">+<span id="mnLiveRate">0.00</span> $PLASMA/сек</div>
           <button class="mn-collect-btn" id="mnCollectBtn" onclick="collectMining()" data-i18n="mn_collect"></button>
         </div>
       </div>
@@ -1599,7 +1609,7 @@
     initTelegram();
     document.getElementById('onboarding').classList.add('hide');
     if (obAnimId) cancelAnimationFrame(obAnimId);
-    setTimeout(() => { document.getElementById('onboarding').style.display = 'none'; document.getElementById('app').classList.add('show'); checkDailyReset(); renderAll(); checkStoryProgress(); checkEnergyRegen(); setInterval(checkEnergyRegen, 30000); setInterval(() => { if (document.getElementById('mining').classList.contains('active')) renderMining(); }, 5000); }, 600);
+    setTimeout(() => { document.getElementById('onboarding').style.display = 'none'; document.getElementById('app').classList.add('show'); checkDailyReset(); renderAll(); checkStoryProgress(); checkEnergyRegen(); setInterval(checkEnergyRegen, 30000); }, 600);
   }
 
   // ============ SCREENS ============
@@ -1615,6 +1625,7 @@
     }
     if (name === 'home') renderHome();
     if (name !== 'shipyard') stopHangar();
+    if (name !== 'mining' && miningLiveInterval) { clearInterval(miningLiveInterval); miningLiveInterval = null; }
     if (name === 'shipyard') renderShipyard();
     if (name === 'mining') renderMining();
     if (name === 'airdrop') renderAirdrop();
@@ -3283,13 +3294,18 @@
     return Math.floor(profitPerSec * elapsed);
   }
 
+  let miningLiveInterval = null;
+  let miningLastFloatTime = 0;
   function renderMining() {
     const s = getState();
     const totalProfit = getMiningTotalProfit();
     const pending = getPendingPlasma();
     document.getElementById('mnTotalIncome').textContent = totalProfit.toLocaleString() + '/ч';
-    document.getElementById('mnPending').textContent = pending.toLocaleString();
+    document.getElementById('mnLiveCounter').textContent = pending.toLocaleString();
+    const perSec = totalProfit / 3600;
+    document.getElementById('mnLiveRate').textContent = perSec.toFixed(2);
     document.getElementById('mnCollectBtn').disabled = pending <= 0;
+    // Render module list
     const list = document.getElementById('mnList');
     list.innerHTML = MINING_MODULES.map(mod => {
       const owned = s.miningModules.find(m => m.id === mod.id);
@@ -3310,6 +3326,46 @@
         </div>
       </div>`;
     }).join('');
+    // Start live counter interval
+    if (miningLiveInterval) clearInterval(miningLiveInterval);
+    miningLiveInterval = setInterval(() => {
+      if (!document.getElementById('mining').classList.contains('active')) {
+        clearInterval(miningLiveInterval);
+        miningLiveInterval = null;
+        return;
+      }
+      const livePending = getPendingPlasma();
+      const liveProfit = getMiningTotalProfit();
+      const livePerSec = liveProfit / 3600;
+      const counterEl = document.getElementById('mnLiveCounter');
+      if (counterEl) {
+        counterEl.textContent = livePending.toLocaleString();
+        // Pulse effect on number change
+        counterEl.style.transform = 'scale(1.03)';
+        setTimeout(() => { if (counterEl) counterEl.style.transform = 'scale(1)'; }, 150);
+      }
+      const rateEl = document.getElementById('mnLiveRate');
+      if (rateEl) rateEl.textContent = livePerSec.toFixed(2);
+      const collectBtn = document.getElementById('mnCollectBtn');
+      if (collectBtn) collectBtn.disabled = livePending <= 0;
+      // Floating "+X" numbers every 3 seconds
+      if (Date.now() - miningLastFloatTime > 3000 && liveProfit > 0) {
+        miningLastFloatTime = Date.now();
+        spawnMiningFloat(livePerSec * 3);
+      }
+    }, 1000);
+  }
+
+  function spawnMiningFloat(amount) {
+    const card = document.getElementById('mnSummaryCard');
+    if (!card) return;
+    const float = document.createElement('div');
+    float.className = 'mn-float-num';
+    float.textContent = '+' + Math.floor(amount).toLocaleString();
+    float.style.left = (30 + Math.random() * 40) + '%';
+    float.style.top = '40%';
+    card.appendChild(float);
+    setTimeout(() => float.remove(), 2000);
   }
 
   function buyMining(id) {
@@ -3570,7 +3626,7 @@
   document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === currentLang));
   applyI18n();
 
-  if (sessionStorage.getItem('vd_entered')) { document.getElementById('onboarding').style.display = 'none'; document.getElementById('app').classList.add('show'); checkDailyReset(); renderAll(); checkStoryProgress(); checkEnergyRegen(); setInterval(checkEnergyRegen, 30000); setInterval(() => { if (document.getElementById('mining').classList.contains('active')) renderMining(); }, 5000); }
+  if (sessionStorage.getItem('vd_entered')) { document.getElementById('onboarding').style.display = 'none'; document.getElementById('app').classList.add('show'); checkDailyReset(); renderAll(); checkStoryProgress(); checkEnergyRegen(); setInterval(checkEnergyRegen, 30000); }
   else { sessionStorage.setItem('vd_entered', '1'); }
 </script>
 
