@@ -8,7 +8,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="app-version" content="1.9.0">
+<meta name="app-version" content="2.0.0">
 <title>LETUCHKA — Прорыв блокады</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
@@ -100,6 +100,20 @@
   .pf-ach-icon { font-size: 22px; margin-bottom: 4px; }
   .pf-ach-name { font-size: 8px; color: #6B7B9F; font-weight: 800; letter-spacing: 0.04em; }
   .pf-ach-card.earned .pf-ach-name { color: var(--neon-cyan); }
+
+  /* SHIP SKINS grid */
+  .pf-skins { max-width: 540px; margin: 0 auto; padding: 0 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .pf-skin-card { background: linear-gradient(180deg, rgba(20, 16, 46, 0.9) 0%, rgba(10, 8, 32, 0.95) 100%); border: 1px solid rgba(124, 92, 252, 0.15); border-radius: 16px; padding: 14px; text-align: center; cursor: pointer; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); position: relative; overflow: hidden; }
+  .pf-skin-card:hover { transform: translateY(-2px); border-color: rgba(124, 92, 252, 0.4); }
+  .pf-skin-card.locked { opacity: 0.5; cursor: not-allowed; }
+  .pf-skin-card.equipped { border-color: var(--neon-cyan); box-shadow: 0 0 16px rgba(0, 229, 204, 0.25); }
+  .pf-skin-preview { width: 60px; height: 60px; margin: 0 auto 10px; border-radius: 14px; display: flex; align-items: center; justify-content: center; position: relative; }
+  .pf-skin-preview svg { width: 36px; height: 36px; filter: drop-shadow(0 0 8px currentColor); }
+  .pf-skin-name { font-size: 12px; font-weight: 900; color: #F0EBFF; margin-bottom: 3px; }
+  .pf-skin-card.equipped .pf-skin-name { color: var(--neon-cyan); }
+  .pf-skin-unlock { font-size: 9px; color: #6B7B9F; font-weight: 700; line-height: 1.3; }
+  .pf-skin-card.equipped .pf-skin-unlock { color: var(--success); }
+  .pf-skin-badge { position: absolute; top: 6px; right: 6px; background: var(--neon-cyan); color: #060B1A; font-size: 7px; font-weight: 900; padding: 2px 6px; border-radius: 999px; letter-spacing: 0.1em; }
 
   /* Converter */
   .pf-conv { max-width: 540px; margin: 0 auto; padding: 0 16px; }
@@ -338,6 +352,38 @@
 
   .battle-joyhint { position: absolute; bottom: 100px; left: 50%; transform: translateX(-50%); background: rgba(3, 2, 10, 0.85); padding: 8px 16px; border-radius: 999px; font-size: 11px; color: #8A8AB0; font-weight: 700; border: 1px solid rgba(124, 92, 252, 0.15); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); pointer-events: none; z-index: 4; transition: opacity 0.5s ease; }
   .battle-joyhint.hide { opacity: 0; }
+
+  /* Battle exit button (top center) */
+  .battle-exit-btn { position: absolute; top: 64px; left: 50%; transform: translateX(-50%); width: 36px; height: 36px; border-radius: 50%; background: rgba(3, 2, 10, 0.85); border: 1.5px solid rgba(255, 77, 109, 0.4); color: var(--danger); cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 8; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); transition: all 0.2s ease; padding: 0; }
+  .battle-exit-btn svg { width: 16px; height: 16px; }
+  .battle-exit-btn:hover { background: rgba(255, 77, 109, 0.15); border-color: var(--danger); box-shadow: 0 0 12px rgba(255, 77, 109, 0.4); }
+  .battle-exit-btn:active { transform: translateX(-50%) scale(0.92); }
+
+  /* Exit confirmation modal */
+  .exit-overlay { position: fixed; inset: 0; background: rgba(3, 2, 10, 0.88); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); z-index: 170; display: flex; align-items: center; justify-content: center; padding: 24px; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+  .exit-overlay.show { opacity: 1; pointer-events: auto; }
+  .exit-card { width: 100%; max-width: 340px; background: linear-gradient(180deg, #1A0810 0%, #060B1A 100%); border: 2px solid rgba(255, 77, 109, 0.3); border-radius: 24px; padding: 28px 20px; text-align: center; box-shadow: 0 0 60px rgba(255, 77, 109, 0.2), 0 20px 60px rgba(0, 0, 0, 0.6); }
+  .exit-icon { font-size: 48px; margin-bottom: 12px; }
+  .exit-title { font-size: 18px; font-weight: 900; color: var(--danger); margin-bottom: 8px; letter-spacing: 0.02em; }
+  .exit-sub { font-size: 12px; color: #8A8AB0; font-weight: 600; line-height: 1.5; margin-bottom: 20px; }
+  .exit-actions { display: flex; flex-direction: column; gap: 8px; }
+  .exit-btn { padding: 14px; font-size: 13px; font-weight: 900; cursor: pointer; font-family: inherit; border-radius: 999px; letter-spacing: 0.05em; text-transform: uppercase; border: none; transition: all 0.2s ease; }
+  .exit-btn-stay { background: linear-gradient(135deg, var(--neon-cyan), #00B8D4); color: #060B1A; box-shadow: 0 4px 14px rgba(0, 229, 204, 0.3); }
+  .exit-btn-stay:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(0, 229, 204, 0.5); }
+  .exit-btn-leave { background: transparent; color: var(--danger); border: 1px solid rgba(255, 77, 109, 0.3); }
+  .exit-btn-leave:hover { background: rgba(255, 77, 109, 0.1); border-color: var(--danger); }
+
+  /* AFK warning overlay (tab switched) */
+  .afk-overlay { position: fixed; inset: 0; background: rgba(3, 2, 10, 0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); z-index: 175; display: flex; align-items: center; justify-content: center; padding: 24px; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+  .afk-overlay.show { opacity: 1; pointer-events: auto; }
+  .afk-card { width: 100%; max-width: 340px; background: linear-gradient(180deg, #1A0810 0%, #060B1A 100%); border: 2px solid rgba(255, 179, 71, 0.4); border-radius: 24px; padding: 28px 20px; text-align: center; box-shadow: 0 0 60px rgba(255, 179, 71, 0.3), 0 20px 60px rgba(0, 0, 0, 0.6); }
+  .afk-icon { font-size: 48px; margin-bottom: 12px; animation: afkBlink 1s ease-in-out infinite; }
+  @keyframes afkBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+  .afk-title { font-size: 18px; font-weight: 900; color: var(--gold); margin-bottom: 8px; }
+  .afk-sub { font-size: 12px; color: #8A8AB0; font-weight: 600; line-height: 1.5; margin-bottom: 20px; }
+  .afk-btn { width: 100%; background: linear-gradient(135deg, var(--gold), #F59E0B); color: #060B1A; border: none; padding: 14px; font-size: 13px; font-weight: 900; cursor: pointer; font-family: inherit; border-radius: 999px; letter-spacing: 0.1em; text-transform: uppercase; box-shadow: 0 4px 14px rgba(255, 179, 71, 0.4); transition: all 0.2s ease; }
+  .afk-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(255, 179, 71, 0.6); }
+  .afk-btn:active { transform: scale(0.97); }
 
   .battle-pause { position: absolute; top: 60px; left: 50%; transform: translateX(-50%); background: rgba(3, 2, 10, 0.7); border: 1px solid rgba(124, 92, 252, 0.2); width: 36px; height: 36px; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 6; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); font-size: 16px; color: var(--text); }
   .battle-pause:active { transform: translateX(-50%) scale(0.95); }
@@ -1301,6 +1347,11 @@
     <!-- BATTLE -->
     <div id="battle" class="screen">
       <div class="battle-canvas-wrap"><canvas id="battleCanvas"></canvas></div>
+      <button class="battle-exit-btn" id="battleExitBtn" onclick="confirmExitBattle()" aria-label="Exit">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+      </button>
       <div class="battle-hud">
         <div class="bh-left">
           <div class="bh-card gold"><span>◈</span><span id="bhPlasma">0</span></div>
@@ -1319,6 +1370,29 @@
         <button class="ab-btn magnet ready" id="abMagnet" onclick="useAbility('magnet')"><span>🧲</span><div class="ab-cd" id="abMagnetCd"></div><div class="ab-cd-text" id="abMagnetText" style="display:none;"></div><div class="ab-label">MAGNET</div></button>
       </div>
       <div class="battle-joyhint" id="joyHint" data-i18n="joy_hint"></div>
+
+      <!-- Exit confirmation modal -->
+      <div class="exit-overlay" id="exitOverlay">
+        <div class="exit-card">
+          <div class="exit-icon">🚪</div>
+          <div class="exit-title" data-i18n="exit_title"></div>
+          <div class="exit-sub" id="exitSub"></div>
+          <div class="exit-actions">
+            <button class="exit-btn exit-btn-stay" onclick="cancelExitBattle()" data-i18n="exit_stay"></button>
+            <button class="exit-btn exit-btn-leave" onclick="doExitBattle()" data-i18n="exit_leave"></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- AFK warning (tab switched) -->
+      <div class="afk-overlay" id="afkOverlay">
+        <div class="afk-card">
+          <div class="afk-icon">⚠️</div>
+          <div class="afk-title" data-i18n="afk_title"></div>
+          <div class="afk-sub" data-i18n="afk_sub"></div>
+          <button class="afk-btn" onclick="resumeFromAFK()" data-i18n="afk_resume"></button>
+        </div>
+      </div>
     </div>
 
     <!-- GAME OVER -->
@@ -1581,10 +1655,12 @@
       <div class="pf-tabs">
         <button class="pf-tab active" data-ptab="stats" onclick="switchProfileTab('stats')" data-i18n="pf_tab_stats"></button>
         <button class="pf-tab" data-ptab="ach" onclick="switchProfileTab('ach')" data-i18n="pf_tab_ach"></button>
+        <button class="pf-tab" data-ptab="skins" onclick="switchProfileTab('skins')" data-i18n="pf_tab_skins"></button>
         <button class="pf-tab" data-ptab="conv" onclick="switchProfileTab('conv')" data-i18n="pf_tab_conv"></button>
       </div>
       <div id="pfStatsContent" class="pf-stats"></div>
       <div id="pfAchContent" class="pf-ach" style="display:none;"></div>
+      <div id="pfSkinsContent" class="pf-skins" style="display:none;"></div>
       <div id="pfConvContent" class="pf-conv" style="display:none;"></div>
     </div>
 
@@ -1620,7 +1696,7 @@
           <div class="se-info-icon">⚙️</div>
           <div class="se-info-body">
             <div class="se-info-label" data-i18n="se_version_label"></div>
-            <div class="se-info-value">v<span class="accent" id="seVersionNum">1.9.0</span> · <span data-i18n="se_build"></span></div>
+            <div class="se-info-value">v<span class="accent" id="seVersionNum">2.0.0</span> · <span data-i18n="se_build"></span></div>
             <div class="se-info-sub" data-i18n="se_version_sub"></div>
           </div>
         </div>
@@ -1756,6 +1832,14 @@
       rf_tile: 'Рефералы',
       nav_home: 'Главная', nav_shipyard: 'Верфь', nav_quests: 'Задания', nav_comms: 'Связь', nav_faq: 'FAQ', nav_settings: 'Настройки',
       joy_hint: 'Веди палец в любом месте — корабль летит за ним',
+      exit_title: 'ПОКИНУТЬ РЕЙС?',
+      exit_stay: 'ОСТАТЬСЯ',
+      exit_leave: 'ПОКИНУТЬ',
+      exit_sub_plasmoid: 'Ты собрал {n} ◈. Если уйдёшь сейчас — всё сохранится в твой баланс.',
+      exit_sub_empty: 'Ты ещё ничего не собрал. Можно уйти без потерь.',
+      afk_title: 'ТЫ УШЁЛ ИЗ ИГРЫ',
+      afk_sub: 'Корабль поставлен на паузу. Нажми чтобы продолжить рейс!',
+      afk_resume: 'ПРОДОЛЖИТЬ',
       go_title: 'РЕЙС ОКОНЧЕН', go_sub: 'Корабль уничтожен. Плазмоид спасён.',
       gr_plasma: 'ПЛАЗМОИД', gr_glory: 'СЛАВА',
       gs_kills: 'Дронов сбито', gs_time: 'Время в рейсе', gs_plasma_collected: 'Плазмоида собрано',
@@ -1835,7 +1919,7 @@
       ad_wallet_soon: 'Привязка TON-кошелька будет доступна ближе к листингу. Следите за новостями!',
       ad_wallet_soon_btn: 'СКОРО',
       nav_profile: 'Профиль',
-      pf_tab_stats: 'Статистика', pf_tab_ach: 'Достижения', pf_tab_conv: 'Конвертер',
+      pf_tab_stats: 'Статистика', pf_tab_ach: 'Достижения', pf_tab_skins: 'Скины', pf_tab_conv: 'Конвертер',
       pf_conv_title: 'Конвертер $PLASMOID → TON',
       pf_conv_desc: 'Курс обмена фиксирован. После листинга вы сможете конвертировать $PLASMOID в TON напрямую.',
       titles: ['Искатель','Новичок','Штурман','Капитан','Командор','Адмирал','Звездоходец','Галактический Лорд','Бог Вселенной'],
@@ -1914,6 +1998,14 @@
       rf_tile: 'Referrals',
       nav_home: 'Home', nav_shipyard: 'Shipyard', nav_quests: 'Quests', nav_comms: 'Comms', nav_faq: 'FAQ', nav_settings: 'Settings',
       joy_hint: 'Drag finger anywhere — ship follows',
+      exit_title: 'LEAVE THE RUN?',
+      exit_stay: 'STAY',
+      exit_leave: 'LEAVE',
+      exit_sub_plasmoid: 'You collected {n} ◈. If you leave now — everything is saved to your balance.',
+      exit_sub_empty: "You haven't collected anything yet. Safe to leave.",
+      afk_title: 'YOU WENT AFK',
+      afk_sub: 'Ship is paused. Tap to continue the run!',
+      afk_resume: 'RESUME',
       go_title: 'MISSION ENDED', go_sub: 'Ship destroyed. Plasmoid saved.',
       gr_plasma: 'PLASMOID', gr_glory: 'GLORY',
       gs_kills: 'Drones killed', gs_time: 'Time in battle', gs_plasma_collected: 'Plasmoid collected',
@@ -1993,7 +2085,7 @@
       ad_wallet_soon: 'TON wallet linking will be available closer to listing. Stay tuned!',
       ad_wallet_soon_btn: 'COMING SOON',
       nav_profile: 'Profile',
-      pf_tab_stats: 'Stats', pf_tab_ach: 'Achievements', pf_tab_conv: 'Converter',
+      pf_tab_stats: 'Stats', pf_tab_ach: 'Achievements', pf_tab_skins: 'Skins', pf_tab_conv: 'Converter',
       pf_conv_title: '$PLASMOID → TON Converter',
       pf_conv_desc: 'Exchange rate is fixed. After listing, you will be able to convert $PLASMOID to TON directly.',
       titles: ['Seeker','Novice','Navigator','Captain','Commander','Admiral','Starwalker','Galactic Lord','God of Universe'],
@@ -2130,6 +2222,62 @@
     { day: 30, reward: { type: 'stars', amount: 200 }, label: { ru: '👑 200 ★ Легендарный', en: '👑 200 ★ Legendary' } }
   ];
 
+  // ============ SHIP SKINS ============
+  // Each skin: id, name, unlock condition, colors (body/cockpit/trail), shape variant
+  const SHIP_SKINS = [
+    { id: 'default', name: { ru: 'ЛЕТУЧКА', en: 'LETUCHKA' }, icon: '🚀',
+      desc: { ru: 'Стандартный корабль. Дан всем.', en: 'Default ship. Given to everyone.' },
+      unlock: { ru: 'Базовый', en: 'Default' },
+      body: '#7C5CFC', cockpit: '#00E5CC', trail: '124,92,252', shape: 'arrow',
+      glow: 'rgba(124, 92, 252, 0.5)' },
+    { id: 'crimson', name: { ru: 'Багровый', en: 'Crimson' }, icon: '🔴',
+      desc: { ru: 'Красный цвет. Для опасных капитанов.', en: 'Red color. For dangerous captains.' },
+      unlock: { ru: '5000 славы', en: '5000 glory' },
+      body: '#FF4D6D', cockpit: '#FFD700', trail: '255,77,109', shape: 'arrow',
+      glow: 'rgba(255, 77, 109, 0.5)' },
+    { id: 'emerald', name: { ru: 'Изумруд', en: 'Emerald' }, icon: '🟢',
+      desc: { ru: 'Зелёный цвет. Природа и плазма.', en: 'Green color. Nature and plasma.' },
+      unlock: { ru: '10000 славы', en: '10000 glory' },
+      body: '#10B981', cockpit: '#34D399', trail: '16,185,129', shape: 'arrow',
+      glow: 'rgba(16, 185, 129, 0.5)' },
+    { id: 'golden', name: { ru: 'Золотой', en: 'Golden' }, icon: '🟡',
+      desc: { ru: 'Золото. Легендарный статус.', en: 'Gold. Legendary status.' },
+      unlock: { ru: 'Достичь 10000 славы', en: 'Reach 10000 glory' },
+      body: '#FFB347', cockpit: '#FFF700', trail: '255,179,71', shape: 'arrow',
+      glow: 'rgba(255, 179, 71, 0.6)' },
+    { id: 'void', name: { ru: 'Пустотный', en: 'Void' }, icon: '⚫',
+      desc: { ru: 'Чёрный как космос. Для элиты.', en: 'Black as space. For elites.' },
+      unlock: { ru: 'Убить 1000 дронов', en: 'Kill 1000 drones' },
+      body: '#1E1B4B', cockpit: '#A78BFA', trail: '126,58,242', shape: 'arrow',
+      glow: 'rgba(126, 58, 242, 0.5)' }
+  ];
+  function getSelectedSkin() {
+    const s = getState();
+    const skinId = localStorage.getItem('vd_skin') || 'default';
+    return SHIP_SKINS.find(sk => sk.id === skinId) || SHIP_SKINS[0];
+  }
+  function isSkinUnlocked(skin, s) {
+    if (skin.id === 'default') return true;
+    if (skin.id === 'crimson') return (s.glory || 0) >= 5000;
+    if (skin.id === 'emerald') return (s.glory || 0) >= 10000;
+    if (skin.id === 'golden') return (s.glory || 0) >= 10000;
+    if (skin.id === 'void') return (s.totalKills || 0) >= 1000;
+    return false;
+  }
+  function selectSkin(skinId) {
+    const s = getState();
+    const skin = SHIP_SKINS.find(sk => sk.id === skinId);
+    if (!skin || !isSkinUnlocked(skin, s)) {
+      showToast(currentLang === 'ru' ? 'Скин заблокирован' : 'Skin locked', 'danger');
+      return;
+    }
+    localStorage.setItem('vd_skin', skinId);
+    SOUNDS.buy();
+    vibrate(40);
+    showToast(currentLang === 'ru' ? 'Скин выбран: ' + skin.name.ru : 'Skin equipped: ' + skin.name.en, 'success');
+    renderProfile();
+  }
+
   const CHAPTERS = [
     { num: 1, name: { ru: 'ПЕРВЫЙ ВЫЛЕТ', en: 'FIRST LAUNCH' }, tagline: { ru: 'Тишина. Бесконечная темнота. И ты.', en: 'Silence. Endless dark. And you.' }, trigger: () => true, messages: [
       { from: 'system', text: { ru: 'Корабль активирован. Перед тобой — открытый космос. Вокруг разбросан плазмоид. Собирай. Наблюдатели уже заметили тебя.', en: 'Ship activated. Before you — open space. Plasmoid scattered around. Collect. Watchers already noticed you.' } }
@@ -2163,7 +2311,12 @@
     { id: 'plasmoid', icon: '◈', name: { ru: 'Жрец плазмоида', en: 'Plasmoid Priest' }, pro: { ru: '+200% плазмоида', en: '+200% plasmoid' }, con: { ru: '-1 HP', en: '-1 HP' }, rarity: 'rare', effect: { plasmaMult: 3.0, hpAdd: -1 } },
     { id: 'lucky', icon: '🍀', name: { ru: 'Удачливый', en: 'Lucky' }, pro: { ru: '+100% шанс золотого дрона', en: '+100% golden drone chance' }, con: { ru: '-20% урон', en: '-20% damage' }, rarity: 'rare', effect: { goldenMult: 2.0, dmgMult: 0.8 } },
     { id: 'godmode', icon: '👑', name: { ru: 'Бог войны', en: 'God of War' }, pro: { ru: '+50% всё', en: '+50% everything' }, con: { ru: 'Нет щита', en: 'No shield' }, rarity: 'epic', effect: { dmgMult: 1.5, fireRateMult: 1.5, speedMult: 1.5, plasmaMult: 1.5, noShield: true } },
-    { id: 'pacifist', icon: '🕊️', name: { ru: 'Пацифист', en: 'Pacifist' }, pro: { ru: '+300% плазмоида, +2 HP, щит + отталкивание', en: '+300% plasmoid, +2 HP, shield + repulse' }, con: { ru: 'Нет стрельбы', en: 'No shooting' }, rarity: 'epic', effect: { plasmaMult: 4.0, hpAdd: 2, noShoot: true, freeShield: true, repulse: true } }
+    { id: 'pacifist', icon: '🕊️', name: { ru: 'Пацифист', en: 'Pacifist' }, pro: { ru: '+300% плазмоида, +2 HP, щит + отталкивание', en: '+300% plasmoid, +2 HP, shield + repulse' }, con: { ru: 'Нет стрельбы', en: 'No shooting' }, rarity: 'epic', effect: { plasmaMult: 4.0, hpAdd: 2, noShoot: true, freeShield: true, repulse: true } },
+    // ============ NEW ARTIFACTS (Wave 5b) ============
+    { id: 'overclock', icon: '⚡', name: { ru: 'Разгон', en: 'Overclock' }, pro: { ru: '+200% скорострел, +50% скорость', en: '+200% fire rate, +50% speed' }, con: { ru: 'Получает на 50% больше урона', en: 'Takes 50% more damage' }, rarity: 'epic', effect: { fireRateMult: 3.0, speedMult: 1.5, dmgTakenMult: 1.5 } },
+    { id: 'thorns', icon: '🌵', name: { ru: 'Шипы', en: 'Thorns' }, pro: { ru: 'Дроны умирают при касании', en: 'Drones die on contact' }, con: { ru: '-50% урон выстрелами', en: '-50% bullet damage' }, rarity: 'rare', effect: { thorns: true, dmgMult: 0.5 } },
+    { id: 'homing', icon: '🎯', name: { ru: 'Самонаведение', en: 'Homing' }, pro: { ru: 'Пули сами летят к дронам', en: 'Bullets home to drones' }, con: { ru: '-30% скорострел', en: '-30% fire rate' }, rarity: 'rare', effect: { homing: true, fireRateMult: 0.7 } },
+    { id: 'titan', icon: '🗿', name: { ru: 'Титан', en: 'Titan' }, pro: { ru: '+5 HP, +50% радиус сбора', en: '+5 HP, +50% collect radius' }, con: { ru: '-50% скорость, -50% урон', en: '-50% speed, -50% damage' }, rarity: 'epic', effect: { hpAdd: 5, radiusMult: 1.5, speedMult: 0.5, dmgMult: 0.5 } }
   ];
 
   let pendingBattleCallback = null;
@@ -2868,14 +3021,20 @@
     loop(now) {
       if (!this.running) return;
       if (this.paused) return;
-      // FIX: clamp dt harder and detect tab-throttle / freeze. If dt > 100ms, skip update to avoid spiral of death.
+      // FIX: clamp dt harder and detect tab-throttle / freeze.
       const rawDt = now - this.lastTime;
       this.lastTime = now;
       // If browser throttled (tab switch / lag spike), skip this frame entirely
-      if (rawDt > 250) { requestAnimationFrame(this.loop); return; }
+      // AND shift startTime forward so elapsedTime doesn't jump (was causing instant death from difficulty spike)
+      if (rawDt > 250) {
+        this.startTime += rawDt; // shift startTime so elapsedTime stays consistent with dt accumulation
+        requestAnimationFrame(this.loop);
+        return;
+      }
       const dt = Math.min(50, rawDt);
       this.t += dt;
-      this.elapsedTime = (now - this.startTime) / 1000;
+      // FIX: use accumulated t instead of (now - startTime) to avoid time jumps when tab was inactive
+      this.elapsedTime = this.t / 1000;
       this.difficulty = Math.floor(this.elapsedTime / 20);
       this.threatLevel = Math.floor(this.elapsedTime / 120); // every 2 min
       // Detect threat level transition
@@ -2974,6 +3133,29 @@
 
       // Update bullets
       this.bullets = this.bullets.filter(b => {
+        // Homing artifact: bullets steer toward nearest drone
+        if (eff.homing && !b.fromBoss) {
+          let nearest = null, minDist2 = 250 * 250;
+          for (const d of this.drones) {
+            if (d.hp <= 0) continue;
+            const dx = d.x - b.x, dy = d.y - b.y;
+            const d2 = dx*dx + dy*dy;
+            if (d2 < minDist2) { minDist2 = d2; nearest = d; }
+          }
+          if (nearest) {
+            const dx = nearest.x - b.x, dy = nearest.y - b.y;
+            const dist = Math.sqrt(dx*dx + dy*dy);
+            if (dist > 0) {
+              const speed = Math.sqrt(b.vx*b.vx + b.vy*b.vy);
+              const steerForce = 800 * (dt / 1000);
+              b.vx += (dx / dist) * steerForce;
+              b.vy += (dy / dist) * steerForce;
+              // Normalize to maintain speed
+              const newSpeed = Math.sqrt(b.vx*b.vx + b.vy*b.vy);
+              if (newSpeed > 0) { b.vx = (b.vx / newSpeed) * speed; b.vy = (b.vy / newSpeed) * speed; }
+            }
+          }
+        }
         b.x += b.vx * (dt / 1000); b.y += b.vy * (dt / 1000); b.life -= dt;
         // Boss bullet hits ship
         if (b.fromBoss) {
@@ -3017,9 +3199,22 @@
         d.phase += 0.05;
         // Collision with ship — i-frame protects against instant multi-hit
         if (dist < this.ship.size + d.size) {
+          // Thorns artifact: drone dies on contact (player still takes damage unless shielded)
+          if (eff.thorns) {
+            d.hp = 0;
+            this.kills++;
+            this.combo++;
+            this.comboTimer = 5000;
+            if (this.combo > this.maxCombo) this.maxCombo = this.combo;
+            this.spawnExplosion(d.x, d.y, d.golden ? '#FFB347' : '#FF4D6D');
+            SOUNDS.hit();
+            vibrate(15);
+          }
           if (this.ship.shield) { this.ship.shield = false; this.spawnExplosion(d.x, d.y, '#00E5CC'); }
           else if (this.ship.invincibility <= 0) {
             this.ship.hp--;
+            // Overclock artifact: takes 50% more damage (1 hit = 2 HP loss effectively)
+            if (eff.dmgTakenMult && eff.dmgTakenMult > 1) this.ship.hp--;
             this.combo = 0; // COMBO RESET on damage
             this.ship.invincibility = 800; // 0.8s invincibility frame
             const lostPlasma = Math.floor(this.plasmaCollected * 0.15);
@@ -3030,7 +3225,7 @@
             SOUNDS.damage(); vibrate([80, 40, 80]); // Haptic pattern: damage
             if (this.ship.hp <= 0) this.endBattle();
           }
-          d.hp = 0;
+          if (!eff.thorns) d.hp = 0;
         }
       });
 
@@ -3444,18 +3639,19 @@
         ctx.fillStyle = '#FF4D6D';
         ctx.fillRect(b.x - barW/2, b.y - b.size - 16, barW * hpPct, 6);
       }
-      // Ship
+      // Ship — uses selected skin colors
+      const skin = getSelectedSkin();
       ctx.save();
       ctx.translate(this.ship.x, this.ship.y);
       ctx.rotate(this.ship.angle + Math.PI / 2);
-      // Engine trail
-      const trailGrad = ctx.createLinearGradient(0, 15, 0, 50); trailGrad.addColorStop(0, 'rgba(124,92,252,0.8)'); trailGrad.addColorStop(1, 'rgba(124,92,252,0)'); ctx.fillStyle = trailGrad;
+      // Engine trail (skin-colored)
+      const trailGrad = ctx.createLinearGradient(0, 15, 0, 50); trailGrad.addColorStop(0, `rgba(${skin.trail},0.8)`); trailGrad.addColorStop(1, `rgba(${skin.trail},0)`); ctx.fillStyle = trailGrad;
       ctx.beginPath(); ctx.moveTo(-8, 15); ctx.lineTo(8, 15); ctx.lineTo(4, 45); ctx.lineTo(-4, 45); ctx.closePath(); ctx.fill();
-      // Body
-      ctx.fillStyle = '#7C5CFC'; ctx.shadowColor = '#7C5CFC'; ctx.shadowBlur = 16;
+      // Body (skin-colored)
+      ctx.fillStyle = skin.body; ctx.shadowColor = skin.body; ctx.shadowBlur = 16;
       ctx.beginPath(); ctx.moveTo(0, -18); ctx.lineTo(14, 12); ctx.lineTo(6, 16); ctx.lineTo(-6, 16); ctx.lineTo(-14, 12); ctx.closePath(); ctx.fill();
-      // Cockpit
-      ctx.fillStyle = '#00E5CC'; ctx.shadowColor = '#00E5CC'; ctx.shadowBlur = 8;
+      // Cockpit (skin-colored)
+      ctx.fillStyle = skin.cockpit; ctx.shadowColor = skin.cockpit; ctx.shadowBlur = 8;
       ctx.beginPath(); ctx.arc(0, -4, 5, 0, Math.PI * 2); ctx.fill();
       // Shield
       if (this.ship.shield) { ctx.strokeStyle = 'rgba(0,229,204,0.5)'; ctx.lineWidth = 2; ctx.shadowBlur = 0; ctx.beginPath(); ctx.arc(0, 0, 24, 0, Math.PI * 2); ctx.stroke(); }
@@ -4260,6 +4456,89 @@
       switchScreen('gameover');
     }
   }
+  // ============ BATTLE EXIT + AFK HANDLING ============
+  function confirmExitBattle() {
+    if (!battle) return;
+    battle.paused = true; // freeze game
+    const overlay = document.getElementById('exitOverlay');
+    const sub = document.getElementById('exitSub');
+    const plasma = battle.plasmaCollected || 0;
+    if (plasma > 0) {
+      sub.textContent = t('exit_sub_plasmoid').replace('{n}', plasma.toLocaleString());
+    } else {
+      sub.textContent = t('exit_sub_empty');
+    }
+    overlay.classList.add('show');
+    vibrate(30);
+  }
+  function cancelExitBattle() {
+    const overlay = document.getElementById('exitOverlay');
+    overlay.classList.remove('show');
+    if (battle && battle.paused) {
+      battle.paused = false;
+      battle.lastTime = performance.now();
+      requestAnimationFrame(battle.loop);
+    }
+  }
+  function doExitBattle() {
+    const overlay = document.getElementById('exitOverlay');
+    overlay.classList.remove('show');
+    if (battle) {
+      // Save collected plasmoid before exiting (player chose to leave, not die)
+      if (battle.plasmaCollected > 0) {
+        const s = getState();
+        s.plasmoid += battle.plasmaCollected;
+        s.totalPlasma += battle.plasmaCollected;
+        s.totalRuns++;
+        s.totalKills += battle.kills;
+        const glory = battle.kills * 5 + Math.floor(battle.elapsedTime);
+        s.glory += glory;
+        const score = battle.plasmaCollected + battle.kills * 20 + Math.floor(battle.elapsedTime) * 2;
+        if (score > s.bestRun) s.bestRun = score;
+        if (battle.isDailyRun) {
+          const today = new Date().toDateString();
+          if (s.dailyRunDate !== today) { s.dailyRunDate = today; s.dailyRunScore = 0; }
+          if (battle.plasmaCollected > s.dailyRunScore) s.dailyRunScore = battle.plasmaCollected;
+          if (typeof submitDailyRun === 'function') submitDailyRun(score, battle.kills, Math.floor(battle.elapsedTime));
+        }
+        saveState(s);
+        if (typeof syncToServer === 'function') syncToServer(true);
+        updateQuestProgress('plasmoid', battle.plasmaCollected);
+        updateQuestProgress('kills', battle.kills);
+        updateQuestProgress('time', Math.floor(battle.elapsedTime));
+        updateQuestProgress('runs', 1);
+        updateQuestProgress('combo', battle.maxCombo);
+        checkStoryProgress();
+      }
+      battle.running = false;
+      battle.stop();
+    }
+    switchScreen('home');
+    showToast(currentLang === 'ru' ? 'Рейс завершён' : 'Run ended', 'cyan');
+  }
+  function resumeFromAFK() {
+    const overlay = document.getElementById('afkOverlay');
+    overlay.classList.remove('show');
+    if (battle && battle.paused) {
+      battle.paused = false;
+      battle.lastTime = performance.now();
+      // Grant 1.5s invincibility on resume (drones may have been mid-collision)
+      battle.ship.invincibility = 1500;
+      requestAnimationFrame(battle.loop);
+    }
+  }
+  // Visibility API: pause + show AFK warning when tab becomes hidden during battle
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden && battle && battle.running && !battle.paused && !battle.ended) {
+      // Only show AFK warning if player has been in battle > 5 seconds (avoid spam on quick switches)
+      if (battle.elapsedTime > 5) {
+        battle.paused = true;
+        const afkOverlay = document.getElementById('afkOverlay');
+        if (afkOverlay) afkOverlay.classList.add('show');
+      }
+    }
+  });
+
   function shareResult() {
     const s = getState();
     // Gather last run stats (battle object still has them)
@@ -5009,6 +5288,7 @@
     document.querySelectorAll('.pf-tab').forEach(b => b.classList.toggle('active', b.dataset.ptab === tab));
     document.getElementById('pfStatsContent').style.display = tab === 'stats' ? 'grid' : 'none';
     document.getElementById('pfAchContent').style.display = tab === 'ach' ? 'grid' : 'none';
+    document.getElementById('pfSkinsContent').style.display = tab === 'skins' ? 'grid' : 'none';
     document.getElementById('pfConvContent').style.display = tab === 'conv' ? 'block' : 'none';
   }
 
@@ -5052,6 +5332,24 @@
       </div>`;
     }).join('');
     document.getElementById('pfAchContent').innerHTML = achHtml;
+    // Skins tab
+    const selectedSkinId = localStorage.getItem('vd_skin') || 'default';
+    const skinsHtml = SHIP_SKINS.map(skin => {
+      const unlocked = isSkinUnlocked(skin, s);
+      const equipped = skin.id === selectedSkinId;
+      const cls = equipped ? 'equipped' : (unlocked ? '' : 'locked');
+      const badge = equipped ? '<div class="pf-skin-badge">✓</div>' : '';
+      // SVG preview with skin color
+      const svg = `<svg viewBox="0 0 24 24" fill="${skin.body}" stroke="${skin.cockpit}" stroke-width="0.5" style="color:${skin.body}"><path d="M12 1L21 18L15 22L9 22L3 18L12 1Z" fill="${skin.body}"/><circle cx="12" cy="10" r="3" fill="${skin.cockpit}"/></svg>`;
+      const unlockText = equipped ? (currentLang === 'ru' ? 'Выбран' : 'Equipped') : skin.unlock[currentLang];
+      return `<div class="pf-skin-card ${cls}" onclick="${unlocked ? `selectSkin('${skin.id}')` : ''}">
+        ${badge}
+        <div class="pf-skin-preview" style="background:linear-gradient(135deg, ${skin.glow}, transparent); border:1px solid ${skin.body}40;">${svg}</div>
+        <div class="pf-skin-name">${skin.name[currentLang]}</div>
+        <div class="pf-skin-unlock">${unlockText}</div>
+      </div>`;
+    }).join('');
+    document.getElementById('pfSkinsContent').innerHTML = skinsHtml;
     // Converter tab
     const tonValue = (s.plasmoid / PLASMOID_TO_TON_RATE).toFixed(4);
     const pendingTon = (getPendingPlasma() / PLASMOID_TO_TON_RATE).toFixed(4);
@@ -5097,8 +5395,8 @@
   else { sessionStorage.setItem('vd_entered', '1'); }
 </script>
 
-<!-- Version badge: helps detect stale Telegram cache. If you don't see "v1.9.0" here, you're viewing a cached old version. -->
-<div class="ver-badge" id="verBadge">v1.9.0</div>
+<!-- Version badge: helps detect stale Telegram cache. If you don't see "v2.0.0" here, you're viewing a cached old version. -->
+<div class="ver-badge" id="verBadge">v2.0.0</div>
 
 </body>
 </html>
