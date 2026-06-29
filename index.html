@@ -8,7 +8,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="app-version" content="1.6.1">
+<meta name="app-version" content="1.6.2">
 <title>LETUCHKA — Прорыв блокады</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1460,7 +1460,7 @@
           <div class="se-info-icon">⚙️</div>
           <div class="se-info-body">
             <div class="se-info-label" data-i18n="se_version_label"></div>
-            <div class="se-info-value">v<span class="accent" id="seVersionNum">1.6.1</span> · <span data-i18n="se_build"></span></div>
+            <div class="se-info-value">v<span class="accent" id="seVersionNum">1.6.2</span> · <span data-i18n="se_build"></span></div>
             <div class="se-info-sub" data-i18n="se_version_sub"></div>
           </div>
         </div>
@@ -2526,11 +2526,7 @@
     }
     update(dt) {
       // FIX: use cached state instead of getState() every frame (localStorage+JSON.parse kills FPS)
-      // Refresh cache every 2 seconds to pick up upgrade changes
-      if (Date.now() - this._stateCacheTime > 2000) {
-        this._cachedState = getState();
-        this._stateCacheTime = Date.now();
-      }
+      // Cache is set once in setupState() and refreshed only in revive() — upgrades don't change mid-battle
       const s = this._cachedState;
       const speedUpgrade = s.upgrades.speed || 0;
       const eff = this.artifact ? this.artifact.effect : {};
@@ -3571,6 +3567,9 @@
           // Go back to home from any sub-screen
           const activeScreen = document.querySelector('.screen.active');
           if (activeScreen && activeScreen.id !== 'home' && activeScreen.id !== 'battle') {
+            // FIX: clean up mining interval + hangar animation before switching (was leaking)
+            if (miningLiveInterval) { clearInterval(miningLiveInterval); miningLiveInterval = null; }
+            if (typeof stopHangar === 'function') stopHangar();
             switchScreen('home');
             tg.BackButton.hide();
           }
@@ -3613,8 +3612,12 @@
       battle.ended = false; // Reset so player can die again
       battle.ship.hp = battle.ship.maxHp;
       battle.ship.shield = true;
+      battle.ship.invincibility = 1500; // 1.5s grace period after revive
       battle.running = true;
       battle.lastTime = performance.now();
+      // Refresh cached state — stars changed, upgrades might have been bought via quest claim
+      battle._cachedState = getState();
+      battle._stateCacheTime = Date.now();
       clearInterval(battle._reviveInterval);
       document.getElementById('reviveOverlay').classList.remove('show');
       // Clear nearby drones
@@ -3739,14 +3742,18 @@
     input.select(); input.setSelectionRange(0, 99999);
     try { navigator.clipboard.writeText(input.value); } catch (e) { document.execCommand('copy'); }
     showToast(t('ref_copied'), 'cyan');
-    // Simulate referral for demo (1 per copy, max 30)
-    const s = getState();
-    if (s.invited < 30) {
-      s.invited++;
-      saveState(s);
-      renderReferrals();
-      renderShipyard();
-      showToast(t('ref_invited'), 'success');
+    // FIX: removed s.invited++ simulation — was letting players unlock TOP upgrades by just clicking Copy 3 times.
+    // Real referral tracking will come with server backend. For testing, use ?testRef=1 URL param.
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('testRef') === '1') {
+      const s = getState();
+      if (s.invited < 30) {
+        s.invited++;
+        saveState(s);
+        renderReferrals();
+        renderShipyard();
+        showToast(t('ref_invited'), 'success');
+      }
     }
   }
   function renderReferrals() {
@@ -3791,6 +3798,11 @@
         <div class="nw-reward-count" style="color:${p.isMe ? 'var(--neon)' : 'var(--gold)'};min-width:auto;">${p.score.toLocaleString()} ◈</div>
       </div>`;
     }).join('');
+    // Disclaimer: leaderboard is simulated until server backend is connected
+    const disclaimer = currentLang === 'ru'
+      ? '⚡ Демо-данные. Реальный лидерборд появится после подключения серверов.'
+      : '⚡ Demo data. Real leaderboard will appear after servers are connected.';
+    lb.innerHTML += `<div style="text-align:center;font-size:10px;color:#6B7B9F;margin-top:12px;padding:8px;background:rgba(124,92,252,0.05);border-radius:10px;border:1px solid rgba(124,92,252,0.1);">${disclaimer}</div>`;
   }
   function startDailyRun() {
     initAudio();
@@ -3839,7 +3851,8 @@
   function getPendingPlasma() {
     const s = getState();
     const profitPerSec = getMiningTotalProfit() / 3600;
-    const elapsed = (Date.now() - s.miningLastCollect) / 1000;
+    // FIX: cap elapsed time to MN_RING_CAP_HOURS — was uncapped, player could collect 24h of mining despite UI showing only cap hours
+    const elapsed = Math.min((Date.now() - s.miningLastCollect) / 1000, MN_RING_CAP_HOURS * 3600);
     return Math.floor(profitPerSec * elapsed);
   }
 
@@ -4333,12 +4346,15 @@
   document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === currentLang));
   applyI18n();
 
+  // FIX: initTelegram() unconditionally on page load — was only in enterApp(), so returning visitors (sessionStorage skip) never got tgUser/avatar/tgId
+  initTelegram();
+
   if (sessionStorage.getItem('vd_entered')) { document.getElementById('onboarding').style.display = 'none'; document.getElementById('app').classList.add('show'); checkDailyReset(); renderAll(); checkStoryProgress(); checkEnergyRegen(); setInterval(checkEnergyRegen, 30000); }
   else { sessionStorage.setItem('vd_entered', '1'); }
 </script>
 
-<!-- Version badge: helps detect stale Telegram cache. If you don't see "v1.6.1" here, you're viewing a cached old version. -->
-<div class="ver-badge" id="verBadge">v1.6.1</div>
+<!-- Version badge: helps detect stale Telegram cache. If you don't see "v1.6.2" here, you're viewing a cached old version. -->
+<div class="ver-badge" id="verBadge">v1.6.2</div>
 
 </body>
 </html>
