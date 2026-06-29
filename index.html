@@ -1290,6 +1290,7 @@
       tgBackButton(true);
     }
     if (name === 'home') renderHome();
+    if (name !== 'shipyard') stopHangar(); // Stop hangar animation when leaving shipyard
     if (name === 'shipyard') renderShipyard();
     if (name === 'quests') renderQuests();
     if (name === 'comms') { renderComms(); markMessagesRead(); }
@@ -1733,29 +1734,24 @@
       this.ship.x = Math.max(this.ship.size, Math.min(this.W - this.ship.size, this.ship.x));
       this.ship.y = Math.max(playTop + this.ship.size, Math.min(playBottom - this.ship.size, this.ship.y));
 
-      // Auto-shoot — fires in the direction the ship is facing
+      // Auto-shoot — aims at nearest drone, fires forward if none
       this.ship.shootCooldown -= dt;
       const fireRateUpgrade = s.upgrades.fireRate || 0;
       const fireMult = eff.fireRateMult || 1;
       const fireRate = Math.max(100, (600 - fireRateUpgrade * 100) / fireMult);
       const noShoot = eff.noShoot || false;
-      // Default ship angle is -PI/2 (pointing up). If not moving, keep facing up.
-      const shootAngle = this.ship.angle;
-      // Direction vector the nose is pointing
-      const dirX = Math.cos(shootAngle);
-      const dirY = Math.sin(shootAngle);
-      // Find nearest drone IN FRONT of the ship (within 90° cone)
+      // Find nearest drone (full 360°, no cone restriction)
       let nearest = null, minDist = Infinity;
       this.drones.forEach(d => {
         const dx = d.x - this.ship.x, dy = d.y - this.ship.y;
         const dist = Math.sqrt(dx*dx + dy*dy);
-        if (dist > 500) return; // only shoot at close drones
-        // Dot product > 0 means drone is in front (within 90° cone)
-        const dot = (dx / dist) * dirX + (dy / dist) * dirY;
-        if (dot > 0.3 && dist < minDist) { minDist = dist; nearest = d; }
+        if (dist < minDist) { minDist = dist; nearest = d; }
       });
-      // If no drone in front, just shoot forward
-      const hasTarget = nearest !== null;
+      // Aim at nearest drone if within range, else fire forward
+      let shootAngle = this.ship.angle;
+      if (nearest && minDist < 500) {
+        shootAngle = Math.atan2(nearest.y - this.ship.y, nearest.x - this.ship.x);
+      }
       if (!noShoot && this.ship.shootCooldown <= 0) {
         const damageUpgrade = s.upgrades.damage || 0;
         const dmgMult = eff.dmgMult || 1;
@@ -2262,12 +2258,14 @@
 
   // ============ HANGAR PREVIEW ============
   let hangarAnimId = null;
+  let hangarRunning = false;
   function renderHangar() {
-    // GUARD: cancel existing loop FIRST, then verify it's cancelled before starting new
+    // GUARD: cancel existing loop FIRST
     if (hangarAnimId) {
       cancelAnimationFrame(hangarAnimId);
       hangarAnimId = null;
     }
+    hangarRunning = false;
     const canvas = document.getElementById('hangarCanvas');
     if (!canvas) return;
     // Only render if shipyard screen is active (avoid running in background)
@@ -2361,9 +2359,20 @@
         }
       }
       ctx.shadowBlur = 0;
-      hangarAnimId = requestAnimationFrame(animate);
+      // Only continue if still running and shipyard is visible
+      if (hangarRunning) {
+        hangarAnimId = requestAnimationFrame(animate);
+      }
     };
+    hangarRunning = true;
     animate();
+  }
+  function stopHangar() {
+    hangarRunning = false;
+    if (hangarAnimId) {
+      cancelAnimationFrame(hangarAnimId);
+      hangarAnimId = null;
+    }
   }
 
   // ============ SHIPYARD ============
