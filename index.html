@@ -8,7 +8,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="app-version" content="1.6.0">
+<meta name="app-version" content="1.6.1">
 <title>LETUCHKA — Прорыв блокады</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1460,7 +1460,7 @@
           <div class="se-info-icon">⚙️</div>
           <div class="se-info-body">
             <div class="se-info-label" data-i18n="se_version_label"></div>
-            <div class="se-info-value">v<span class="accent" id="seVersionNum">1.6.0</span> · <span data-i18n="se_build"></span></div>
+            <div class="se-info-value">v<span class="accent" id="seVersionNum">1.6.1</span> · <span data-i18n="se_build"></span></div>
             <div class="se-info-sub" data-i18n="se_version_sub"></div>
           </div>
         </div>
@@ -1934,15 +1934,15 @@
     { id: 'speed', icon: '🚀', name: { ru: 'Гипердвигатель', en: 'Hyperdrive' }, pro: { ru: '+30% скорость', en: '+30% speed' }, con: { ru: '-1 HP', en: '-1 HP' }, rarity: 'common', effect: { speedMult: 1.3, hpAdd: -1 } },
     { id: 'fan', icon: '🌐', name: { ru: 'Веерная стрельба', en: 'Fan Shot' }, pro: { ru: 'Стреляет веером ×3', en: 'Shoots 3-way fan' }, con: { ru: '-40% урон', en: '-40% damage' }, rarity: 'rare', effect: { fanShot: true, dmgMult: 0.6 } },
     { id: 'vampire', icon: '🩸', name: { ru: 'Вампир', en: 'Vampire' }, pro: { ru: 'Восстанавливает HP за киллы', en: 'Heal on kill' }, con: { ru: '-50% плазмоида', en: '-50% plasmoid' }, rarity: 'rare', effect: { vampire: true, plasmaMult: 0.5 } },
-    { id: 'berserk', icon: '⚔️', name: { ru: 'Берсерк', en: 'Berserker' }, pro: { ru: '+100% урон', en: '+100% damage' }, con: { ru: '-2 HP', en: '-2 HP' }, rarity: 'rare', effect: { dmgMult: 2.0, hpAdd: -2 } },
+    { id: 'berserk', icon: '⚔️', name: { ru: 'Берсерк', en: 'Berserker' }, pro: { ru: '+100% урон', en: '+100% damage' }, con: { ru: '-1 HP', en: '-1 HP' }, rarity: 'rare', effect: { dmgMult: 2.0, hpAdd: -1 } },
     { id: 'magnet', icon: '🧲', name: { ru: 'Постоянный магнит', en: 'Permanent Magnet' }, pro: { ru: '+200% радиус сбора', en: '+200% collect radius' }, con: { ru: '+30% скорость дронов', en: '+30% drone speed' }, rarity: 'rare', effect: { radiusMult: 3.0, droneSpeedMult: 1.3 } },
-    { id: 'glass', icon: '🔮', name: { ru: 'Стеклянная пушка', en: 'Glass Cannon' }, pro: { ru: '+150% урон, +50% скорострел', en: '+150% dmg, +50% fire rate' }, con: { ru: '1 HP всего', en: 'Only 1 HP' }, rarity: 'epic', effect: { dmgMult: 2.5, fireRateMult: 1.5, hpSet: 1 } },
+    { id: 'glass', icon: '🔮', name: { ru: 'Стеклянная пушка', en: 'Glass Cannon' }, pro: { ru: '+150% урон, +50% скорострел, щит', en: '+150% dmg, +50% fire rate, shield' }, con: { ru: '1 HP всего', en: 'Only 1 HP' }, rarity: 'epic', effect: { dmgMult: 2.5, fireRateMult: 1.5, hpSet: 1, freeShield: true } },
     { id: 'tank', icon: '🛡️', name: { ru: 'Танк', en: 'Tank' }, pro: { ru: '+3 HP', en: '+3 HP' }, con: { ru: '-30% скорость', en: '-30% speed' }, rarity: 'rare', effect: { hpAdd: 3, speedMult: 0.7 } },
     { id: 'rapid', icon: '⚡', name: { ru: 'Скорострел', en: 'Rapid Fire' }, pro: { ru: '+100% скорострельность', en: '+100% fire rate' }, con: { ru: '-30% урон', en: '-30% damage' }, rarity: 'common', effect: { fireRateMult: 2.0, dmgMult: 0.7 } },
     { id: 'plasmoid', icon: '◈', name: { ru: 'Жрец плазмоида', en: 'Plasmoid Priest' }, pro: { ru: '+200% плазмоида', en: '+200% plasmoid' }, con: { ru: '-1 HP', en: '-1 HP' }, rarity: 'rare', effect: { plasmaMult: 3.0, hpAdd: -1 } },
     { id: 'lucky', icon: '🍀', name: { ru: 'Удачливый', en: 'Lucky' }, pro: { ru: '+100% шанс золотого дрона', en: '+100% golden drone chance' }, con: { ru: '-20% урон', en: '-20% damage' }, rarity: 'rare', effect: { goldenMult: 2.0, dmgMult: 0.8 } },
     { id: 'godmode', icon: '👑', name: { ru: 'Бог войны', en: 'God of War' }, pro: { ru: '+50% всё', en: '+50% everything' }, con: { ru: 'Нет щита', en: 'No shield' }, rarity: 'epic', effect: { dmgMult: 1.5, fireRateMult: 1.5, speedMult: 1.5, plasmaMult: 1.5, noShield: true } },
-    { id: 'pacifist', icon: '🕊️', name: { ru: 'Пацифист', en: 'Pacifist' }, pro: { ru: '+300% плазмоида, +2 HP', en: '+300% plasmoid, +2 HP' }, con: { ru: 'Нет стрельбы', en: 'No shooting' }, rarity: 'epic', effect: { plasmaMult: 4.0, hpAdd: 2, noShoot: true } }
+    { id: 'pacifist', icon: '🕊️', name: { ru: 'Пацифист', en: 'Pacifist' }, pro: { ru: '+300% плазмоида, +2 HP, щит + отталкивание', en: '+300% plasmoid, +2 HP, shield + repulse' }, con: { ru: 'Нет стрельбы', en: 'No shooting' }, rarity: 'epic', effect: { plasmaMult: 4.0, hpAdd: 2, noShoot: true, freeShield: true, repulse: true } }
   ];
 
   let pendingBattleCallback = null;
@@ -2285,7 +2285,9 @@
       const hpSet = eff.hpSet || null;
       let baseHp = 3 + (s.upgrades.maxHp || 0) + hpAdd;
       if (hpSet !== null) baseHp = hpSet;
-      this.ship = { x: this.W / 2, y: this.H / 2, vx: 0, vy: 0, angle: -Math.PI / 2, hp: baseHp, maxHp: baseHp, shield: (eff.noShield ? false : (s.upgrades.shield ? true : false)), size: 16, shootCooldown: 0 };
+      // Shield: from upgrade, OR from freeShield artifact effect (Glass Cannon / Pacifist)
+      const hasShield = eff.noShield ? false : (s.upgrades.shield ? true : (eff.freeShield ? true : false));
+      this.ship = { x: this.W / 2, y: this.H / 2, vx: 0, vy: 0, angle: -Math.PI / 2, hp: baseHp, maxHp: baseHp, shield: hasShield, size: 16, shootCooldown: 0, invincibility: 0 };
       this.plasmoid = []; this.drones = []; this.bullets = []; this.particles = [];
       // HARD CAPS to prevent freeze on long runs
       this.MAX_DRONES = 60;
@@ -2299,7 +2301,8 @@
       this.revivedThisRun = false;
       this.ended = false;
       this.combo = 0; this.comboTimer = 0; this.maxCombo = 0;
-      this.boss = null; this.nextBossSpawn = 180000; // 3 min
+      this.boss = null; this.nextBossSpawn = 300000; // First boss at 5 min (was 3 min — too early for unupgraded ships)
+      this.bossCount = 0; // track boss kills for progressive difficulty
       this.bossWarning = 0;
       this.startTime = performance.now(); this.elapsedTime = 0;
       this.nextDroneSpawn = 4000; // First drones after 4 sec (was 2)
@@ -2360,10 +2363,11 @@
     spawnDrone() {
       const side = Math.floor(Math.random() * 4);
       let x, y;
-      if (side === 0) { x = Math.random() * this.W; y = -30; }
-      else if (side === 1) { x = this.W + 30; y = Math.random() * this.H; }
-      else if (side === 2) { x = Math.random() * this.W; y = this.H + 30; }
-      else { x = -30; y = Math.random() * this.H; }
+      // FIX: spawn offset 30→60px — give player time to react, especially on small screens
+      if (side === 0) { x = Math.random() * this.W; y = -60; }
+      else if (side === 1) { x = this.W + 60; y = Math.random() * this.H; }
+      else if (side === 2) { x = Math.random() * this.W; y = this.H + 60; }
+      else { x = -60; y = Math.random() * this.H; }
       // FIX: speed in px/sec — much slower, gradual scaling
       const baseSpeed = 60 + this.difficulty * 8; // px per second
       const speed = baseSpeed + Math.random() * 20;
@@ -2396,15 +2400,18 @@
       vibrate([200, 100, 200, 100, 400]);
       setTimeout(() => {
         if (!this.running) return;
+        // Progressive boss HP: 20 base + 10 per boss kill, capped at 50
+        const bossHp = Math.min(50, 20 + this.bossCount * 10);
         this.boss = {
           x: this.W / 2, y: -80,
           vx: 0, vy: 30,
-          hp: 50, maxHp: 50,
+          hp: bossHp, maxHp: bossHp,
           phase: 0, shootTimer: 0,
           size: 40, angle: Math.PI / 2,
           entering: true
         };
-        showToast(currentLang === 'ru' ? '🐋 БОСС НАБЛЮДАТЕЛЕЙ ПРИБЫВАЕТ!' : '🐋 WATCHER BOSS INCOMING!', 'danger');
+        this.bossCount++;
+        showToast(currentLang === 'ru' ? `🐋 БОСС НАБЛЮДАТЕЛЕЙ ПРИБЫВАЕТ! (${bossHp} HP)` : `🐋 WATCHER BOSS INCOMING! (${bossHp} HP)`, 'danger');
         SOUNDS.overclock();
       }, 2000);
     }
@@ -2446,7 +2453,7 @@
       // Boss death
       if (b.hp <= 0) {
         this.kills += 10;
-        this.combo += 10; this.comboTimer = 3000;
+        this.combo += 10; this.comboTimer = 5000;
         if (this.combo > this.maxCombo) this.maxCombo = this.combo;
         // Mega explosion
         for (let i = 0; i < 40; i++) {
@@ -2468,15 +2475,15 @@
       const dist = Math.sqrt(dx*dx + dy*dy);
       if (dist < this.ship.size + b.size) {
         if (this.ship.shield) { this.ship.shield = false; }
-        else {
+        else if (this.ship.invincibility <= 0) {
           this.ship.hp--;
           this.combo = 0;
+          this.ship.invincibility = 800; // i-frame
           SOUNDS.damage(); vibrate([80, 40, 80]);
           if (this.ship.hp <= 0) this.endBattle();
         }
         // Push ship away
-        this.ship.vx = (dx / dist) * 500;
-        this.ship.vy = (dy / dist) * 500;
+        if (dist > 0) { this.ship.vx = (dx / dist) * 500; this.ship.vy = (dy / dist) * 500; }
       }
     }
     start() {
@@ -2614,9 +2621,10 @@
           if (Math.sqrt(dx*dx + dy*dy) < this.ship.size + 4) {
             b.life = 0;
             if (this.ship.shield) { this.ship.shield = false; this.spawnExplosion(this.ship.x, this.ship.y, '#00E5CC'); }
-            else {
+            else if (this.ship.invincibility <= 0) {
               this.ship.hp--;
               this.combo = 0;
+              this.ship.invincibility = 800; // i-frame
               SOUNDS.damage(); vibrate([80, 40, 80]);
               this.spawnExplosion(this.ship.x, this.ship.y, '#FF4D6D');
               if (this.ship.hp <= 0) this.endBattle();
@@ -2635,16 +2643,25 @@
         if (d.stunned > 0) { d.stunned -= dt; d.phase += 0.02; return; }
         const dx = this.ship.x - d.x, dy = this.ship.y - d.y;
         const dist = Math.sqrt(dx*dx + dy*dy);
-        if (dist > 0) { d.vx = (dx / dist) * d.speed * droneSpeedMult; d.vy = (dy / dist) * d.speed * droneSpeedMult; }
+        // Pacifist repulse: drones within 80px get pushed away (can still reach, but slower)
+        if (eff.repulse && dist < 80 && dist > 0) {
+          const pushForce = (80 - dist) / 80 * 180; // stronger when closer
+          d.vx = -(dx / dist) * pushForce;
+          d.vy = -(dy / dist) * pushForce;
+        } else if (dist > 0) {
+          d.vx = (dx / dist) * d.speed * droneSpeedMult;
+          d.vy = (dy / dist) * d.speed * droneSpeedMult;
+        }
         // FIX: speed in px/sec, apply via dt/1000
         d.x += d.vx * (dt / 1000); d.y += d.vy * (dt / 1000);
         d.phase += 0.05;
-        // Collision with ship
+        // Collision with ship — i-frame protects against instant multi-hit
         if (dist < this.ship.size + d.size) {
           if (this.ship.shield) { this.ship.shield = false; this.spawnExplosion(d.x, d.y, '#00E5CC'); }
-          else {
+          else if (this.ship.invincibility <= 0) {
             this.ship.hp--;
             this.combo = 0; // COMBO RESET on damage
+            this.ship.invincibility = 800; // 0.8s invincibility frame
             const lostPlasma = Math.floor(this.plasmaCollected * 0.15);
             this.plasmaCollected -= lostPlasma;
             this.spawnExplosion(this.ship.x, this.ship.y, '#FF4D6D');
@@ -2665,9 +2682,9 @@
             d.hp -= b.damage; b.life = 0;
             if (d.hp <= 0) {
               this.kills++;
-              // COMBO: increment on kill, 3 sec window
+              // COMBO: increment on kill, 5 sec window (raised from 3s for better scaling with base fire-rate)
               this.combo++;
-              this.comboTimer = 3000;
+              this.comboTimer = 5000;
               if (this.combo > this.maxCombo) this.maxCombo = this.combo;
               // Haptic: different patterns by combo tier
               if (this.combo % 10 === 0) vibrate([30, 30, 30, 30, 60]);
@@ -2675,9 +2692,11 @@
               else vibrate(15);
               this.spawnExplosion(d.x, d.y, d.golden ? '#FFB347' : (d.elite ? '#FB923C' : '#FF4D6D'));
               SOUNDS.hit();
-              // Drop plasmoid with combo bonus — cap combo multiplier to prevent runaway values
-              const comboMult = Math.min(5, 1 + Math.floor(this.combo / 5) * 0.2);
-              if (Math.random() < 0.4) this.plasmoid.push({ x: d.x, y: d.y, size: 5, phase: Math.random() * Math.PI * 2, value: Math.floor(15 * comboMult) });
+              // Drop plasmoid with combo bonus — raised multiplier: +30% per 5 combo (was +20%), cap 7x (was 5x)
+              const comboMult = Math.min(7, 1 + Math.floor(this.combo / 5) * 0.3);
+              // Drop plasmoid: 60% chance for normal drones (raised from 40%), 100% for elite drones
+              const dropChance = d.elite ? 1.0 : 0.6;
+              if (Math.random() < dropChance) this.plasmoid.push({ x: d.x, y: d.y, size: 5, phase: Math.random() * Math.PI * 2, value: Math.floor(15 * comboMult) });
               // Vampire effect: heal on kill
               if (eff.vampire && this.ship.hp < this.ship.maxHp && Math.random() < 0.15) {
                 this.ship.hp++;
@@ -2722,14 +2741,16 @@
         if (p.life <= 0) this.particles.splice(i, 1);
       }
 
-      // COMBO: countdown timer
+      // COMBO: countdown timer (window raised 3s → 5s for better scaling with low fire-rate)
       if (this.comboTimer > 0) { this.comboTimer -= dt; if (this.comboTimer <= 0) this.combo = 0; }
+      // INVINCIBILITY FRAME decay (0.8s after taking damage)
+      if (this.ship.invincibility > 0) this.ship.invincibility -= dt;
 
-      // BOSS: spawn every 3 min
+      // BOSS: first at 5 min, then every 3 min
       this.nextBossSpawn -= dt;
       if (this.nextBossSpawn <= 0 && !this.boss) {
         this.spawnBoss();
-        this.nextBossSpawn = 180000;
+        this.nextBossSpawn = 180000; // subsequent bosses every 3 min
       }
       // Boss warning flash
       if (this.bossWarning > 0) this.bossWarning -= dt;
@@ -4316,8 +4337,8 @@
   else { sessionStorage.setItem('vd_entered', '1'); }
 </script>
 
-<!-- Version badge: helps detect stale Telegram cache. If you don't see "v1.6.0" here, you're viewing a cached old version. -->
-<div class="ver-badge" id="verBadge">v1.6.0</div>
+<!-- Version badge: helps detect stale Telegram cache. If you don't see "v1.6.1" here, you're viewing a cached old version. -->
+<div class="ver-badge" id="verBadge">v1.6.1</div>
 
 </body>
 </html>
