@@ -8,7 +8,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="app-version" content="2.1.0">
+<meta name="app-version" content="2.1.1">
 <title>LETUCHKA — Прорыв блокады</title>
 <!-- Yandex.Metrika counter -->
 <script type="text/javascript">
@@ -1708,7 +1708,7 @@
           <div class="se-info-icon">⚙️</div>
           <div class="se-info-body">
             <div class="se-info-label" data-i18n="se_version_label"></div>
-            <div class="se-info-value">v<span class="accent" id="seVersionNum">2.1.0</span> · <span data-i18n="se_build"></span></div>
+            <div class="se-info-value">v<span class="accent" id="seVersionNum">2.1.1</span> · <span data-i18n="se_build"></span></div>
             <div class="se-info-sub" data-i18n="se_version_sub"></div>
           </div>
         </div>
@@ -3258,17 +3258,21 @@
         }
       });
 
-      // Bullet-drone collisions
-      this.bullets.forEach(b => {
-        if (b.fromBoss) return; // Boss bullets don't hit drones
-        this.drones.forEach(d => {
-          if (d.hp <= 0) return;
+      // Bullet-drone collisions — OPTIMIZED: use squared distance (no Math.sqrt), early exit on hit
+      for (let bi = 0; bi < this.bullets.length; bi++) {
+        const b = this.bullets[bi];
+        if (b.fromBoss || b.life <= 0) continue;
+        for (let di = 0; di < this.drones.length; di++) {
+          const d = this.drones[di];
+          if (d.hp <= 0) continue;
           const dx = b.x - d.x, dy = b.y - d.y;
-          if (Math.sqrt(dx*dx + dy*dy) < d.size + 4) {
+          const distSq = dx*dx + dy*dy;
+          const hitR = d.size + 4;
+          if (distSq < hitR * hitR) {
             d.hp -= b.damage; b.life = 0;
             if (d.hp <= 0) {
               this.kills++;
-              // COMBO: increment on kill, 5 sec window (raised from 3s for better scaling with base fire-rate)
+              // COMBO: increment on kill, 5 sec window
               this.combo++;
               this.comboTimer = 5000;
               if (this.combo > this.maxCombo) this.maxCombo = this.combo;
@@ -3278,9 +3282,8 @@
               else vibrate(15);
               this.spawnExplosion(d.x, d.y, d.golden ? '#FFB347' : (d.elite ? '#FB923C' : '#FF4D6D'));
               SOUNDS.hit();
-              // Drop plasmoid with combo bonus — raised multiplier: +30% per 5 combo (was +20%), cap 7x (was 5x)
+              // Drop plasmoid with combo bonus
               const comboMult = Math.min(7, 1 + Math.floor(this.combo / 5) * 0.3);
-              // Drop plasmoid: 60% chance for normal drones (raised from 40%), 100% for elite drones
               const dropChance = d.elite ? 1.0 : 0.6;
               if (Math.random() < dropChance) this.plasmoid.push({ x: d.x, y: d.y, size: 5, phase: Math.random() * Math.PI * 2, value: Math.floor(15 * comboMult) });
               // Vampire effect: heal on kill
@@ -3289,19 +3292,25 @@
                 this.spawnCollectEffect(this.ship.x, this.ship.y);
                 SOUNDS.collect();
               }
-              // Golden drone drops lootbox
+              // Golden drone drops lootbox — deferred to avoid getState() in hot loop
               if (d.golden) {
-                const s2 = getState();
-                s2.lootboxes = [...s2.lootboxes, { id: Date.now(), acquiredAt: Date.now() }];
-                saveState(s2);
+                this._pendingLootbox = true;
                 showToast(currentLang === 'ru' ? '🎁 Золотой дрон сбит! Контейнер в Верфи!' : '🎁 Golden drone down! Container in Shipyard!', 'gold');
                 SOUNDS.buy();
                 vibrate([50, 50, 50]);
               }
             }
+            break; // bullet hit one drone, stop checking
           }
-        });
-      });
+        }
+      }
+      // Process deferred lootbox save (outside hot loop)
+      if (this._pendingLootbox) {
+        this._pendingLootbox = false;
+        const s2 = getState();
+        s2.lootboxes = [...s2.lootboxes, { id: Date.now(), acquiredAt: Date.now() }];
+        saveState(s2);
+      }
       this.drones = this.drones.filter(d => d.hp > 0);
 
       // Plasma collection
@@ -3543,66 +3552,64 @@
       const threatColors = ['#060B1A', '#0C1428', '#1A0810', '#2A0810', '#3A0810', '#4A0810'];
       const bgColor = threatColors[Math.min(this.threatLevel, threatColors.length - 1)];
       ctx.fillStyle = bgColor; ctx.fillRect(0, 0, this.W, this.H);
-      // Red vignette at high threat
+      // Red vignette at high threat — cached gradient (only recreate if threat level changed)
       if (this.threatLevel >= 2) {
-        const vig = ctx.createRadialGradient(this.W/2, this.H/2, this.W/3, this.W/2, this.H/2, this.W/1.5);
-        vig.addColorStop(0, 'rgba(255,77,109,0)');
-        vig.addColorStop(1, `rgba(255,77,109,${0.05 + this.threatLevel * 0.03})`);
-        ctx.fillStyle = vig; ctx.fillRect(0, 0, this.W, this.H);
+        if (!this._vigCache || this._vigCacheThreat !== this.threatLevel) {
+          this._vigCache = ctx.createRadialGradient(this.W/2, this.H/2, this.W/3, this.W/2, this.H/2, this.W/1.5);
+          this._vigCache.addColorStop(0, 'rgba(255,77,109,0)');
+          this._vigCache.addColorStop(1, `rgba(255,77,109,${0.05 + this.threatLevel * 0.03})`);
+          this._vigCacheThreat = this.threatLevel;
+        }
+        ctx.fillStyle = this._vigCache; ctx.fillRect(0, 0, this.W, this.H);
       }
-      // BG stars
-      this.bgStars.forEach(s => { const tw = 0.3 + Math.sin(this.t * 0.002 + s.phase) * 0.4; ctx.fillStyle = `rgba(255,255,255,${Math.max(0, tw)})`; ctx.beginPath(); ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2); ctx.fill(); });
-      // Nebula
-      const ng = ctx.createRadialGradient(this.W * 0.3, this.H * 0.4, 0, this.W * 0.3, this.H * 0.4, this.W * 0.6); ng.addColorStop(0, 'rgba(124,92,252,0.06)'); ng.addColorStop(1, 'rgba(124,92,252,0)'); ctx.fillStyle = ng; ctx.fillRect(0, 0, this.W, this.H);
-      // Plasma
+      // BG stars — no shadow, simple fill
+      ctx.fillStyle = '#fff';
+      this.bgStars.forEach(s => { const tw = Math.max(0, 0.3 + Math.sin(this.t * 0.002 + s.phase) * 0.4); ctx.globalAlpha = tw; ctx.beginPath(); ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2); ctx.fill(); });
+      ctx.globalAlpha = 1;
+      // Nebula — cached gradient
+      if (!this._nebulaCache) {
+        this._nebulaCache = ctx.createRadialGradient(this.W * 0.3, this.H * 0.4, 0, this.W * 0.3, this.H * 0.4, this.W * 0.6);
+        this._nebulaCache.addColorStop(0, 'rgba(124,92,252,0.06)');
+        this._nebulaCache.addColorStop(1, 'rgba(124,92,252,0)');
+      }
+      ctx.fillStyle = this._nebulaCache; ctx.fillRect(0, 0, this.W, this.H);
+      // Plasma — simplified: no per-item gradient, use single fillStyle
+      ctx.fillStyle = '#00E5CC';
       this.plasmoid.forEach(p => {
         const pulse = 1 + Math.sin(this.t * 0.005 + p.phase) * 0.2;
-        const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size * 3); grad.addColorStop(0, 'rgba(0,229,204,0.6)'); grad.addColorStop(1, 'rgba(0,229,204,0)'); ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(p.x, p.y, p.size * 3, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = '#00E5CC'; ctx.shadowColor = '#00E5CC'; ctx.shadowBlur = 10;
         ctx.beginPath(); ctx.arc(p.x, p.y, p.size * pulse, 0, Math.PI * 2); ctx.fill();
-        ctx.shadowBlur = 0;
       });
-      // Bullets — player (purple) vs boss (red)
+      // Bullets — no shadowBlur (was 8 per bullet = expensive), use simple fill
       this.bullets.forEach(b => {
-        if (b.fromBoss) { ctx.fillStyle = '#FF4D6D'; ctx.shadowColor = '#FF4D6D'; }
-        else { ctx.fillStyle = '#7C5CFC'; ctx.shadowColor = '#7C5CFC'; }
-        ctx.shadowBlur = 8;
+        ctx.fillStyle = b.fromBoss ? '#FF4D6D' : '#7C5CFC';
         ctx.beginPath(); ctx.arc(b.x, b.y, b.fromBoss ? 4 : 3, 0, Math.PI * 2); ctx.fill();
-        ctx.shadowBlur = 0;
       });
-      // Drones — actual enemy ships, not dots
+      // Drones — reduced shadowBlur, cached skin
+      const skin = this._skinCache || (this._skinCache = getSelectedSkin());
       this.drones.forEach(d => {
         const pulse = 1 + Math.sin(d.phase) * 0.1;
         const color = d.golden ? '#FFB347' : (d.elite ? '#FB923C' : '#FF4D6D');
-        const glowColor = d.golden ? 'rgba(255,179,71,0.5)' : (d.elite ? 'rgba(251,146,60,0.5)' : 'rgba(255,77,109,0.4)');
-        // Glow
-        const grad = ctx.createRadialGradient(d.x, d.y, 0, d.x, d.y, d.size * 3);
-        grad.addColorStop(0, glowColor);
-        grad.addColorStop(1, d.golden ? 'rgba(255,179,71,0)' : (d.elite ? 'rgba(251,146,60,0)' : 'rgba(255,77,109,0)'));
-        ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(d.x, d.y, d.size * 3, 0, Math.PI * 2); ctx.fill();
-        // Stunned = blue tint
         const bodyColor = d.stunned > 0 ? '#00E5CC' : color;
-        ctx.shadowColor = bodyColor; ctx.shadowBlur = d.golden ? 20 : (d.elite ? 16 : 10);
-        // Draw enemy ship shape (inverted triangle pointing at player)
+        // Glow — simplified to single fillStyle instead of gradient
+        ctx.fillStyle = d.golden ? 'rgba(255,179,71,0.15)' : (d.elite ? 'rgba(251,146,60,0.12)' : 'rgba(255,77,109,0.1)');
+        ctx.beginPath(); ctx.arc(d.x, d.y, d.size * 2.5, 0, Math.PI * 2); ctx.fill();
+        // Body — minimal shadowBlur (was 10-20, now 6)
+        ctx.shadowColor = bodyColor; ctx.shadowBlur = 6;
         const angle = Math.atan2(this.ship.y - d.y, this.ship.x - d.x);
         ctx.save();
         ctx.translate(d.x, d.y);
         ctx.rotate(angle);
-        // Elite: armor ring
         if (d.elite) { ctx.strokeStyle = '#FB923C'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(0, 0, d.size * 1.4, 0, Math.PI * 2); ctx.stroke(); }
-        // Main body — aggressive ship shape
         ctx.fillStyle = bodyColor;
         ctx.beginPath();
-        ctx.moveTo(d.size * pulse, 0); // nose pointing at player
-        ctx.lineTo(-d.size * 0.6 * pulse, -d.size * 0.7 * pulse); // left wing
-        ctx.lineTo(-d.size * 0.3 * pulse, 0); // notch
-        ctx.lineTo(-d.size * 0.6 * pulse, d.size * 0.7 * pulse); // right wing
+        ctx.moveTo(d.size * pulse, 0);
+        ctx.lineTo(-d.size * 0.6 * pulse, -d.size * 0.7 * pulse);
+        ctx.lineTo(-d.size * 0.3 * pulse, 0);
+        ctx.lineTo(-d.size * 0.6 * pulse, d.size * 0.7 * pulse);
         ctx.closePath();
         ctx.fill();
-        // Core
-        ctx.fillStyle = '#fff'; ctx.shadowBlur = 6;
+        ctx.fillStyle = '#fff'; ctx.shadowBlur = 4;
         ctx.beginPath(); ctx.arc(0, 0, d.size * 0.25, 0, Math.PI * 2); ctx.fill();
-        // Golden drone: star marker
         if (d.golden) {
           ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.shadowBlur = 0;
           ctx.beginPath();
@@ -3670,32 +3677,32 @@
         ctx.fillStyle = '#FF4D6D';
         ctx.fillRect(b.x - barW/2, b.y - b.size - 16, barW * hpPct, 6);
       }
-      // Ship — uses selected skin colors
-      const skin = getSelectedSkin();
+      // Ship — uses selected skin colors (cached), minimal shadowBlur
       ctx.save();
       ctx.translate(this.ship.x, this.ship.y);
       ctx.rotate(this.ship.angle + Math.PI / 2);
-      // Engine trail (skin-colored)
-      const trailGrad = ctx.createLinearGradient(0, 15, 0, 50); trailGrad.addColorStop(0, `rgba(${skin.trail},0.8)`); trailGrad.addColorStop(1, `rgba(${skin.trail},0)`); ctx.fillStyle = trailGrad;
+      // Engine trail (skin-colored) — cached gradient
+      if (!this._trailCache) {
+        this._trailCache = ctx.createLinearGradient(0, 15, 0, 50);
+        this._trailCache.addColorStop(0, `rgba(${skin.trail},0.8)`);
+        this._trailCache.addColorStop(1, `rgba(${skin.trail},0)`);
+      }
+      ctx.fillStyle = this._trailCache;
       ctx.beginPath(); ctx.moveTo(-8, 15); ctx.lineTo(8, 15); ctx.lineTo(4, 45); ctx.lineTo(-4, 45); ctx.closePath(); ctx.fill();
-      // Body (skin-colored)
-      ctx.fillStyle = skin.body; ctx.shadowColor = skin.body; ctx.shadowBlur = 16;
+      // Body (skin-colored) — single shadowBlur set
+      ctx.fillStyle = skin.body; ctx.shadowColor = skin.body; ctx.shadowBlur = 12;
       ctx.beginPath(); ctx.moveTo(0, -18); ctx.lineTo(14, 12); ctx.lineTo(6, 16); ctx.lineTo(-6, 16); ctx.lineTo(-14, 12); ctx.closePath(); ctx.fill();
-      // Cockpit (skin-colored)
-      ctx.fillStyle = skin.cockpit; ctx.shadowColor = skin.cockpit; ctx.shadowBlur = 8;
+      // Cockpit (skin-colored) — reuse shadowBlur, no reset
+      ctx.fillStyle = skin.cockpit;
       ctx.beginPath(); ctx.arc(0, -4, 5, 0, Math.PI * 2); ctx.fill();
       // Shield
       if (this.ship.shield) { ctx.strokeStyle = 'rgba(0,229,204,0.5)'; ctx.lineWidth = 2; ctx.shadowBlur = 0; ctx.beginPath(); ctx.arc(0, 0, 24, 0, Math.PI * 2); ctx.stroke(); }
       ctx.shadowBlur = 0;
       ctx.restore();
-      // Joystick visual — hidden (player just drags anywhere)
-      // (no rendering, ship follows finger silently)
-      // Boost trail
+      // Boost trail — no shadowBlur (was 16 per particle)
       this.boostTrail.forEach(t => {
         ctx.fillStyle = `rgba(255, 179, 71, ${t.life * 0.6})`;
-        ctx.shadowColor = '#FFB347'; ctx.shadowBlur = 16;
         ctx.beginPath(); ctx.arc(t.x, t.y, 12 * t.life, 0, Math.PI * 2); ctx.fill();
-        ctx.shadowBlur = 0;
       });
       // Magnet aura
       if (this.magnetActive > 0) {
@@ -3706,14 +3713,14 @@
       }
       // Particles
       this.particles.forEach(p => { ctx.fillStyle = p.color; ctx.globalAlpha = p.life; ctx.beginPath(); ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2); ctx.fill(); });
-      // Damage texts (floating -247 ◈)
+      // Damage texts (floating -247 ◈) — reduced shadowBlur
       this.damageTexts.forEach(dt2 => {
         ctx.globalAlpha = Math.min(1, dt2.life);
         ctx.fillStyle = dt2.color;
         ctx.font = 'bold 18px Inter, sans-serif';
         ctx.textAlign = 'center';
         ctx.shadowColor = dt2.color;
-        ctx.shadowBlur = 8;
+        ctx.shadowBlur = 4;
         ctx.fillText(dt2.text, dt2.x, dt2.y);
         ctx.shadowBlur = 0;
       });
@@ -5435,8 +5442,8 @@
   else { sessionStorage.setItem('vd_entered', '1'); }
 </script>
 
-<!-- Version badge: helps detect stale Telegram cache. If you don't see "v2.1.0" here, you're viewing a cached old version. -->
-<div class="ver-badge" id="verBadge">v2.1.0</div>
+<!-- Version badge: helps detect stale Telegram cache. If you don't see "v2.1.1" here, you're viewing a cached old version. -->
+<div class="ver-badge" id="verBadge">v2.1.1</div>
 
 </body>
 </html>
